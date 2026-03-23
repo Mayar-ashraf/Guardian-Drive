@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  fName    String
+  lName    String
+  password String
+  phone    String[]
+  hiredAt  DateTime @default(now())
+  address  String
+  role     Role
+  driver   Driver?
+}
+
+enum Role {
+  ADMIN
+  FLEET_MANAGER
+  DRIVER
+}
+
+model Driver {
+  id             Int    @id
+  drivingLicense String
+  medicalInformation MedicalInformation?
+  user           User   @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  avgHealthReadings AvgHealthReadings[]
+}
+
+model Trip {
+  tripId     Int        @id @default(autoincrement())
+  startPoint String
+  destPoint  String
+  startTime  DateTime
+  endTime    DateTime?
+  status     tripStatus
+
+  location   Location[]
+  alerts Alert[]
+
+  towingRequest TowingRequest?
+}
+
+enum tripStatus {
+  PLANNED
+  ONGOING
+  CANCELLED
+  COMPLETED
+}
+
+model Location {
+  // locationId is pk to be able to make it auto-increment
+  locationId Int      @id @default(autoincrement())
+  time       DateTime @default(now())
+  longitude  Float
+  latitude   Float
+
+  tripId Int
+  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+
+  alerts Alert[] // multiple alerts can happen at the same point in time
+
+}
+
+// the enforce consistency at the service layer when creating an alert:
+// SO, tripId is always derived from the location's trip — never independently set
+
+// NOTE : INDEXING NEEDS TO BE ADDED LATER
+
+model Car {
+  engineId String    @id
+  plateNo  String
+  color    String
+  status   carStatus
+}
+
+enum carStatus {
+  ACTIVE
+  IN_TRIP
+  DISABLED
+}
+
+model HardwareAddOn {
+  moduleId            Int     @id @default(autoincrement())
+  buzzerStatus        Boolean
+  hazardLightStatus   Boolean
+  speedControllStatus Boolean
+  engineStatus        Boolean
+}
+
+model Alert {
+  alertId     Int         @id @default(autoincrement())
+  type        alertType
+  status      alertStatus
+  generatedAt DateTime    @default(now())
+  solvedAt    DateTime?
+
+  tripId     Int
+  locationId Int
+  location   Location @relation(fields: [locationId], references: [locationId], onDelete: Cascade)
+  trip       Trip     @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+
+  healthEvents HealthEvent?
+  emergencyServiceRequest EmergencyServiceRequest?
+}
+
+enum alertStatus {
+  ACTIVE
+  RESOLVED
+}
+
+enum alertType {
+  HEALTH_ABNORMAL
+  SOS
+  VEHICLE_EMERGENCY
+}
+
+model WearableBand {
+  deviceId     Int      @id @default(autoincrement())
+  sensorList   String[]
+  batteryLevel Int
+  isConnected  Boolean
+}
+
+model MedicalInformation {
+  recordId   Int @id @default(autoincrement())
+  conditions String[]
+  medications String[]
+
+  driverId   Int @unique
+  
+  driver     Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  healthEvents HealthEvent[]
+}
+
+model AvgHealthReadings {
+  heartRateRange String
+  tempRange String
+  driverId   Int @unique
+  driver     Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+}
+
+model HealthEvent {
+  eventId   Int      @id @default(autoincrement())
+  eventDate DateTime @default(now())
+  heartRate String
+  temp      Float
+
+  recordId  Int
+  medical   MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
+
+  alertId   Int @unique
+  alert     Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+}
+
+model TowingRequest {
+  requestId Int @id @default(autoincrement())
+  status requestStatus
+  requestTime DateTime @default(now())
+  completionTime DateTime?
+  towingCompany String
+
+  tripId   Int @unique
+  trip     Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+
+}
+
+enum requestStatus {
+  REQUESTED
+  INPROGRESS
+  COMPLETED
+}
+
+model EmergencyServiceRequest {
+  requestId Int @id @default(autoincrement())
+  status requestStatus
+  requestTime DateTime @default(now())
+  phone String
+  completionTime DateTime?
+  hospitalAssigned String
+
+  alertId   Int @unique
+  alert     Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+
+}
