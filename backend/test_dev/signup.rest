@@ -1,0 +1,12 @@
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{ 
+    "email":"admin@gmail.com",
+    "fname":"adminName",
+    "lname":"adminLname",
+    "password":"123@123",
+    "phone":["0112222"],
+    "address":"abcd",
+    "role":"ADMIN" 
+} 
