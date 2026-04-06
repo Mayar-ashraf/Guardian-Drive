@@ -21,7 +21,7 @@ model User {
 }
 
 enum Role {
-  ADMIN
+  ADMIN 
   FLEET_MANAGER
   DRIVER
 }
