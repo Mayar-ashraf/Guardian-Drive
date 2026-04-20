@@ -1,0 +1,31 @@
+POST http://localhost:3000/api/trips
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NjcxMTI1NSwiZXhwIjoxNzc2Nzk3NjU1fQ.BoC0b0G5_EPnwId83_HTIxQEsNnP4lLO1c7Kk3wm-Fc
+
+{ 
+    "startPoint":"Alexandria",
+    "destPoint":"Cairo",
+    "startTime": "2026-04-20T20:30"
+
+} 
+
+#########
+POST http://localhost:3000/api/trips
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzExOTcxLCJleHAiOjE3NzY3OTgzNzF9.kEHyuTnGHMuoUHFoCwILEhJBpE_JAniRj_NHFVK7nmA
+
+{ 
+    "startPoint":"Alexandria",
+    "destPoint":"Cairo",
+    "startTime": "2026-04-20T20:30:00.000Z"
+
+} 
+
+########
+GET http://localhost:3000/api/trips
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzExOTcxLCJleHAiOjE3NzY3OTgzNzF9.kEHyuTnGHMuoUHFoCwILEhJBpE_JAniRj_NHFVK7nmA
+
+{ 
+    
+} 
