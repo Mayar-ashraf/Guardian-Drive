@@ -9,6 +9,9 @@ app.use("/api/auth", authRoute)
 app.use("/api/password",passwordRoutes)
 app.use("/api/users",usersRoutes)
 app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/api/auth", authRoute);
 app.listen(3000, () => {
     console.log("server is running on http://localhost:3000")
 })
