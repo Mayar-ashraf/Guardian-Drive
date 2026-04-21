@@ -12,7 +12,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
 #########
 POST http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzExOTcxLCJleHAiOjE3NzY3OTgzNzF9.kEHyuTnGHMuoUHFoCwILEhJBpE_JAniRj_NHFVK7nmA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgwOTM4LCJleHAiOjE3NzY4NjczMzh9.tARdZoPTPUO1mU33FI7elshJVCYcWahOBHJJdCOOElA
 
 { 
     "startPoint":"Alexandria",
@@ -24,7 +24,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvb
 ########
 GET http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzExOTcxLCJleHAiOjE3NzY3OTgzNzF9.kEHyuTnGHMuoUHFoCwILEhJBpE_JAniRj_NHFVK7nmA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgwOTM4LCJleHAiOjE3NzY4NjczMzh9.tARdZoPTPUO1mU33FI7elshJVCYcWahOBHJJdCOOElA
 
 { 
     

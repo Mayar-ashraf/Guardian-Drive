@@ -8,47 +8,50 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  fName    String
-  lName    String
-  password String
-  phone    String[]
-  hiredAt  DateTime @default(now())
-  address  String
-  role     Role
-  driver   Driver?
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  fName            String
+  lName            String
+  password         String
+  phone            String[]
+  hiredAt          DateTime  @default(now())
+  address          String
+  role             Role
+  driver           Driver?
   resetToken       String?
   resetTokenExpiry DateTime?
 }
 
 enum Role {
-  ADMIN 
+  ADMIN
   FLEET_MANAGER
   DRIVER
 }
 
 model Driver {
-  id             Int    @id
-  drivingLicense String
+  id                 Int                 @id
+  drivingLicense     String
   medicalInformation MedicalInformation?
-  user           User   @relation(fields: [id], references: [id], onDelete: Cascade)
+  user               User                @relation(fields: [id], references: [id], onDelete: Cascade)
 
   avgHealthReadings AvgHealthReadings[]
+  trips             Trip[]
 }
 
 model Trip {
-  tripId     Int        @id @default(autoincrement())
-  startPoint String
-  destPoint  String
-  startTime  DateTime
-  endTime    DateTime?
-  status     tripStatus
-
-  location   Location[]
-  alerts Alert[]
-
+  tripId        Int            @id @default(autoincrement())
+  startPoint    String
+  destPoint     String
+  startTime     DateTime
+  endTime       DateTime?
+  status        tripStatus
+  location      Location[]
+  alerts        Alert[]
   towingRequest TowingRequest?
+  driver        Driver?        @relation(fields: [driverId], references: [id])
+  driverId      Int?
+  car           Car?           @relation(fields: [engineId], references: [engineId])
+  engineId      String?
 }
 
 enum tripStatus {
@@ -69,7 +72,6 @@ model Location {
   trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 
   alerts Alert[] // multiple alerts can happen at the same point in time
-
 }
 
 // the enforce consistency at the service layer when creating an alert:
@@ -82,6 +84,7 @@ model Car {
   plateNo  String
   color    String
   status   carStatus
+  trips    Trip[]
 }
 
 enum carStatus {
@@ -110,7 +113,7 @@ model Alert {
   location   Location @relation(fields: [locationId], references: [locationId], onDelete: Cascade)
   trip       Trip     @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 
-  healthEvents HealthEvent?
+  healthEvents            HealthEvent?
   emergencyServiceRequest EmergencyServiceRequest?
 }
 
@@ -133,21 +136,21 @@ model WearableBand {
 }
 
 model MedicalInformation {
-  recordId   Int @id @default(autoincrement())
-  conditions String[]
+  recordId    Int      @id @default(autoincrement())
+  conditions  String[]
   medications String[]
 
-  driverId   Int @unique
-  
-  driver     Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  driverId Int @unique
+
+  driver       Driver        @relation(fields: [driverId], references: [id], onDelete: Cascade)
   healthEvents HealthEvent[]
 }
 
 model AvgHealthReadings {
   heartRateRange String
-  tempRange String
-  driverId   Int @unique
-  driver     Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  tempRange      String
+  driverId       Int    @unique
+  driver         Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
 }
 
 model HealthEvent {
@@ -156,23 +159,22 @@ model HealthEvent {
   heartRate String
   temp      Float
 
-  recordId  Int
-  medical   MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
+  recordId Int
+  medical  MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
 
-  alertId   Int @unique
-  alert     Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+  alertId Int   @unique
+  alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
 }
 
 model TowingRequest {
-  requestId Int @id @default(autoincrement())
-  status requestStatus
-  requestTime DateTime @default(now())
+  requestId      Int           @id @default(autoincrement())
+  status         requestStatus
+  requestTime    DateTime      @default(now())
   completionTime DateTime?
-  towingCompany String
+  towingCompany  String
 
-  tripId   Int @unique
-  trip     Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
-
+  tripId Int  @unique
+  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 }
 
 enum requestStatus {
@@ -182,14 +184,13 @@ enum requestStatus {
 }
 
 model EmergencyServiceRequest {
-  requestId Int @id @default(autoincrement())
-  status requestStatus
-  requestTime DateTime @default(now())
-  phone String
-  completionTime DateTime?
+  requestId        Int           @id @default(autoincrement())
+  status           requestStatus
+  requestTime      DateTime      @default(now())
+  phone            String
+  completionTime   DateTime?
   hospitalAssigned String
 
-  alertId   Int @unique
-  alert     Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
-
+  alertId Int   @unique
+  alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
 }
