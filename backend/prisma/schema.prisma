@@ -18,6 +18,8 @@ model User {
   address  String
   role     Role
   driver   Driver?
+  resetToken       String?
+  resetTokenExpiry DateTime?
 }
 
 enum Role {
