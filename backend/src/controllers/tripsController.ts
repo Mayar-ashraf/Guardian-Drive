@@ -5,6 +5,9 @@ import bcrypt from "bcrypt";
 import { signAccessToken } from "../utils/jwt";
 import { sendUnauthorized, sendForbidden, sendNotFound, sendError, sendNoContent, sendCreated, sendSuccess } from "../utils/HTMLresponses";
 import { carStatus } from './../../generated/prisma/enums';
+import { templateLiteral } from "zod";
+import { is, tr } from "zod/locales";
+import { error } from "node:console";
 
 async function createTrip(req: Request, res: Response) {
     try {
@@ -45,7 +48,7 @@ async function readTrips(req: Request, res: Response) {
     try {
         const user = req.user
         let trips;
-    
+
         if (user?.role === "ADMIN" || user?.role === "FLEET_MANAGER") {
             trips = await prisma.trip.findMany()
 
@@ -61,7 +64,85 @@ async function readTrips(req: Request, res: Response) {
     }
 }
 
+async function getTripLocation(req: Request, res: Response) {
+    try {
+        const tripId = Number(req.params.tripId);
+        const user = req.user;
+
+        if (isNaN(tripId)) {
+            return res.status(400).json({ message: "Invalid tripId" });
+        }
+
+        const trip = await prisma.trip.findUnique({
+            where: { tripId },
+            include: {
+                location: {
+                    orderBy: { time: "desc" },
+                    take: 1, // only latest location
+                },
+            },
+        });
+
+
+        if (!trip) {
+            return res.status(404).json({ message: "Trip not found." });
+        }
+
+        const isADMIN = (user?.role === "ADMIN");
+        const isAuthorizedFleetManager = (user?.role === "FLEET_MANAGER" && trip.fleetManagerId === user.userId);
+        const isAuthorizedDriver = (user?.role === "DRIVER" && trip.driverId === user.userId);
+
+        if (!isADMIN && !isAuthorizedFleetManager && !isAuthorizedDriver) {
+            return res.status(403).json({ message: "You are unauthorized to make this request" });
+        }
+
+        if (trip.location.length === 0) {
+            return res.status(404).json({ message: "No locations found for this trip yet." });
+        }
+
+        res.json(trip.location[0]);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+
+async function getTripHeatMap(req: Request, res: Response) {
+    try {
+        const tripId = Number(req.params.tripId);
+
+        if (isNaN(tripId)) {
+            return res.status(400).json({ message: "Invalid tripId" });
+        }
+
+        const trip = await prisma.trip.findUnique({
+            where: { tripId },
+            include: {
+                location: {
+                    orderBy: { time: "asc" },
+                },
+            },
+        });
+
+        if (!trip) {
+            return res.status(404).json({ message: "Trip not found" });
+        }
+
+        if (trip.location.length === 0) {
+            return res.status(404).json({ message: "No locations found for this trip yet." });
+        }
+
+        res.json(trip.location);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
 
 
 
-export { createTrip, readTrips }
+
+export { createTrip, readTrips, getTripLocation }

@@ -1,5 +1,6 @@
 import express from "express"
-import { createTrip, readTrips } from "../controllers/tripsController"
+import { createTrip, readTrips, getTripLocation } from "../controllers/tripsController"
+import { authorize } from "../middleware/AuthMiddleware"
 const router = express.Router()
 /*
 POST /api/trips
@@ -10,6 +11,16 @@ DELETE /api/trips/:tripId
 */
 router.post("/", createTrip)
 router.get("/", readTrips)
+
+/*
+POST /api/trips/:tripId/gps
+GET /api/trips/:tripId/gps
+GET /api/trips/:tripId/heatmap
+*/
+
+router.get("/:tripId/gps", getTripLocation);
+//router.post("/trips/:tripId/gps", postTripLocation);
+
 
 
 
