@@ -16,3 +16,11 @@ Content-Type: application/json
     "email":"fleetManager@gmail.com",
     "password":"Fleet@12345678"
 } 
+######
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{ 
+    "email":"driver@gmail.com",
+    "password":"Driver@12345678"
+} 

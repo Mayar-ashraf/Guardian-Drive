@@ -12,20 +12,68 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
 #########
 POST http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgwOTM4LCJleHAiOjE3NzY4NjczMzh9.tARdZoPTPUO1mU33FI7elshJVCYcWahOBHJJdCOOElA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
 
 { 
     "startPoint":"Alexandria",
-    "destPoint":"Cairo",
-    "startTime": "2026-04-20T20:30:00.000Z"
-
+    "destPoint":"China",
+    "startTime": "2026-04-20T20:30:00.000Z",
+    "driverId": 1
 } 
 
-########
+########get all trips admin or fleet manager
 GET http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgwOTM4LCJleHAiOjE3NzY4NjczMzh9.tARdZoPTPUO1mU33FI7elshJVCYcWahOBHJJdCOOElA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
 
 { 
     
 } 
+########get all trips admin or fleet manager
+GET http://localhost:3000/api/trips?fromStartDate=2026-03-20T20:30:00.000Z&status=PLANNED
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
+
+{ 
+    
+} 
+#######get trips for a specific driver
+GET http://localhost:3000/api/trips
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzY3ODU2MDksImV4cCI6MTc3Njg3MjAwOX0.WPU3CFgIxJbFZ5Q6bZ0ej8u13yKRz1t1aD5fOPNFZws
+
+{ 
+    
+} 
+########specific admin or fleet manager
+GET http://localhost:3000/api/trips/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
+
+{ 
+    
+}
+#######get a specific trip for a specific driver
+GET http://localhost:3000/api/trips/9
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzY3ODU2MDksImV4cCI6MTc3Njg3MjAwOX0.WPU3CFgIxJbFZ5Q6bZ0ej8u13yKRz1t1aD5fOPNFZws
+
+{ 
+    
+} 
+#######delete trip unauthorized
+DELETE http://localhost:3000/api/trips/9
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzY3ODU2MDksImV4cCI6MTc3Njg3MjAwOX0.WPU3CFgIxJbFZ5Q6bZ0ej8u13yKRz1t1aD5fOPNFZws
+
+{ 
+    
+} 
+########DELETE TRIP fleet manager
+DELETE  http://localhost:3000/api/trips/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
+
+{ 
+    
+}

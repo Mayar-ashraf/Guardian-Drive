@@ -10,3 +10,18 @@ Content-Type: application/json
     "address":"abcd",
     "role":"FLEET_MANAGER" 
 } 
+
+######
+POST http://localhost:3000/api/auth/signup
+Content-Type: application/json
+
+{ 
+    "email":"driver2@gmail.com",
+    "fName":"Driver",
+    "lName":"Driver",
+    "password":"Driver@12345678",
+    "phone":["01122226666"],
+    "address":"abcd",
+    "role":"DRIVER" ,
+    "drivingLicense":"abc123456"
+} 
