@@ -12,22 +12,25 @@ import { error } from "node:console";
 
 async function createTrip(req: Request, res: Response) {
     try {
-        const { startPoint, destPoint, plannedStartTime, location, driverId, engineId, fleetManagerId } = req.body
-        const user = req.user
-        const data: any = {
-            startPoint,
-            destPoint,
-            plannedStartTime,
-            status: tripStatus.PLANNED,
-            location,
-            fleetManagerId
-        };
+        //  const { startPoint, destPoint, plannedStartTime, location, driverId, engineId, fleetManagerId } = req.body
+        // const user = req.user
+        // const data: any = {
+        //     startPoint,
+        //     destPoint,
+        //     plannedStartTime,
+        //     status: tripStatus.PLANNED,
+        //     location,
+        //     fleetManagerId
+        // };
+        const dataFromZod: any = req.body
+
         // change after zod
-        if (driverId !== undefined) {
-            data.driverId = Number(driverId);
+        if (dataFromZod.driverId !== undefined) {
+            // data.driverId = Number(driverId);
             const driver = await prisma.driver.findUnique({
                 where: {
-                    id: driverId
+                    // id: driverId
+                    id: dataFromZod.driverId
                 }
             })
             if (!driver) {
@@ -35,24 +38,40 @@ async function createTrip(req: Request, res: Response) {
                 return res.status(422).json({ message: "Driver doesn't exist" })
             }
         }
-        if (fleetManagerId !== undefined) {
-            data.fleetManagerId = Number(fleetManagerId);
-            const user = await prisma.user.findUnique({
-                where: {
-                    id: fleetManagerId
-                }
-            })
-            if (!user || user.role !== "FLEET_MANAGER") {
-
-                return res.status(422).json({ message: "Fleet manager doesn't exist" })
+        const assignedFleetManager = await prisma.user.findUnique({
+            where: {
+                // id: fleetManagerId
+                id: dataFromZod.fleetManagerId
             }
+        })
+        if (!assignedFleetManager || assignedFleetManager.role !== "FLEET_MANAGER") {
+
+            return res.status(422).json({ message: "Fleet manager doesn't exist" })
         }
-        if (engineId !== undefined) {
-            data.engineId = engineId;
-        }
+        // if (dataFromZod.fleetManagerId !== undefined) {
+        //     //data.fleetManagerId = Number(fleetManagerId);
+        //     const assignedFleetManager = await prisma.user.findUnique({
+        //         where: {
+        //             // id: fleetManagerId
+        //             id: dataFromZod.fleetManagerId
+        //         }
+        //     })
+        //     if (!assignedFleetManager || assignedFleetManager.role !== "FLEET_MANAGER") {
+
+        //         return res.status(422).json({ message: "Fleet manager doesn't exist" })
+        //     }
+        // }
+        // if (engineId !== undefined) {
+        //     data.engineId = engineId;
+        // }
 
 
-        const trip = await prisma.trip.create({ data });
+        const trip = await prisma.trip.create({
+            data: {
+                ...dataFromZod,
+                status: tripStatus.PLANNED
+            }
+        });
 
         return res.status(201).json({ message: "Trip created successfully", trip });
     } catch (error) {
