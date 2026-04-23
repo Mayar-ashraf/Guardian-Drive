@@ -12,29 +12,51 @@ import { error } from "node:console";
 
 async function createTrip(req: Request, res: Response) {
     try {
-        const { startPoint, destPoint, startTime, location, driverId, engineId } = req.body
+        const { startPoint, destPoint, plannedStartTime, location, driverId, engineId, fleetManagerId } = req.body
         const user = req.user
         const data: any = {
             startPoint,
             destPoint,
-            startTime,
+            plannedStartTime,
             status: tripStatus.PLANNED,
-            location
+            location,
+            fleetManagerId
         };
-
+        // change after zod
         if (driverId !== undefined) {
             data.driverId = Number(driverId);
-        }
+            const driver = await prisma.driver.findUnique({
+                where: {
+                    id: driverId
+                }
+            })
+            if (!driver) {
 
+                return res.status(422).json({ message: "Driver doesn't exist" })
+            }
+        }
+        if (fleetManagerId !== undefined) {
+            data.fleetManagerId = Number(fleetManagerId);
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: fleetManagerId
+                }
+            })
+            if (!user || user.role !== "FLEET_MANAGER") {
+
+                return res.status(422).json({ message: "Fleet manager doesn't exist" })
+            }
+        }
         if (engineId !== undefined) {
             data.engineId = engineId;
         }
+
 
         const trip = await prisma.trip.create({ data });
 
         return res.status(201).json({ message: "Trip created successfully", trip });
     } catch (error) {
-        // console.error("FULL ERROR:", error);
+        console.error("FULL ERROR:", error);
         return res.status(500).json({ message: "Server Error" })
     }
 
@@ -43,7 +65,7 @@ async function readTrips(req: Request, res: Response) {
 
     try {
         const user = req.user
-        const { engineId, driverId, status, fromDate, toDate } = req.query
+        const { engineId, driverId, status, fromDate, toDate, fleetManagerId } = req.query
         const whereConditions: any = {}
         // change after adding validators
         const limit = parseInt(req.query.limit_by as string, 10) || 10
@@ -58,6 +80,10 @@ async function readTrips(req: Request, res: Response) {
         if (req.query.driverId) {
             //redo after validation
             whereConditions.driverId = Number(req.query.driverId)
+        }
+        if (req.query.fleetManagerId) {
+            //redo after validation
+            whereConditions.fleetManagerId = Number(req.query.fleetManagerId)
         }
         if (req.query.status) {
             whereConditions.status = req.query.status
@@ -226,26 +252,42 @@ async function updateTrip(req: Request, res: Response) {
             return res.status(200).json({ trip });
 
         } else {
-            if (updates.status === "ONGOING") {
-                allowedUpdates.status = "ONGOING";
-                //add field plannedStartTime and startTime this sets startTime
-            }
-
-            else if (updates.status === "COMPLETED") {
-                allowedUpdates.status = "COMPLETED";
-                allowedUpdates.endTime = new Date();
-            }
-            //driver can only edit trip status and endTime
+            //driver can only edit trip status which changes end and start time
             let trip = await prisma.trip.findUnique({
                 where: {
                     tripId: tripId
                 }
             })
+
             if (!trip) {
                 return res.status(404).json({ message: "Trip not found" });
             }
             if (trip.driverId !== user?.userId) {
                 return res.status(403).json({ message: "Forbidden" });
+            }
+            const currentTime = new Date();
+            if (updates.status === tripStatus.ONGOING) {
+
+                if (trip.status !== tripStatus.PLANNED) {
+                    return res.status(409).json({ message: `Can't start a ${trip.status} trip` });
+
+                }
+                if (currentTime >= trip?.plannedStartTime) {
+                    allowedUpdates.status = tripStatus.ONGOING;
+                    allowedUpdates.startTime = currentTime;
+
+                }
+                else {
+                    return res.status(409).json({ message: "Trip cannot be started before plannedStartTime" })
+                }
+            }
+
+            else if (updates.status === tripStatus.COMPLETED) {
+                if (trip.status !== tripStatus.ONGOING) {
+                    return res.status(409).json({ message: "Trip must be ongoing to complete it" });
+                }
+                allowedUpdates.status = tripStatus.COMPLETED;
+                allowedUpdates.endTime = currentTime;
             }
             trip = await prisma.trip.update({
                 where: { tripId: tripId },
@@ -273,7 +315,7 @@ async function deleteTrip(req: Request, res: Response) {
                 tripId: tripId
             }
         })
-        return res.status(204)
+        return res.status(204).send();
 
     } catch (error: any) {
         if (error.code === "P2025") {

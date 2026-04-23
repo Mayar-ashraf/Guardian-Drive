@@ -14,9 +14,10 @@ Content-Type: application/json
 ######
 POST http://localhost:3000/api/auth/signup
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2OTM5MzA1LCJleHAiOjE3NzcwMjU3MDV9.oxilPdvDpx3k9GJK_ix64Be3td2659pEek_yRLsLd_o
 
 { 
-    "email":"driver2@gmail.com",
+    "email":"driver5@gmail.com",
     "fName":"Driver",
     "lName":"Driver",
     "password":"Driver@12345678",
