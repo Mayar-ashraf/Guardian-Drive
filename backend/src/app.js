@@ -1,7 +1,8 @@
 import express from "express"
 import authRoute from "./routes/authRoute.js"
 import tripsRoute from "./routes/tripsRoute.js"
-import * as authMiddleware from "./middlware/AuthMiddleware.js"
+//import * as authMiddleware from "./middleware/AuthMiddleware.js"
+import * as authMiddleware from "./middleware/AuthMiddleware.ts"
 import passwordRoutes from "./routes/password.routes.ts";
 import path from "path"
 import usersRoutes from "./routes/users.routes.ts";

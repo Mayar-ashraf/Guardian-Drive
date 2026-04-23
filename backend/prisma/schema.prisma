@@ -20,6 +20,7 @@ model User {
   driver           Driver?
   resetToken       String?
   resetTokenExpiry DateTime?
+  trips            Trip[]
 }
 
 enum Role {
@@ -48,10 +49,15 @@ model Trip {
   location      Location[]
   alerts        Alert[]
   towingRequest TowingRequest?
-  driver        Driver?        @relation(fields: [driverId], references: [id])
-  driverId      Int?
-  car           Car?           @relation(fields: [engineId], references: [engineId])
-  engineId      String?
+
+  driver   Driver? @relation(fields: [driverId], references: [id])
+  driverId Int?
+
+  car      Car?    @relation(fields: [engineId], references: [engineId])
+  engineId String?
+
+  fleetManagerId Int
+  fleetManager   User @relation(fields: [fleetManagerId], references: [id])
 }
 
 enum tripStatus {
