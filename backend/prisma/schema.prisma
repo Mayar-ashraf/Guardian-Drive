@@ -171,10 +171,11 @@ model AvgHealthReadings {
 }
 
 model HealthEvent {
-  eventId   Int      @id @default(autoincrement())
-  eventDate DateTime @default(now())
-  heartRate String
-  temp      Float
+  eventId          Int      @id @default(autoincrement())
+  eventDate        DateTime @default(now())
+  heartRate        String
+  temp             Float
+  firstAidGuidance String? // added to save firstAidGuidance response
 
   recordId Int
   medical  MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)

@@ -14,11 +14,7 @@ export const getMedicalRecords = async (req: express.Request, res: express.Respo
 
 export const getMedicalRecordById = async (req: express.Request, res: express.Response) => {
     try {
-        const driverId = parseInt(req.params.driverId as string);
-        if (isNaN(driverId)) {
-            return HttpResponses.sendNotFound(res, "Invalid driverId");
-        }
-
+        const driverId = req.validated?.params?.driverId
         const driver = await prisma.driver.findUnique({
             where: { id: driverId },
         });
@@ -47,10 +43,7 @@ export const getMedicalRecordById = async (req: express.Request, res: express.Re
 export const createMedicalRecord = async (req: express.Request, res: express.Response) => {
 
     try {
-        const driverId = parseInt(req.params.driverId as string);
-        if (isNaN(driverId)) {
-            return HttpResponses.sendNotFound(res, "Invalid driverId");
-        }
+        const driverId = req.validated?.params?.driverId;
 
         const driver = await prisma.driver.findUnique({
             where: { id: driverId },
@@ -68,7 +61,7 @@ export const createMedicalRecord = async (req: express.Request, res: express.Res
             return HttpResponses.sendError(res, "Medical Records for this driver already exists", 409)
         }
 
-        const { conditions, medications } = req.body
+        const { conditions, medications } = req.validated?.body
 
         const medicalRecord = await prisma.medicalInformation.create({
             data: {
@@ -90,14 +83,10 @@ export const createMedicalRecord = async (req: express.Request, res: express.Res
 export const updateMedicalRecord = async (req: express.Request, res: express.Response) => {
 
     try {
-        const driverId = parseInt(req.params.driverId as string);
-
-        if (isNaN(driverId)) {
-            return HttpResponses.sendNotFound(res, "Invalid driverId");
-        }
+        const driverId = req.validated?.params?.driverId;
 
         // the only parameters right now other than avg health readings , Can add later BloodPressure too? and Blood Type?
-        const { conditions, medications } = req.body;
+        const { conditions, medications } = req.validated?.body;
 
         // check if the driver i am looking for his records exits at all
         const driver = await prisma.driver.findUnique({

@@ -33,3 +33,7 @@ export const sendUnauthorized = (res: Response, error = "Missing or invalid auth
 export const sendValidationError = (res: Response, errors: { field: string; message: string }[]) => {
   res.status(400).json({ message: "Validation failed", errors });
 };
+
+export const sendBadRequest = (res: Response, error = "Bad Request") => {
+  sendError(res, error, 400)
+};

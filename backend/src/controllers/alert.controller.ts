@@ -2,7 +2,7 @@ import express from "express"
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses"
 import { alertStatus, alertType, Role } from './../../generated/prisma/enums';
-import { createHealthEvent } from "./healthEvent.controller";
+import { createHealthEvent, updateHealthEvent } from "./healthEvent.controller";
 import { HealthEventError } from "../utils/InternalErrors";
 
 // would want to add driver avg readings too?? <--------------------- 
@@ -17,57 +17,61 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
             engineId,       // String
             from,           // ISO date string e.g. "2024-01-01"
             to,             // ISO date string e.g. "2024-12-31"
-        } = req.query;
+            limit,
+            page,
+            orderBy,
+        } = req.validated?.query;
 
-        if (driverId && isNaN(parseInt(driverId as string))) {
-            return HttpResponses.sendError(res, "Invalid driverId", 400);
-        }
-        if (from && isNaN(Date.parse(from as string))) {
-            return HttpResponses.sendError(res, "Invalid from date", 400);
-        }
-        if (to && isNaN(Date.parse(to as string))) {
-            return HttpResponses.sendError(res, "Invalid to date", 400);
-        }
+        const skip = (page - 1) * limit;
 
         const driverCondition = req.user?.role === Role.DRIVER
             ? { driverId: req.user?.userId }
             : {};
 
-        const alerts = await prisma.alert.findMany({
-            where: {
-                // the spread operator either spread values or nothing when the condition is falsy, so each filter is simply skipped if not provided.
-                ...(type && { type: type as alertType }),
-                ...(status && { status: status as alertStatus }),
-                ...(from || to) && {
-                    generatedAt: {
-                        ...(from && { gte: new Date(from as string) }),
-                        ...(to && { lte: new Date(to as string) }),
-                    },
-                },
-                ...((driverId || engineId) && {
-                    trip: {
-                        ...driverCondition,
-                        ...(driverId && { driverId: parseInt(driverId as string) }),
-                        ...(engineId && { engineId: engineId as string }),
-                    },
-                }),
-            },
-            include: {
+        // date filter — new Date("2024-01-01") defaults to 00:00:00 UTC automatically
+        const generatedAtFilter: any = {};
+        if (from) generatedAtFilter.gte = new Date(from);
+        if (to) {
+            const toDate = new Date(to);
+            toDate.setHours(23, 59, 59, 999); // include the full end day
+            generatedAtFilter.lte = toDate;
+        }
+
+        const whereConditions: any = {
+            ...(type && { type }),
+            ...(status && { status }),
+            ...(Object.keys(generatedAtFilter).length > 0 && { generatedAt: generatedAtFilter }),
+            ...((driverId || engineId || req.user?.role === Role.DRIVER) && {
                 trip: {
-                    include: {
-                        towingRequest: true,
-                        driver: {
-                            include: { user: true },
+                    ...driverCondition,
+                    ...(driverId && { driverId }),
+                    ...(engineId && { engineId }),
+                },
+            }),
+        };
+        const [alerts, total] = await prisma.$transaction([
+            prisma.alert.findMany({
+                where: whereConditions,
+                include: {
+                    trip: {
+                        include: {
+                            towingRequest: true,
+                            driver: {
+                                include: { user: true },
+                            },
                         },
                     },
+                    healthEvent: true,
+                    triggeredLocation: true,
+                    stoppedLocation: true,
+                    emergencyServiceRequest: true,
                 },
-                healthEvent: true,
-                triggeredLocation: true,
-                stoppedLocation: true,
-                emergencyServiceRequest: true,
-            },
-            orderBy: { generatedAt: "desc" },
-        });
+                orderBy: { generatedAt: orderBy ?? "desc" },
+                skip,
+                take: limit,
+            }),
+            prisma.alert.count({ where: whereConditions }),
+        ]);
 
         const safeAlerts = alerts.map(alert => {
             if (alert.trip.driver?.user) {
@@ -76,7 +80,14 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
             return alert;
         });
 
-        return HttpResponses.sendSuccess(res, safeAlerts)
+        console.log(safeAlerts)
+        return HttpResponses.sendSuccess(res, {
+            ...safeAlerts,
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        });
 
     } catch (error) {
         if (error instanceof Error) {
@@ -87,11 +98,7 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
 }
 export const getAlertById = async (req: express.Request, res: express.Response) => {
     try {
-        const alertId = parseInt(req.params.alertId as string);
-        if (isNaN(alertId)) {
-            return HttpResponses.sendNotFound(res, "Invalid alertId");
-        }
-
+        const alertId = req.validated?.params?.alertId;
         // alert should include (user info - health Event - emergency requestTime , emergency completetionTime, towing request times too)
         const alert = await prisma.alert.findUnique({
             where: { alertId },
@@ -106,7 +113,7 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
                         },
                     },
                 },
-                healthEvents: true,
+                healthEvent: true,
                 triggeredLocation: true,
                 stoppedLocation: true,
                 emergencyServiceRequest: true,  //  these should be added when implemented Normally <------------------
@@ -131,7 +138,10 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
         if (error instanceof HealthEventError) {
             return HttpResponses.sendError(res, `Health Event Failed: ${error.message}`);
         }
-        return HttpResponses.sendError(res)
+        if (error instanceof Error) {
+            return HttpResponses.sendError(res, error.message)
+        }
+        return HttpResponses.sendError(res,)
     }
 }
 // must get first aid guidance here?? <----------------------
@@ -147,7 +157,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         }
 
         // all are required for database success
-        const { type, tripId, locationId, temp, heartRange } = req.body;
+        const { type, tripId, triggeredLocationId, temp, heartRange, firstAidGuidance } = req.validated?.body;
 
         const tripExists = await prisma.trip.findUnique({
             where: { tripId: tripId },
@@ -159,9 +169,20 @@ export const createAlert = async (req: express.Request, res: express.Response) =
             return HttpResponses.sendForbidden(res, "Not Valid Driver For The Trip !!")
         }
 
+        // no two alerts per the same trip
+        const existingAlert = await prisma.alert.findFirst({
+            where: {
+                tripId
+            },
+        });
+
+        if (existingAlert) {
+            return HttpResponses.sendError(res, "Duplicate Alert Per Trip", 409)
+        }
+
 
         const locationExist = await prisma.location.findUnique({
-            where: { locationId: locationId, }
+            where: { locationId: triggeredLocationId, }
         })
         if (!locationExist) {
             return HttpResponses.sendNotFound(res, "Location Not Found")
@@ -173,11 +194,11 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         // alert and healthevent creation must be on one transaction - no fails in between
         const result = await prisma.$transaction(async (tx) => {
             const alert = await tx.alert.create({
-                data: { type, tripId, triggeredLocationId: locationId, status: alertStatus.ACTIVE },
+                data: { type, tripId, triggeredLocationId, status: alertStatus.ACTIVE },
             });
 
             const healthEvent = await createHealthEvent(
-                heartRange, temp, alert.alertId, driverId, tx)
+                heartRange, temp, alert.alertId, driverId, firstAidGuidance, tx)
 
             return { alert, healthEvent };
         });
@@ -201,41 +222,54 @@ export const createAlert = async (req: express.Request, res: express.Response) =
 export const updateAlertById = async (req: express.Request, res: express.Response) => {
 
     try {
-        const alertId = parseInt(req.params.alertId as string);
-        if (isNaN(alertId)) {
-            return HttpResponses.sendError(res, "Invalid alertId", 400);
-        }
+        const alertId = req.validated?.params?.alertId;
         const alert = await prisma.alert.findUnique({
             where: { alertId: alertId },
+            include: {
+                trip: {
+                    include: {
+                        towingRequest: true,
+                    },
+                },
+                emergencyServiceRequest: true,
+            },
         });
 
         if (!alert) {
             return HttpResponses.sendNotFound(res, "Alert Not Found")
         }
 
+        // 1. ensure resolved alert can't be reassigned to either Resolved or Active
+        if (alert.status === alertStatus.RESOLVED) {
+            return HttpResponses.sendError(res, "Alert is already resolved", 409); // conflict
+        }
+
         // status MUST be RESOLVED OR NULL/undefined
-        const { status, stoppedLocationId } = req.body
+        const { status, stoppedLocationId, firstAidGuidance } = req.validated?.body
 
         // Validate stoppedLocationId exists if provided
-        if (stoppedLocationId !== undefined) {
-            const location = await prisma.location.findUnique({
-                where: { locationId: stoppedLocationId },
-            });
-            if (!location) {
-                return HttpResponses.sendNotFound(res, "Stopped Location Not Found");
-            }
-            // Ensure the location belongs to the same trip as the alert
-            if (location.tripId !== alert.tripId) {
-                return HttpResponses.sendForbidden(res, "Stopped location does not belong to this alert's trip");
-            }
+        // 2. ensure valid stopped Location
+        const location = await prisma.location.findUnique({
+            where: { locationId: stoppedLocationId },
+        });
+        if (!location) {
+            return HttpResponses.sendNotFound(res, "Stopped Location Not Found");
+        }
+        // Ensure the location belongs to the same trip as the alert
+        if (location.tripId !== alert.tripId) {
+            return HttpResponses.sendForbidden(res, "Stopped location does not belong to this alert's trip");
         }
 
-        // Prevent re-resolving an already resolved alert - if stoppedLocation is set AFTER resolved status , its okay because then status would be null
-        // the only case this happens if fleet Manager re sumbit a solved alert
-        if (alert.status === alertStatus.RESOLVED && status === alertStatus.RESOLVED) {
-            return HttpResponses.sendError(res, "Alert is already resolved", 409);
+        // 3. ensure if alert Resolved emergency service request and towing request completion time are filled and stoppedLocation filled
+        if (!alert.stoppedLocationId && status === alertStatus.RESOLVED) {
+            return HttpResponses.sendBadRequest(res, "Trip hasn't stopped yet")
+        }
+        if (status === alertStatus.RESOLVED && (!alert.emergencyServiceRequest?.completionTime || !alert.trip.towingRequest?.completionTime)) {
+            return HttpResponses.sendBadRequest(res, "Emergency Requests haven't finished yet");
         }
 
+
+        // all the includes for compatabile return type
         const updatedAlert = await prisma.alert.update({
             where: { alertId },
             data: {
@@ -243,9 +277,31 @@ export const updateAlertById = async (req: express.Request, res: express.Respons
                 solvedAt: status === alertStatus.RESOLVED ? new Date() : alert.solvedAt, // if status = Resolved set time, else it satatus would be null
                 stoppedLocationId: stoppedLocationId ?? alert.stoppedLocationId,
             },
+            include: {
+                trip: {
+                    include: {
+                        driver: { include: { user: true } },
+                        towingRequest: true,
+                    },
+                },
+                healthEvent: true,
+                triggeredLocation: true,
+                stoppedLocation: true,
+                emergencyServiceRequest: true,
+            },
         });
+        let updatedHealthEvent = updatedAlert.healthEvent;
 
-        return HttpResponses.sendSuccess(res, updatedAlert);
+        if (firstAidGuidance !== undefined) {
+            updatedHealthEvent = await updateHealthEvent(alertId, firstAidGuidance);
+        }
+
+        // strip password before returning
+        if (updatedAlert.trip.driver?.user) {
+            const safeUpdatedAlert = stripPassword(updatedAlert)
+            return HttpResponses.sendSuccess(res, { ...safeUpdatedAlert, healthEvent: updatedHealthEvent });
+        }
+        return HttpResponses.sendSuccess(res, { ...updatedAlert, healthEvent: updatedHealthEvent });
 
     } catch (error) {
         return HttpResponses.sendError(res)
@@ -271,10 +327,7 @@ const stripPassword = (alert: any) => {
 // is this really needed?  --- uncomment if needed from alert.route
 export const getAlertsByDriverId = async (req: express.Request, res: express.Response) => {
     try {
-        const driverId = parseInt(req.params.driverId as string);
-        if (isNaN(driverId)) {
-            return HttpResponses.sendError(res, "Invalid alertId", 400);
-        }
+        const driverId = req.validated?.param.driverId
         const driver = await prisma.driver.findUnique({
             where: { id: driverId },
         });
@@ -297,7 +350,7 @@ export const getAlertsByDriverId = async (req: express.Request, res: express.Res
                         },
                     },
                 },
-                healthEvents: true,
+                healthEvent: true,
                 triggeredLocation: true,
                 stoppedLocation: true,
                 emergencyServiceRequest: true
