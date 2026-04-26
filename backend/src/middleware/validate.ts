@@ -22,7 +22,7 @@ export const validate =
                     });
                 }
 
-                // ❌ Not a Zod error → real server error
+                // Not a Zod error → real server error
                 console.error(err);
 
                 return res.status(500).json({

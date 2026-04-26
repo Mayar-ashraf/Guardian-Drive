@@ -3,7 +3,7 @@ import { prisma } from "../lib/prisma"
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { signAccessToken } from "../utils/jwt";
-import { sendUnauthorized, sendForbidden, sendNotFound, sendError, sendNoContent, sendCreated, sendSuccess } from "../utils/HTMLresponses";
+import { sendUnauthorized, sendForbidden, sendNotFound, sendError, sendNoContent, sendCreated, sendSuccess } from "../utils/HttpResponses";
 import { carStatus } from './../../generated/prisma/enums';
 import { templateLiteral } from "zod";
 import { is, tr } from "zod/locales";

@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken, JwtPayload } from "../utils/jwt";
-import { sendUnauthorized, sendForbidden } from "../utils/HTMLresponses";
+import { sendUnauthorized, sendForbidden } from "../utils/HttpResponses";
 import { Role } from "../../generated/prisma/enums"
 
 declare global {
   namespace Express {
     interface Request {
       user?: JwtPayload;    // JWTpayload is the type that will be later stored in the attribute which is userId and role (the cracked token)
-        // user = {user.id , user.Role}
+      // user = {user.id , user.Role}
     }
   }
   /* 
