@@ -40,15 +40,16 @@ model Driver {
 }
 
 model Trip {
-  tripId        Int            @id @default(autoincrement())
-  startPoint    String
-  destPoint     String
-  startTime     DateTime
-  endTime       DateTime?
-  status        tripStatus
-  location      Location[]
-  alerts        Alert[]
-  towingRequest TowingRequest?
+  tripId           Int            @id @default(autoincrement())
+  startPoint       String
+  destPoint        String
+  plannedStartTime DateTime
+  startTime        DateTime? //this will be the actual start time when driver clicks start
+  endTime          DateTime?
+  status           tripStatus
+  location         Location[]
+  alerts           Alert[]
+  towingRequest    TowingRequest?
 
   driver   Driver? @relation(fields: [driverId], references: [id])
   driverId Int?
