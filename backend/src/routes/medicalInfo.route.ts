@@ -3,7 +3,7 @@ import { get } from "node:http";
 import { getMedicalRecords, getMedicalRecordById, updateMedicalRecord, createMedicalRecord } from "../controllers/medicalInfo.contoller";
 import { authenticate, authorize } from "../middleware/AuthMiddleware";
 import { Role } from "../../generated/prisma/client";
-import { validate } from "../middleware/validators/validate";
+import { validate } from "../validators/validate";
 import { createMedicalInfoSchema, getMedicalRecordByIdSchema, UpdateMedicalRecordSchema } from "../schema/medicalInfo";
 
 const router = express.Router();

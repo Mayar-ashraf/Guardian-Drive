@@ -3,7 +3,7 @@ import { Role } from "../../generated/prisma/client";
 import { getAlerts, createAlert, getAlertById, updateAlertById } from "../controllers/alert.controller"
 import { CreateAlertSchema, FilterAlertSchema, getAlertByIdSchema, UpdateAlertSchema } from "../schema/alert"
 import { authenticate, authorize } from "../middleware/AuthMiddleware";
-import { validate } from "../middleware/validators/validate";
+import { validate } from "../validators/validate";
 
 const router = express.Router()
 
