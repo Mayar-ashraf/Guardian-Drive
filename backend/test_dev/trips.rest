@@ -12,7 +12,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
 #########
 POST http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2OTQ1MjQ3LCJleHAiOjE3NzcwMzE2NDd9.9xP1ki_N4WdLPF2iu-LvJWo9avOmA_9ZUBepnxFc66s
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
 
 { 
     "startPoint":"Alexandria",
@@ -25,15 +25,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvb
 ########get all trips admin or fleet manager
 GET http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
 
 { 
     
 } 
 ########get all trips admin or fleet manager
-GET http://localhost:3000/api/trips?fromStartDate=2026-03-20T20:30:00.000Z&status=PLANNED
+GET http://localhost:3000/api/trips?fromStartDate=2026-04-20T20:30:00.000Z&status=PLANNED
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
 
 { 
     
@@ -47,9 +47,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsInJvb
     
 } 
 ########specific admin or fleet manager
-GET http://localhost:3000/api/trips/1
+GET http://localhost:3000/api/trips/15
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2NzgzMDY2LCJleHAiOjE3NzY4Njk0NjZ9.sbTp4E5xQAC2TurMFMwjYSnoDM-eE7hNXagZrt6s7Mc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
 
 { 
     
@@ -71,9 +71,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
     
 } 
 ########DELETE TRIP fleet manager
-DELETE  http://localhost:3000/api/trips/7
+DELETE  http://localhost:3000/api/trips/14
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2OTM5MzA1LCJleHAiOjE3NzcwMjU3MDV9.oxilPdvDpx3k9GJK_ix64Be3td2659pEek_yRLsLd_o
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
 
 { 
     
@@ -82,7 +82,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvb
 ######### patch as driver
 PATCH  http://localhost:3000/api/trips/14
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzY5NDUxNjEsImV4cCI6MTc3NzAzMTU2MX0.a8z_k20MhnAszMAgLUcaZebGjddbGM19CEIGicm247o
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
 
 { 
     "endTime": "2026-04-20T20:30:00.000Z",

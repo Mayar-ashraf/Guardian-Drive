@@ -9,6 +9,7 @@ import { TripFieldRefs } from './../../generated/prisma/models/Trip';
 import { templateLiteral } from "zod";
 import { is, tr } from "zod/locales";
 import { error } from "node:console";
+import { validate } from './../validators/validate';
 
 async function createTrip(req: Request, res: Response) {
     try {
@@ -22,7 +23,7 @@ async function createTrip(req: Request, res: Response) {
         //     location,
         //     fleetManagerId
         // };
-        const dataFromZod: any = req.body
+        const dataFromZod: any = req.validated?.body
 
         // change after zod
         if (dataFromZod.driverId !== undefined) {
@@ -38,6 +39,16 @@ async function createTrip(req: Request, res: Response) {
                 return res.status(422).json({ message: "Driver doesn't exist" })
             }
         }
+        if (dataFromZod.engineId !== undefined) {
+            const car = await prisma.car.findUnique({
+                where: {
+                    engineId: dataFromZod.engineId
+                }
+            })
+            if (!car) {
+                return res.status(422).json({ message: "Car doesn't exist" })
+            }
+        }
         const assignedFleetManager = await prisma.user.findUnique({
             where: {
                 // id: fleetManagerId
@@ -48,22 +59,7 @@ async function createTrip(req: Request, res: Response) {
 
             return res.status(422).json({ message: "Fleet manager doesn't exist" })
         }
-        // if (dataFromZod.fleetManagerId !== undefined) {
-        //     //data.fleetManagerId = Number(fleetManagerId);
-        //     const assignedFleetManager = await prisma.user.findUnique({
-        //         where: {
-        //             // id: fleetManagerId
-        //             id: dataFromZod.fleetManagerId
-        //         }
-        //     })
-        //     if (!assignedFleetManager || assignedFleetManager.role !== "FLEET_MANAGER") {
-
-        //         return res.status(422).json({ message: "Fleet manager doesn't exist" })
-        //     }
-        // }
-        // if (engineId !== undefined) {
-        //     data.engineId = engineId;
-        // }
+        //do same for car
 
 
         const trip = await prisma.trip.create({
@@ -84,41 +80,29 @@ async function readTrips(req: Request, res: Response) {
 
     try {
         const user = req.user
-        const { engineId, driverId, status, fromDate, toDate, fleetManagerId } = req.query
-        const whereConditions: any = {}
-        // change after adding validators
-        const limit = parseInt(req.query.limit_by as string, 10) || 10
-        const page = parseInt(req.query.page as string, 10) || 1
+        // const { engineId, driverId, status, fromDate, toDate, fleetManagerId } = req.query
+        const query = req.validated?.query
+        const { limit, orderBy, page } = query
         const skip = (page - 1) * limit;
-        //check after validator
-        const orderBy =
-            req.query.orderBy === "asc" ? "asc" : "desc";
-        if (req.query.engineId) {
-            whereConditions.engineId = req.query.engineId
-        }
-        if (req.query.driverId) {
-            //redo after validation
-            whereConditions.driverId = Number(req.query.driverId)
-        }
-        if (req.query.fleetManagerId) {
-            //redo after validation
-            whereConditions.fleetManagerId = Number(req.query.fleetManagerId)
-        }
-        if (req.query.status) {
-            whereConditions.status = req.query.status
+        const whereConditions = {
+            ...(req.validated?.query.engineId && { engineId: req.validated?.query.engineId }),
+            ...(req.validated?.query.driverId && { driverId: req.validated?.query.engineId }),
+            ...(req.validated?.query.fleetManagerId && { fleetManagerId: req.validated?.query.engineId }),
+            ...(req.validated?.query.status && { status: req.validated?.query.status })
+
         }
         const startTimeFilter: any = {};
 
-        if (typeof req.query.fromStartDate === "string") {
-            startTimeFilter.gte = new Date(req.query.fromStartDate);
+        if (req.validated?.query.fromStartDate) {
+            startTimeFilter.gte = req.validated?.query.fromStartDate;
         }
 
-        if (typeof req.query.toStartDate === "string") {
-            startTimeFilter.lte = new Date(req.query.toStartDate);
+        if (req.validated?.query.toStartDate) {
+            startTimeFilter.lte = req.validated?.query.toStartDate;
         }
 
         if (Object.keys(startTimeFilter).length > 0) {
-            whereConditions.startTime = startTimeFilter;
+            whereConditions.plannedStartTime = startTimeFilter;
         }
         let trips;
 
@@ -132,7 +116,7 @@ async function readTrips(req: Request, res: Response) {
             skip,
             take: limit,
             orderBy: {
-                startTime: orderBy
+                startTime: req.validated?.query.orderBy
             }
 
         })
@@ -233,12 +217,12 @@ async function getTripHeatMap(req: Request, res: Response) {
 
 async function getTripById(req: Request, res: Response) {
     try {
-        const tripId = req.params.tripId
+        const tripId = req.validated?.params.tripId
         const user = req.user
 
         const trip = await prisma.trip.findUnique({
             where: {
-                tripId: parseInt(tripId as string)
+                tripId: tripId
             }
         })
         if (!trip) {
@@ -258,15 +242,56 @@ async function getTripById(req: Request, res: Response) {
 }
 async function updateTrip(req: Request, res: Response) {
     try {
-        const tripId = parseInt(req.params.tripId as string)
+        const tripId = req.validated?.params.tripId
         const user = req.user
-        const updates = req.body
-        const allowedUpdates: any = {};
+        const updates = req.validated?.body
+        let allowedUpdates: any = {};
 
         if (user?.role === "FLEET_MANAGER") {
+
+            if (updates.driverId !== undefined) {
+                // data.driverId = Number(driverId);
+                const driver = await prisma.driver.findUnique({
+                    where: {
+                        // id: driverId
+                        id: updates.driverId
+                    }
+                })
+                if (!driver) {
+
+                    return res.status(422).json({ message: "Driver doesn't exist" })
+                }
+            }
+            if (updates.engineId !== undefined) {
+                const car = await prisma.car.findUnique({
+                    where: {
+                        engineId: updates.engineId
+                    }
+                })
+                if (!car) {
+                    return res.status(422).json({ message: "Car doesn't exist" })
+                }
+            }
+            if (updates.fleetManagerId !== undefined) {
+                const fleetManager = await prisma.user.findUnique({
+                    where: {
+                        id: updates.fleetManagerId
+                    }
+                })
+                if (!fleetManager || fleetManager.role !== "FLEET_MANAGER") {
+                    return res.status(422).json({ message: "Fleet Manager doesn't exist" })
+                }
+            }
+            allowedUpdates = updates
+            if (updates.status === "ONGOING") {
+                allowedUpdates.startTime = updates.startTime ?? new Date();
+            }
+            if (updates.status === "COMPLETED") {
+                allowedUpdates.endTime = updates.endTime ?? new Date();
+            }
             const trip = await prisma.trip.update({
                 where: { tripId: tripId },
-                data: updates
+                data: allowedUpdates
             })
             return res.status(200).json({ trip });
 
@@ -328,7 +353,7 @@ async function updateTrip(req: Request, res: Response) {
 }
 async function deleteTrip(req: Request, res: Response) {
     try {
-        const tripId = parseInt(req.params.tripId as string)
+        const tripId = req.validated?.params.tripId
         await prisma.trip.delete({
             where: {
                 tripId: tripId
