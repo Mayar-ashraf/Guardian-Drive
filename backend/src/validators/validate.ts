@@ -2,8 +2,20 @@
 import { ZodObject, ZodError, z } from "zod";
 import { Request, Response, NextFunction } from "express";
 
+declare global {
+    namespace Express {
+        interface Request {
+            validated?: {
+                body?: any;
+                query?: any;
+                params?: any;
+            };
+        }
+    }
+}
+
 export const validate =
-    (schema: z.ZodTypeAny) =>
+    (schema: ZodObject<any>) =>
         (req: Request, res: Response, next: NextFunction) => {
             try {
                 const parsed = schema.parse({
@@ -11,7 +23,7 @@ export const validate =
                     query: req.query,
                     params: req.params,
                 });
-                (req as any).validated = parsed;
+                req.validated = parsed;
                 next();
             } catch (err: any) {
                 if (err instanceof ZodError) {
