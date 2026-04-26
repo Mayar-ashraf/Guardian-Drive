@@ -9,7 +9,7 @@ import { TripFieldRefs } from './../../generated/prisma/models/Trip';
 import { any, templateLiteral } from "zod";
 import { is, tr } from "zod/locales";
 import { error } from "node:console";
-import { sendTripLocationDTO } from "../validators/validate";
+import { sendTripLocationDTO } from "../schema/location/sendTripLocation.schema";
 
 async function createTrip(req: Request, res: Response) {
     try {
@@ -139,7 +139,7 @@ async function readTrips(req: Request, res: Response) {
 
 async function getTripLocation(req: Request, res: Response) {
     try {
-        const tripId = Number(req.params.tripId);
+        const tripId = req.validated?.params;
         const user = req.user;
 
         if (!Number.isInteger(tripId)) {
@@ -190,17 +190,9 @@ async function getTripLocation(req: Request, res: Response) {
 
 async function getTripHeatMap(req: Request, res: Response) {
     try {
-        const tripId = Number(req.params.tripId);
+        const tripId = req.validated?.params;
+        
         const user = req.user;
-
-        if (!Number.isInteger(tripId)) {
-            return sendValidationError(res, [
-                {
-                    field: "tripId",
-                    message: "TripId must be a valid integer"
-                }
-            ]);
-        }
 
         const trip = await prisma.trip.findUnique({
             where: { tripId },
@@ -211,9 +203,8 @@ async function getTripHeatMap(req: Request, res: Response) {
             },
         });
 
-
         if (!trip) {
-            return sendNotFound(res, "Trip not found." )
+            return sendNotFound(res, "Trip not found.")
         }
 
         const isADMIN = (user?.role === "ADMIN");
@@ -221,7 +212,7 @@ async function getTripHeatMap(req: Request, res: Response) {
         const isAuthorizedDriver = (user?.role === "DRIVER" && trip.driverId === user.userId);
 
         if (!isADMIN && !isAuthorizedFleetManager && !isAuthorizedDriver) {
-            return sendUnauthorized(res, "You are unauthorized to make this request" );
+            return sendUnauthorized(res, "You are unauthorized to make this request");
         }
 
         if (trip.location.length === 0) {
@@ -238,8 +229,8 @@ async function getTripHeatMap(req: Request, res: Response) {
 
 async function sendTripLocation(req: Request, res: Response) {
     try {
-        const data : sendTripLocationDTO = req.validated;
-        const tripId = data.params.tripId;
+        const data = req.validated as sendTripLocationDTO;
+        const tripId = data.params.tripId
         const { latitude, longitude } = data.body;
         const user = req.user;
 

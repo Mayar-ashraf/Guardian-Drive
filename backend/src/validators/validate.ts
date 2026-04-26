@@ -43,27 +43,3 @@ export const validate =
                 });
             }
         };
-
-export const tripIdParamSchema = z.object({
-    tripId: z.string() 
-    .regex(/^\d+$/, "tripId must be a valid integer") // check if string of didgits 
-    .transform(Number) // then convert to number
-});
-
-export const gpsSchema = z.object({
-  latitude: z.coerce.number().refine((val) => !isNaN(val), {
-    message: "Latitude must be a valid number",
-  }),
-  longitude: z.coerce.number().refine((val) => !isNaN(val), {
-    message: "Longitude must be a valid number",
-  }),
-});
-
-export const sendTripLocationSchema = z.object({
-    params: tripIdParamSchema,
-    body: gpsSchema,
-});
-
-export type tripIdParams = z.infer<typeof tripIdParamSchema>;
-export type gpsBody = z.infer<typeof gpsSchema>;
-export type sendTripLocationDTO = z.infer<typeof sendTripLocationSchema>;
