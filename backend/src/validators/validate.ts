@@ -1,5 +1,5 @@
 // middleware/validate.ts
-import { ZodObject, ZodError } from "zod";
+import { ZodObject, ZodError, z } from "zod";
 import { Request, Response, NextFunction } from "express";
 
 declare global {

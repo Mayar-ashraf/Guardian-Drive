@@ -1,13 +1,16 @@
 import express from "express"
-import { createTrip, readTrips, getTripById, updateTrip, deleteTrip, getTripLocation } from "../controllers/tripsController"
+import { createTrip, readTrips, getTripById, updateTrip, deleteTrip, getTripLocation, sendTripLocation, getTripHeatMap } from "../controllers/tripsController"
 import { authorize } from './../middleware/AuthMiddleware';
-import { validate } from "../validators/validate.ts"
-import { validateRoleBased } from "../validators/roleBasedValidate.ts"
+import { validate } from "../validators/validate"
+import { validateRoleBased } from "../validators/roleBasedValidate"
 import { createTripSchema } from "../schema/trips/createTrip.schema"
-import { getTripByIdSchema } from "../schema/trips/getTripById.schema.ts"
-import { readTripsSchema } from "../schema/trips/readTrips.schema.ts"
-import { deleteTripSchema } from "../schema/trips/deleteTrip.schema.ts"
-import { driverUpdateTripSchema, fleetManagerUpdateTripSchema } from "../schema/trips/updateTrip.schema.ts"
+import { getTripByIdSchema } from "../schema/trips/getTripById.schema"
+import { readTripsSchema } from "../schema/trips/readTrips.schema"
+import { deleteTripSchema } from "../schema/trips/deleteTrip.schema"
+import { driverUpdateTripSchema, fleetManagerUpdateTripSchema } from "../schema/trips/updateTrip.schema"
+import { tripIdParamSchema } from "../schema/trips/tripIdParam.schema";
+import { sendTripLocationSchema } from "../schema/location/sendTripLocation.schema";
+
 const router = express.Router()
 router.post("/", authorize("FLEET_MANAGER"), validate(createTripSchema), createTrip)
 router.get("/", validate(readTripsSchema), readTrips)
@@ -21,9 +24,9 @@ GET /api/trips/:tripId/gps
 GET /api/trips/:tripId/heatmap
 */
 
-router.get("/:tripId/gps", getTripLocation);
-//router.post("/trips/:tripId/gps", postTripLocation);
-
+router.get("/:tripId/gps", validate(tripIdParamSchema), getTripLocation);
+router.get("/:tripId/heatmap", validate(tripIdParamSchema), getTripHeatMap);
+router.post("/:tripId/gps", authorize("DRIVER"), validate(sendTripLocationSchema), sendTripLocation);
 
 
 

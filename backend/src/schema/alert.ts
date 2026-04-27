@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { alertType, alertStatus } from "../../generated/prisma/enums";
+import { Param } from "@prisma/client/runtime/client";
 
 // ================= CREATE =================
 export const CreateAlertSchema = z.object({
@@ -55,7 +56,11 @@ export const getAlertByIdSchema = z.object({
     params: z.object({
         alertId: z.coerce.number().int().positive(),
     })
-})
+});
+
+export const alertIdSchema = z.object({
+    alertId: z.coerce.number().int().positive(),
+});
 
 export type CreateAlertInput = z.infer<typeof CreateAlertSchema>;
 export type UpdateAlertInput = z.infer<typeof UpdateAlertSchema>;
