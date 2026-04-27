@@ -7,7 +7,8 @@ import usersRoutes from "./routes/users.routes.ts";
 import medicalInfoRoute from"./routes/medicalInfo.route.ts"
 import * as authMiddleware from "./middleware/AuthMiddleware.ts"
 import tripsRoute from "./routes/tripsRoute.ts"
-
+import alertRoute from "./routes/alert.route.ts";
+import firstAidRoute from "./routes/firstAid.route.ts";
 
 const app = express();
 app.use(express.json())
@@ -15,10 +16,6 @@ app.use("/api/auth", authRoute)
 app.use("/api/password",passwordRoutes)
 app.use("/api/users",usersRoutes)
 app.use("/api/cars",carsRoute)
-
-import alertRoute from "./routes/alert.route.ts";
-import firstAidRoute from "./routes/firstAid.route.ts";
-
 app.use("/api/auth", authRoute)
 app.use("/api/medical-information", medicalInfoRoute)
 app.use("/api/alerts", alertRoute);
