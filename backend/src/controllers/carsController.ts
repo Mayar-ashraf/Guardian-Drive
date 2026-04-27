@@ -26,7 +26,7 @@ export const getAllcars = async ( req:express.Request, res:express.Response)=>{
 export const getCarbyID = async (req: express.Request, res: express.Response) => {
     try {
         const caller = req.user;
-
+//driver get his own car 
         if (!caller) {
             return res.status(401).json({
                 message: "Missing or invalid authentication token."
