@@ -26,3 +26,31 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvb
     "role":"DRIVER" ,
     "drivingLicense":"abc123456"
 } 
+
+######
+POST http://localhost:3000/api/auth/signup
+Content-Type: application/json
+{ 
+    "email":"driver6@gmail.com",
+    "fName":"Driver",
+    "lName":"Driver",
+    "password":"Driver6@12345678",
+    "phone":["01122226666"],
+    "address":"abcd",
+    "role":"DRIVER" ,
+    "drivingLicense":"abc123456"
+} 
+#####
+
+POST http://localhost:3000/api/auth/signup
+Content-Type: application/json
+
+{ 
+    "email":"admin11@gmail.com",
+    "fName":"AdminfName",
+    "lName":"AdminlName",
+    "password":"Admin11@12345678",
+    "phone":["01122226666"],
+    "address":"abcd",
+    "role":"ADMIN" 
+} 
