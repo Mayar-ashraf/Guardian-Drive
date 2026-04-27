@@ -59,8 +59,10 @@ export const getAlertByIdSchema = z.object({
 });
 
 export const alertIdSchema = z.object({
-    alertId: z.coerce.number().int().positive(),
-});
+    alertId: z.coerce.number("Alert Id must be a valid number")
+    .int("Alert Id must be an integer")
+    .positive("Alert Id must be positive")
+}).strict();
 
 export type CreateAlertInput = z.infer<typeof CreateAlertSchema>;
 export type UpdateAlertInput = z.infer<typeof UpdateAlertSchema>;

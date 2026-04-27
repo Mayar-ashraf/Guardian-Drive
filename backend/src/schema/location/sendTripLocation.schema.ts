@@ -5,6 +5,7 @@ import { gpsSchema } from "./gps.schema";
 export const sendTripLocationSchema = z.object({
     params: tripIdParamSchema,
     body: gpsSchema,
-});
+    query: z.object({}).strict(),
+}).strict();
 
 export type sendTripLocationDTO = z.infer<typeof sendTripLocationSchema>;

@@ -3,13 +3,14 @@ import { prisma } from "../lib/prisma"
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { signAccessToken } from "../utils/jwt";
-import { sendUnauthorized, sendForbidden, sendNotFound, sendError, sendNoContent, sendCreated, sendSuccess, sendValidationError } from "../utils/HttpResponses";
+import { sendUnauthorized, sendForbidden, sendNotFound, sendError, sendNoContent, sendCreated, sendSuccess, sendValidationError, sendBadRequest } from "../utils/HttpResponses";
 import { carStatus } from './../../generated/prisma/enums';
 import { TripFieldRefs } from './../../generated/prisma/models/Trip';
 import { any, templateLiteral } from "zod";
 import { is, tr } from "zod/locales";
 import { error } from "node:console";
 import { sendTripLocationDTO } from "../schema/location/sendTripLocation.schema";
+import { send } from "node:process";
 
 async function createTrip(req: Request, res: Response) {
     try {
@@ -139,17 +140,8 @@ async function readTrips(req: Request, res: Response) {
 
 async function getTripLocation(req: Request, res: Response) {
     try {
-        const tripId = req.validated?.params;
+        const tripId = req.validated?.params.tripId;
         const user = req.user;
-
-        if (!Number.isInteger(tripId)) {
-            return sendValidationError(res, [
-                {
-                    field: "tripId",
-                    message: "TripId must be a valid integer"
-                }
-            ]);
-        }
 
         const trip = await prisma.trip.findUnique({
             where: { tripId },
@@ -161,7 +153,6 @@ async function getTripLocation(req: Request, res: Response) {
             },
         });
 
-
         if (!trip) {
             return sendNotFound(res, "Trip not found.");
         }
@@ -171,27 +162,29 @@ async function getTripLocation(req: Request, res: Response) {
         const isAuthorizedDriver = (user?.role === "DRIVER" && trip.driverId === user.userId);
 
         if (!isADMIN && !isAuthorizedFleetManager && !isAuthorizedDriver) {
-            return sendForbidden(res, "You are unauthorized to make this request");
+            return sendForbidden(res, "You are unauthorized to access this trip");
         }
 
-        if (trip.location.length === 0) {
-            // return res.status(404).json({ message: "No locations found for this trip yet." });
-            return sendNotFound(res, "No locations found for this trip yet.");
+        if (trip.status === "PLANNED") {
+            return sendBadRequest(res, "Trip has not started yet.");
+        }
+
+        if (trip.status === "CANCELLED") {
+            return sendBadRequest(res, "Trip was cancelled and has no location data.");
         }
 
         res.json(trip.location[0]);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        sendError(res);
     }
 }
 
 
 async function getTripHeatMap(req: Request, res: Response) {
     try {
-        const tripId = req.validated?.params;
-        
+        const tripId = req.validated?.params.tripId;
         const user = req.user;
 
         const trip = await prisma.trip.findUnique({
@@ -212,25 +205,29 @@ async function getTripHeatMap(req: Request, res: Response) {
         const isAuthorizedDriver = (user?.role === "DRIVER" && trip.driverId === user.userId);
 
         if (!isADMIN && !isAuthorizedFleetManager && !isAuthorizedDriver) {
-            return sendUnauthorized(res, "You are unauthorized to make this request");
+            return sendUnauthorized(res, "You are unauthorized to access this trip");
         }
 
-        if (trip.location.length === 0) {
-            return sendNotFound(res, "No locations found for this trip yet.");
+        if (trip.status === "PLANNED") {
+            return sendBadRequest(res, "Trip has not started yet.");
+        }
+
+        if (trip.status === "CANCELLED") {
+            return sendBadRequest(res, "Trip was cancelled and has no location data.");
         }
 
         res.json(trip.location);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        sendError(res);
     }
 }
 
 async function sendTripLocation(req: Request, res: Response) {
     try {
         const data = req.validated as sendTripLocationDTO;
-        const tripId = data.params.tripId
+        const tripId = data.params.tripId;
         const { latitude, longitude } = data.body;
         const user = req.user;
 
@@ -240,15 +237,15 @@ async function sendTripLocation(req: Request, res: Response) {
             }
         });
         if (!trip) {
-            return res.status(404).json({ message: "Trip not found." });
+            return sendNotFound(res, "Trip not found.")
         }
 
-        if (trip.driverId !== user?.userId) {  // check that request is by the driver owning the trip
-            return res.status(403).json({ message: "You are unauthorized to make this request" });
-
+        if (trip.driverId !== user?.userId) {  
+            return sendUnauthorized(res, "You are unauthorized to send location updates for this trip");
         }
         if (trip.status !== "ONGOING") {
-            return res.status(400).json({ message: "Can't add location to a non-active trip" });
+            return res.status(400).json({ message: "Can't add location to a non-active trip." });
+            // sendValidationError()
         }
 
         const location = await prisma.location.create({
@@ -258,11 +255,12 @@ async function sendTripLocation(req: Request, res: Response) {
                 longitude
             }
         });
-        return res.status(201).json({ message: "Location sent successfully", location });
+        // return res.status(201).json({ message: "Location sent successfully", location });
+        return sendCreated(res, location, "Location sent successfully");
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        sendError(res);
     }
 }
 

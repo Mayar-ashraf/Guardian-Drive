@@ -1,5 +1,8 @@
 import express from "express"
-import authRoute from "./routes/authRoute.js"
+import authRoute from "./routes/auth.route.ts"
+import tripsRoute from "./routes/trips.route.ts"
+import medicalInfoRoute from "./routes/medicalInfo.route.ts"
+import * as authMiddleware from "./middleware/AuthMiddleware.ts"
 import passwordRoutes from "./routes/password.routes.ts";
 import carsRoute from "./routes/cars.route.ts";
 import path from "path"
@@ -21,6 +24,7 @@ app.use("/api/medical-information", medicalInfoRoute)
 app.use("/api/alerts", alertRoute);
 app.use("/api/trips", authMiddleware.authenticate, tripsRoute)
 app.use("/api/password", passwordRoutes)
+app.use("/api/users", usersRoutes)
 app.use("/api/first-aid-guidance", firstAidRoute)
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.json());
