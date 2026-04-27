@@ -1,11 +1,10 @@
 import express from "express"
 import { Role } from "../../generated/prisma/client";
-import { getAlerts, createAlert, getAlertById, updateAlertById } from "../controllers/alert.controller"
+import { getAlerts, createAlert, getAlertById, updateAlertById, getFirstAid } from "../controllers/alert.controller"
 import { CreateAlertSchema, FilterAlertSchema, getAlertByIdSchema, UpdateAlertSchema } from "../schema/alert"
 import { authenticate, authorize } from "../middleware/AuthMiddleware";
 import { validate } from "../validators/validate";
 import { getFirstAidSchema } from "../schema/firstAidGuidance/getFirstAid.schema";
-import { getFirstAid } from "../controllers/firstAid.controller";
 
 const router = express.Router()
 
