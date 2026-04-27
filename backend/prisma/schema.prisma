@@ -90,7 +90,7 @@ model Location {
 // NOTE : INDEXING NEEDS TO BE ADDED LATER
 
 model Car {
-  engineId String    @id
+  engineId String     @id @default(uuid())
   plateNo  String
   color    String
   status   carStatus
