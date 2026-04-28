@@ -1,0 +1,18 @@
+########i didnt check until i can actually add cars 
+DELETE  http://localhost:3000/api/cars/14
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
+
+{ 
+    
+}
+
+######### patch 
+PATCH  http://localhost:3000/api/cars/14
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
+
+{ 
+    "endTime": "2026-04-20T20:30:00.000Z",
+    "status": "ONGOING"
+} 
