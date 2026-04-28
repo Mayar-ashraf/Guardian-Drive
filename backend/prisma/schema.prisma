@@ -54,7 +54,7 @@ model Trip {
   driver   Driver? @relation(fields: [driverId], references: [id])
   driverId Int?
 
-  car      Car?    @relation(fields: [engineId], references: [engineId])
+ car      Car?    @relation(fields: [engineId], references: [engineId])
   engineId String?
 
   fleetManagerId Int
@@ -90,14 +90,13 @@ model Location {
 // NOTE : INDEXING NEEDS TO BE ADDED LATER
 
 model Car {
-  id        Int @id @default(autoincrement())
-  engineId String     @unique
-  plateNo  String
-  color    String
-  status   carStatus
-  trips    Trip[]
-}
+  engineId  String   @id
+  plateNo   String
+  color     String
+  status    carStatus
 
+  trips     Trip[]
+}
 enum carStatus {
   ACTIVE
   IN_TRIP
