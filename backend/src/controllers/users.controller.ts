@@ -2,6 +2,7 @@ import express from "express";
 import { prisma } from "../lib/prisma"
 import { Role } from "../../generated/prisma/enums";
 import { id } from "zod/locales";
+import { validate } from "../validators/validate";
 export const getAllusers = async (req: express.Request, res: express.Response) => {
     try {
         const role = req.user?.role;
@@ -111,11 +112,14 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
     try {
         const caller = req.user;
         const role = caller?.role;
-        const ID = Number(req.params.id);
+        
+      
+        
+        const ID = Number(req.validated?.params.id);
 
-        if (isNaN(ID)) {
+     /*   if (isNaN(ID)) {
             return res.status(400).json({ message: "Invalid user id" });
-        }
+        }*/
 
         const trips = await prisma.trip.findMany();
 
@@ -216,13 +220,13 @@ export const edituserbyID = async (req: express.Request, res: express.Response) 
             });
         }
 
-        const userId = Number(req.params.id);
+        const userId = Number(req.validated?.params.id);
 
-        if (isNaN(userId)) {
+      /*  if (isNaN(userId)) {
             return res.status(400).json({ message: "Invalid user id" });
-        }
+        }*/
 
-        const { email, fName, lName, phone, address } = req.body;
+        const { email, fName, lName, phone, address } = req.validated?.body;
 
         const data: any = {};
         if (email) data.email = email;
@@ -231,11 +235,11 @@ export const edituserbyID = async (req: express.Request, res: express.Response) 
         if (phone) data.phone = phone;
         if (address) data.address = address;
 
-        if (Object.keys(data).length === 0) {
+        /*if (Object.keys(data).length === 0) {
             return res.status(400).json({
                 message: "No valid fields to update",
             });
-        }
+        }*/
 
         const existingUser = await prisma.user.findUnique({
             where: { id: userId },
@@ -298,13 +302,13 @@ export const deleteuserbyID = async (req: express.Request, res: express.Response
             return res.status(403).json({ message: "unauthorized" });
         }
 
-        const userId = Number(req.params.id);
-        const { newFleetManagerId } = req.body;
-        const { newdriverID } = req.body;
+        const userId = Number(req.validated?.params.id);
+        const { newFleetManagerId,newdriverID } = req.validated?.body;
+       // const { newdriverID } = req.body;
 
-        if (isNaN(userId)) {
+        /*if (isNaN(userId)) {
             return res.status(400).json({ message: "Invalid user id" });
-        }
+        }*/
 
         const user = await prisma.user.findUnique({
             where: { id: userId },

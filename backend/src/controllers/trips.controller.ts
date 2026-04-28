@@ -3,13 +3,14 @@ import { prisma } from "../lib/prisma"
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { signAccessToken } from "../utils/jwt";
-import { sendUnauthorized, sendForbidden, sendNotFound, sendError, sendNoContent, sendCreated, sendSuccess } from "../utils/HTMLresponses";
-import { carStatus } from './../../generated/prisma/enums';
-import { TripFieldRefs } from './../../generated/prisma/models/Trip';
-import { templateLiteral } from "zod";
+import { sendUnauthorized, sendForbidden, sendNotFound, sendError, sendNoContent, sendCreated, sendSuccess, sendValidationError, sendBadRequest } from "../utils/HttpResponses";
+import { carStatus } from '../../generated/prisma/enums';
+import { TripFieldRefs } from '../../generated/prisma/models/Trip';
+import { any, templateLiteral } from "zod";
 import { is, tr } from "zod/locales";
 import { error } from "node:console";
-import { validate } from './../validators/validate';
+import { sendTripLocationDTO } from "../schema/location/sendTripLocation.schema";
+import { send } from "node:process";
 
 async function createTrip(req: Request, res: Response) {
     try {
@@ -139,12 +140,8 @@ async function readTrips(req: Request, res: Response) {
 
 async function getTripLocation(req: Request, res: Response) {
     try {
-        const tripId = Number(req.params.tripId);
+        const tripId = req.validated?.params.tripId;
         const user = req.user;
-
-        if (isNaN(tripId)) {
-            return res.status(400).json({ message: "Invalid tripId" });
-        }
 
         const trip = await prisma.trip.findUnique({
             where: { tripId },
@@ -156,9 +153,8 @@ async function getTripLocation(req: Request, res: Response) {
             },
         });
 
-
         if (!trip) {
-            return res.status(404).json({ message: "Trip not found." });
+            return sendNotFound(res, "Trip not found.");
         }
 
         const isADMIN = (user?.role === "ADMIN");
@@ -166,52 +162,109 @@ async function getTripLocation(req: Request, res: Response) {
         const isAuthorizedDriver = (user?.role === "DRIVER" && trip.driverId === user.userId);
 
         if (!isADMIN && !isAuthorizedFleetManager && !isAuthorizedDriver) {
-            return res.status(403).json({ message: "You are unauthorized to make this request" });
+            return sendForbidden(res, "You are unauthorized to access this trip");
         }
 
-        if (trip.location.length === 0) {
-            return res.status(404).json({ message: "No locations found for this trip yet." });
+        if (trip.status === "PLANNED") {
+            return sendBadRequest(res, "Trip has not started yet.");
         }
 
-        res.json(trip.location[0]);
+        if (trip.status === "CANCELLED") {
+            return sendBadRequest(res, "Trip was cancelled and has no location data.");
+        }
+
+        res.json({
+            "latitude": trip.location[0].latitude,
+            "longitude": trip.location[0].longitude,
+
+        });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        sendError(res);
     }
 }
 
 
 async function getTripHeatMap(req: Request, res: Response) {
     try {
-        const tripId = Number(req.params.tripId);
-
-        if (isNaN(tripId)) {
-            return res.status(400).json({ message: "Invalid tripId" });
-        }
+        const tripId = req.validated?.params.tripId;
+        const user = req.user;
 
         const trip = await prisma.trip.findUnique({
             where: { tripId },
             include: {
                 location: {
-                    orderBy: { time: "asc" },
+                    orderBy: { time: "asc" },  // locations sorted ascendingly
                 },
             },
         });
 
         if (!trip) {
-            return res.status(404).json({ message: "Trip not found" });
+            return sendNotFound(res, "Trip not found.")
         }
 
-        if (trip.location.length === 0) {
-            return res.status(404).json({ message: "No locations found for this trip yet." });
+        const isADMIN = (user?.role === "ADMIN");
+        const isAuthorizedFleetManager = (user?.role === "FLEET_MANAGER" && trip.fleetManagerId === user.userId);
+        const isAuthorizedDriver = (user?.role === "DRIVER" && trip.driverId === user.userId);
+
+        if (!isADMIN && !isAuthorizedFleetManager && !isAuthorizedDriver) {
+            return sendUnauthorized(res, "You are unauthorized to access this trip");
+        }
+
+        if (trip.status === "PLANNED") {
+            return sendBadRequest(res, "Trip has not started yet.");
+        }
+
+        if (trip.status === "CANCELLED") {
+            return sendBadRequest(res, "Trip was cancelled and has no location data.");
         }
 
         res.json(trip.location);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        sendError(res);
+    }
+}
+
+async function sendTripLocation(req: Request, res: Response) {
+    try {
+        const data = req.validated as sendTripLocationDTO;
+        const tripId = data.params.tripId;
+        const { latitude, longitude } = data.body;
+        const user = req.user;
+
+        const trip = await prisma.trip.findUnique({
+            where: {
+                tripId,
+            }
+        });
+        if (!trip) {
+            return sendNotFound(res, "Trip not found.")
+        }
+
+        if (trip.driverId !== user?.userId) {
+            return sendUnauthorized(res, "You are unauthorized to send location updates for this trip");
+        }
+        if (trip.status !== "ONGOING") {
+            return res.status(400).json({ message: "Can't add location to a non-active trip." });
+            // sendValidationError()
+        }
+
+        const location = await prisma.location.create({
+            data: {
+                tripId,
+                latitude,
+                longitude
+            }
+        });
+        // return res.status(201).json({ message: "Location sent successfully", location });
+        return sendCreated(res, location, "Location sent successfully");
+
+    } catch (error) {
+        console.error(error);
+        sendError(res);
     }
 }
 
@@ -370,4 +423,4 @@ async function deleteTrip(req: Request, res: Response) {
     }
 }
 
-export { createTrip, readTrips, getTripById, updateTrip, deleteTrip, getTripLocation }
+export { createTrip, readTrips, getTripById, updateTrip, deleteTrip, getTripLocation, getTripHeatMap, sendTripLocation }

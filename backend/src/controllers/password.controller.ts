@@ -29,7 +29,7 @@ export const forgetPass = async (req: express.Request, res: express.Response) =>
     },
   });
 
-const resetLink = `http://localhost:3000/reset-password.html?token=${resettoken}`;
+  const resetLink = `http://localhost:3000/reset-password.html?token=${resettoken}`;
   await sgMail.send({
     to: email,
     from: process.env.EMAIL_FROM!,

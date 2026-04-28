@@ -1,7 +1,7 @@
 import express from "express"
-import { signup , login} from "../controllers/authController.ts"
-import { SignupSchema } from "../schema/users.ts"
-import { validate } from "../validators/validate.ts"
+import { signup, login } from "../controllers/auth.controller"
+import { SignupSchema } from "../schema/users"
+import { validate } from "../validators/validate"
 
 const router = express.Router()
 

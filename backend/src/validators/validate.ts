@@ -1,5 +1,5 @@
 // middleware/validate.ts
-import { ZodObject, ZodError } from "zod";
+import { ZodObject, ZodError, z } from "zod";
 import { Request, Response, NextFunction } from "express";
 
 declare global {
@@ -36,7 +36,6 @@ export const validate =
                     });
                 }
 
-                // ❌ Not a Zod error → real server error
                 console.error(err);
 
                 return res.status(500).json({

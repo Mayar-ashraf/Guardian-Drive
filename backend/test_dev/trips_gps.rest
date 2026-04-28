@@ -1,3 +1,12 @@
-GET http://localhost:3000/api/trips/7/gps
+GET http://localhost:3000/api/trips/23/gps
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc2ODE2MzI3LCJleHAiOjE3NzY5MDI3Mjd9.qrtnLL23jHZG6YXTluzms1Hb-4iNfPpzjOByASmcqVA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzczODA3NTcsImV4cCI6MTc3NzQ2NzE1N30.e-ezM_3QqaLQQ55BI5Yikv_UTZWsowN-eS6zHMim8Ro
+
+### 
+POST http://localhost:3000/api/trips/23/gps
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc3MzkxOTg2LCJleHAiOjE3Nzc0NzgzODZ9.s5b77OoP_jeLHkt7Qf6Rmppvvk226uBSEjnPomLT194
+
+{
+    "latitude" : 2.1121
+}

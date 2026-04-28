@@ -37,6 +37,8 @@ model Driver {
 
   avgHealthReadings AvgHealthReadings[]
   trips             Trip[]
+
+  wearableBand      WearableBand?
 }
 
 model Trip {
@@ -54,7 +56,7 @@ model Trip {
   driver   Driver? @relation(fields: [driverId], references: [id])
   driverId Int?
 
-  car      Car?    @relation(fields: [engineId], references: [engineId])
+ car      Car?    @relation(fields: [engineId], references: [engineId])
   engineId String?
 
   fleetManagerId Int
@@ -78,7 +80,10 @@ model Location {
   tripId Int
   trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 
-  alerts Alert[] // multiple alerts can happen at the same point in time
+  // multiple alerts can happen at the same point in time
+  // Named back-relations to match the two relations on Alert
+  triggeredAlerts Alert[] @relation("AlertTriggeredLocation")
+  stoppedAlerts   Alert[] @relation("AlertStoppedLocation")
 }
 
 // the enforce consistency at the service layer when creating an alert:
@@ -87,13 +92,13 @@ model Location {
 // NOTE : INDEXING NEEDS TO BE ADDED LATER
 
 model Car {
-  engineId String    @id
-  plateNo  String
-  color    String
-  status   carStatus
-  trips    Trip[]
-}
+  engineId  String   @id
+  plateNo   String
+  color     String
+  status    carStatus
 
+  trips     Trip[]
+}
 enum carStatus {
   ACTIVE
   IN_TRIP
@@ -115,12 +120,18 @@ model Alert {
   generatedAt DateTime    @default(now())
   solvedAt    DateTime?
 
-  tripId     Int
-  locationId Int
-  location   Location @relation(fields: [locationId], references: [locationId], onDelete: Cascade)
-  trip       Trip     @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+  tripId Int
+  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 
-  healthEvents            HealthEvent?
+  // Where the alert was triggered
+  triggeredLocationId Int
+  triggeredLocation   Location @relation("AlertTriggeredLocation", fields: [triggeredLocationId], references: [locationId], onDelete: Cascade)
+
+  // Where the car actually stopped (nullable — filled in once car stops)
+  stoppedLocationId Int?
+  stoppedLocation   Location? @relation("AlertStoppedLocation", fields: [stoppedLocationId], references: [locationId], onDelete: SetNull)
+
+  healthEvent             HealthEvent?
   emergencyServiceRequest EmergencyServiceRequest?
 }
 
@@ -130,9 +141,9 @@ enum alertStatus {
 }
 
 enum alertType {
-  HEALTH_ABNORMAL
-  SOS
-  VEHICLE_EMERGENCY
+  HEALTH_ABNORMAL // automatic trigger
+  SOS // manual trigger
+  // VEHICLE_EMERGENCY
 }
 
 model WearableBand {
@@ -140,8 +151,12 @@ model WearableBand {
   sensorList   String[]
   batteryLevel Int
   isConnected  Boolean
+  
+  driverId     Int?    @unique
+  driver       Driver? @relation(fields: [driverId], references: [id])
 }
 
+// Can add later BloodPressure too? and Blood Type?
 model MedicalInformation {
   recordId    Int      @id @default(autoincrement())
   conditions  String[]
@@ -161,10 +176,11 @@ model AvgHealthReadings {
 }
 
 model HealthEvent {
-  eventId   Int      @id @default(autoincrement())
-  eventDate DateTime @default(now())
-  heartRate String
-  temp      Float
+  eventId          Int      @id @default(autoincrement())
+  eventDate        DateTime @default(now())
+  heartRate        String
+  temp             Float
+  firstAidGuidance String? // added to save firstAidGuidance response
 
   recordId Int
   medical  MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
@@ -177,6 +193,7 @@ model TowingRequest {
   requestId      Int           @id @default(autoincrement())
   status         requestStatus
   requestTime    DateTime      @default(now())
+  //updatedAt        DateTime      @updatedAt
   completionTime DateTime?
   towingCompany  String
 
@@ -195,6 +212,7 @@ model EmergencyServiceRequest {
   status           requestStatus
   requestTime      DateTime      @default(now())
   phone            String
+  //updatedAt        DateTime      @updatedAt
   completionTime   DateTime?
   hospitalAssigned String
 
