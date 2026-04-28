@@ -2,7 +2,7 @@ import express from "express";
 import { prisma } from "../lib/prisma"
 import { Role } from "../../generated/prisma/enums"; 
 import { id } from "zod/locales";
-import {CarFieldRefs } from './../../generated/prisma/models/Car';
+import {CarFieldRefs } from '../../generated/prisma/models/Car';
 export const getAllcars = async ( req:express.Request, res:express.Response)=>{
     try{
         const role =req.user?.role;

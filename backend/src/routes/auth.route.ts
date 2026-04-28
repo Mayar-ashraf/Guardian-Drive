@@ -1,5 +1,5 @@
 import express from "express"
-import { signup, login } from "../controllers/authController"
+import { signup, login } from "../controllers/auth.controller"
 import { SignupSchema } from "../schema/users"
 import { validate } from "../validators/validate"
 

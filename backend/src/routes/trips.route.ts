@@ -1,5 +1,5 @@
 import express from "express"
-import { createTrip, readTrips, getTripById, updateTrip, deleteTrip, getTripLocation, sendTripLocation, getTripHeatMap } from "../controllers/tripsController"
+import { createTrip, readTrips, getTripById, updateTrip, deleteTrip, getTripLocation, sendTripLocation, getTripHeatMap } from "../controllers/trips.controller"
 import { authorize } from '../middleware/AuthMiddleware';
 import { validate } from "../validators/validate"
 import { validateRoleBased } from "../validators/roleBasedValidate"

@@ -1,7 +1,7 @@
 import express from "express";
 import { get } from "node:http";
 import { deleteuserbyID, edituserbyID, getAllusers, getuserbyID } from "../controllers/users.controller";
-import { authorize, authenticate } from './../middleware/AuthMiddleware';
+import { authorize, authenticate } from '../middleware/AuthMiddleware';
 import { Role } from "../../generated/prisma/enums";
 import{validate } from "../validators/validate"
 import { getUserbyIDschema, edituserbyIDschema,deleteUserbyIDschema } from "../schema/user/user.schema";

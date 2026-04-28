@@ -1,6 +1,6 @@
 import express from "express";
 import { get } from "node:http";
-import { createCar, getAllcars,getCarbyID } from "../controllers/carsController";
+import { createCar, getAllcars,getCarbyID } from "../controllers/cars.controller";
 import { authorize, authenticate } from './../middleware/AuthMiddleware';
 import { Role } from "../../generated/prisma/enums";
 
