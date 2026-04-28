@@ -173,7 +173,11 @@ async function getTripLocation(req: Request, res: Response) {
             return sendBadRequest(res, "Trip was cancelled and has no location data.");
         }
 
-        res.json(trip.location[0]);
+        res.json({
+            "latitude": trip.location[0].latitude,
+            "longitude": trip.location[0].longitude,
+
+        });
 
     } catch (error) {
         console.error(error);
@@ -240,7 +244,7 @@ async function sendTripLocation(req: Request, res: Response) {
             return sendNotFound(res, "Trip not found.")
         }
 
-        if (trip.driverId !== user?.userId) {  
+        if (trip.driverId !== user?.userId) {
             return sendUnauthorized(res, "You are unauthorized to send location updates for this trip");
         }
         if (trip.status !== "ONGOING") {
