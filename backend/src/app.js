@@ -8,6 +8,7 @@ import carsRoute from "./routes/cars.route.ts";
 import path from "path"
 import usersRoutes from "./routes/users.route.ts";
 import alertRoute from "./routes/alert.route.ts";
+import wearablebandsRoute from "./routes/wearableBands.route.ts";
 
 const app = express();
 app.use(express.json())
@@ -20,6 +21,7 @@ app.use("/api/alerts", alertRoute);
 app.use("/api/trips", authMiddleware.authenticate, tripsRoute)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
+app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
