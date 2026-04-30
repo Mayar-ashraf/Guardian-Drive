@@ -4,109 +4,124 @@ import { Role } from "../../generated/prisma/enums";
 import { id } from "zod/locales";
 import { CarFieldRefs } from '../../generated/prisma/models/Car';
 import { Request, Response } from "express"
-export const getAllcars = async (req: express.Request, res: express.Response) => {
-    try {
-        const role = req.user?.role;
-        if (role == Role.DRIVER) {
-            return res.status(403).json({ message: "you are unauthorized to make this request" });
-        }
-        const cars = await prisma.car.findMany({
-            include: {
-                trips: true,
-            },
-        });
-        return res.json({ cars });
+export const getAllCars = async (req: Request, res: Response) => {
+  try {
+    const role = req.user?.role;
+
+    if (!role) {
+      return res.status(401).json({ message: "Missing or invalid token" });
     }
-    catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "internal server error" });
 
-
+    if (role === Role.DRIVER) {
+      return res.status(403).json({ message: "you are unauthorized to make this request" });
     }
-}
-export const getCarbyID = async (req: express.Request, res: express.Response) => {
-    try {
-        const caller = req.user;
-        //driver get his own car 
-        if (!caller) {
-            return res.status(401).json({
-                message: "Missing or invalid authentication token."
-            });
-        }
 
-        const ID = Array.isArray(req.params.carId) ? req.params.carId[0] : req.params.carId;
+    const { status, color, plateNo } = req.validated?.query;
 
-        if (!ID) {
-            return res.status(400).json({ message: "Invalid Car ID" });
-        }
+    const cars = await prisma.car.findMany({
+      where: {
+        ...(status && {
+          status: String(status).toUpperCase(),
+        }),
+        ...(color && {
+          color: {
+            contains: String(color),
+            mode: "insensitive",
+          },
+        }),
+        ...(plateNo && {
+          plateNo: {
+            contains: String(plateNo),
+            mode: "insensitive",
+          },
+        }),
+      },
+    });
 
-        const car = await prisma.car.findUnique({
-            where: { engineId: ID },
-            include: { trips: true }
-        });
+    return res.status(200).json({ cars });
 
-        if (!car) {
-            return res.status(404).json({ message: "Car Not Found." });
-        }
-
-        if (caller.role === Role.DRIVER) {
-            const allowed = car.trips.some(t => t.driverId === caller.userId);
-
-            if (!allowed) {
-                return res.status(403).json({
-                    message: "You are unauthorized to make this request."
-                });
-            }
-        }
-
-        return res.status(200).json(car);
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
+export const getCarById = async (req: Request, res: Response) => {
+  try {
+    const { engineId } = req.validated?.params;
+    const user = req.user;
 
-export const createCar = async (req: express.Request, res: express.Response) => {
-    try {
-        const caller = req.user;
-
-        if (!caller) {
-            return res.status(401).json({
-                message: "Missing or invalid authentication token."
-            });
-        }
-        if (caller.role == Role.DRIVER || caller.role == Role.FLEET_MANAGER) {
-            return res.status(403).json({ message: "you are unauthorized to make this request " });
-        }
-        const { engineId, plateNo, color, status } = req.body;
-
-        if (!engineId || !plateNo || !color) {
-            return res.status(400).json({ message: "fields are missing " });
-        }
-
-        const car = await prisma.car.create({
-            data: {
-                engineId,
-                plateNo,
-                color,
-                status,
-            },
-        });
-
-        res.status(201).json({ message: "Car created successfully", car, });
-    } catch (error: any) {
-        console.error(error);
-        if (error.code === "P2002") {
-            return res.status(400).json({
-                message: "engine id already exists",
-            });
-        }
-
-        res.status(500).json({
-            message: "Internal server error",
-        });
+    if (!user) {
+      return res.status(401).json({ message: "Missing or invalid token" });
     }
+
+    const car = await prisma.car.findUnique({
+      where: { engineId },
+      include: {
+        trips: true,
+      },
+    });
+
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    if (user.role === Role.DRIVER) {
+      const ownsCar = car.trips.some(
+        (trip) => trip.driverId === user.userId
+      );
+
+      if (!ownsCar) {
+        return res.status(403).json({
+          message: "You are not allowed to access this car",
+        });
+      }
+    }
+
+    return res.status(200).json({ car });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+export const createCar = async (req: Request, res: Response) => {
+  try {
+   /* const caller = req.user;
+
+    if (!caller) {
+      return res.status(401).json({ message: "Missing or invalid token" });
+    }
+
+    if (caller.role === Role.DRIVER || caller.role === Role.FLEET_MANAGER) {
+      return res.status(403).json({ message: "You are unauthorized to make this request " });
+    }*/
+
+    const { engineId, plateNo, color, status } = req.validated ?.body;
+
+    if (!engineId || !plateNo || !color) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
+
+    const car = await prisma.car.create({
+      data: {
+        engineId,
+        plateNo,
+        color,
+        status: status || "ACTIVE"//default
+      }
+    });
+
+    return res.status(201).json({ message: "Car created", car });
+
+  } catch (error: any) {
+    console.error(error);
+
+    if (error.code === "P2002") {
+      return res.status(400).json({ message: "Car already exists" });
+    }
+
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 async function updateCar(req: Request, res: Response) {
 

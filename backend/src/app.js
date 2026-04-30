@@ -17,13 +17,13 @@ app.use(express.json())
 app.use("/api/auth", authRoute)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
-app.use("/api/cars", carsRoute)
 app.use("/api/medical-information", medicalInfoRoute)
 app.use("/api/alerts", alertRoute);
 app.use("/api/trips", authMiddleware.authenticate, tripsRoute)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/cars", authMiddleware.authenticate, carsRoute)
+
 app.use("/api/emergency-service-request", authMiddleware.authenticate, emergencyServiceRequestRoute)
 app.use("/api/towing-requests", authMiddleware.authenticate, towingRequestRoute);
 app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);
