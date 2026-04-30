@@ -37,6 +37,8 @@ model Driver {
 
   avgHealthReadings AvgHealthReadings[]
   trips             Trip[]
+
+  wearableBand      WearableBand?
 }
 
 model Trip {
@@ -149,6 +151,9 @@ model WearableBand {
   sensorList   String[]
   batteryLevel Int
   isConnected  Boolean
+  
+  driverId     Int?    @unique
+  driver       Driver? @relation(fields: [driverId], references: [id])
 }
 
 // Can add later BloodPressure too? and Blood Type?
