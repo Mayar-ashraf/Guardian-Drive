@@ -133,6 +133,8 @@ model Alert {
 
   healthEvent             HealthEvent?
   emergencyServiceRequest EmergencyServiceRequest?
+    towingRequest           TowingRequest?
+
 }
 
 enum alertStatus {
@@ -199,6 +201,9 @@ model TowingRequest {
 
   tripId Int  @unique
   trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+  alertId Int   @unique
+  alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+
 }
 
 enum requestStatus {

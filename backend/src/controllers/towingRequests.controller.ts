@@ -1,113 +1,200 @@
-import { prisma } from "../lib/prisma"
-import express from "express";
-import { Role } from "../../generated/prisma/enums";
+import { prisma } from "../lib/prisma";
+import { Request, Response } from "express";
+import { requestStatus } from "../../generated/prisma/enums";
 
-export const createTowingRequest = async (req: express.Request, res: express.Response) => {
-    try {
-        const caller = req?.user;
-        const role = caller?.role;
-        if (!caller) {
-            return res.status(401).json({ message: "missing or invalid token" });
-        }
-        if (role == Role.DRIVER || role == Role.ADMIN) {
-            return res.status(403).json({ message: "You are unauthorized to make this request" });
-        }
+export const createTowingRequest = async (req: Request, res: Response) => {
+  try {
+    const { tripId, alertId, towingCompany, status } = req.validated?.body;
 
-        const { tripId, towingCompany, status } = req.validated?.body;
-        const request = await prisma.towingRequest.create({
-            data: {
-                tripId,
-                towingCompany,
-                status: status || "PENDING",
-            },
+    const trip = await prisma.trip.findUnique({
+      where: { tripId },
+    });
 
-        });
-        return res.status(201).json({
-            message: "Request created succsefully",
-            data: request
-        })
+    if (!trip) {
+      return res.status(404).json({ message: "Trip not found" });
     }
-    catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "error creating towing request" });
+
+    const alert = await prisma.alert.findUnique({
+      where: { alertId },
+    });
+
+    if (!alert) {
+      return res.status(404).json({ message: "Alert not found" });
     }
-};
-export const getTowingRequests = async (req: express.Request, res: express.Response) => {
-    try {
 
-        const caller = req?.user;
-        const role = caller?.role;
-        if (!caller) {
-            return res.status(401).json({ message: "missing or invalid token" });
-        }
-        if (role == Role.DRIVER) {
-            return res.status(403).json({ message: "You are unauthorized to make this request" });
-        }
-        const filters = req.validated?.query || {};
-        const requests = await prisma.towingRequest.findMany({
-            where: {
-                ...(filters.status && { status: filters.status }),
-                ...(filters.towingCompany && { towingCompany: filters.towingCompany }),
-                ...(filters.completionTime && { completionTime: filters.completionTime }),
-                ...(filters.requestTime && { requestTime: filters.requestTime }),
-                ...(filters.car && {
-                    trip: {
-                        car: {
-                            engineId: filters.car,
-                        },
-                    },
-                }),
-            },
-            orderBy: {
-                requestTime: "desc",
-            },
-
-            include: {
-                trip: true,
-            },
-        });
-
-        return res.status(200).json({
-            message: "Towing requests fetched successfully",
-            data: requests,
-        });
-    } catch (error) {
-        console.error(error);
-        return res
-            .status(500)
-            .json({ message: "Error getting towing requests" });
+    if (alert.tripId !== tripId) {
+      return res.status(400).json({
+        message: "Alert does not belong to this trip",
+      });
     }
-};
-export const gettowingRequestbyID = async (req: express.Request, res: express.Response) => {
-    try {
-        const caller = req?.user;
-        const role = caller?.role;
-        if (!caller) {
-            return res.status(401).json({ message: "missing or invalid token" });
 
-        }
-        if (role == Role.DRIVER) {
-            return res.status(403).json({ message: "you are not authorized to make this request" });
-        }
-        const id = req.validated?.params.towingRequestId;
+    const existingRequest = await prisma.towingRequest.findUnique({
+      where: { tripId },
+    });
 
-        const request = await prisma.towingRequest.findUnique({
-            where: {
-                requestId: id,
-
-            },
-            include: {
-                trip: true,
-            }
-        });
-        if (!request) {
-            return res.status(404).json({ message: "Towing request not found" });
-        }
-        return res.status(200).json(request);
+    if (existingRequest) {
+      return res.status(400).json({
+        message: "This trip already has a towing request",
+      });
     }
-    catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error getting towing request" });
-    }
+
+    const request = await prisma.towingRequest.create({
+      data: {
+        tripId,
+        alertId,
+        towingCompany,
+        status: status || requestStatus.REQUESTED,
+      },
+    });
+
+    return res.status(201).json({
+      message: "Request created successfully",
+      data: request,
+    });
+  } catch (error) {
+    console.error("Create error:", error);
+    return res.status(500).json({ message: "Error creating towing request" });
+  }
 };
 
+
+export const getTowingRequests = async (req: Request, res: Response) => {
+  try {
+    const {
+      status,
+      towingCompany,
+      car,
+      requestTime,
+      completionTime,
+    } = req.validated?.query;
+
+    const requests = await prisma.towingRequest.findMany({
+      where: {
+        ...(status && { status }),
+        ...(towingCompany && { towingCompany }),
+
+        ...(requestTime && { requestTime }),
+        ...(completionTime && { completionTime }),
+
+        ...(car && {
+          trip: {
+            car: {
+              engineId: car,
+            },
+          },
+        }),
+      },
+
+      include: {
+        trip: {
+          include: {
+            car: true,
+          },
+        },
+        alert: true, 
+      },
+
+      orderBy: {
+        requestTime: "desc",
+      },
+    });
+
+    return res.status(200).json({
+      message: "Towing requests fetched successfully",
+      data: requests,
+    });
+  } catch (error) {
+    console.error("Get all error:", error);
+    return res.status(500).json({ message: "Error getting towing requests" });
+  }
+};
+
+
+export const getTowingRequestById = async (req: Request, res: Response) => {
+  try {
+    const { towingRequestId } = req.validated?.params;
+
+    const request = await prisma.towingRequest.findUnique({
+      where: { requestId: towingRequestId },
+      include: {
+        trip: {
+          include: {
+            car: true,
+          },
+        },
+        alert: true, 
+      },
+    });
+
+    if (!request) {
+      return res.status(404).json({ message: "Towing request not found" });
+    }
+
+    return res.status(200).json(request);
+  } catch (error) {
+    console.error("Get by ID error:", error);
+    return res.status(500).json({ message: "Error getting towing request" });
+  }
+};
+
+
+export const updateTowingRequest = async (req: Request, res: Response) => {
+  try {
+    const { towingRequestId } = req.validated?.params;
+    const { status, completionTime, towingCompany } = req.validated?.body;
+
+    const existing = await prisma.towingRequest.findUnique({
+      where: { requestId: towingRequestId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    if (status === requestStatus.COMPLETED && !completionTime) {
+      return res.status(400).json({
+        message: "completionTime is required when status is COMPLETED",
+      });
+    }
+
+    const updated = await prisma.towingRequest.update({
+      where: { requestId: towingRequestId },
+      data: {
+        ...(status && { status }),
+        ...(completionTime && { completionTime }),
+        ...(towingCompany && { towingCompany }),
+      },
+    });
+
+    return res.status(200).json(updated);
+  } catch (error) {
+    console.error("Update error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export const deleteTowingRequest = async (req: Request, res: Response) => {
+  try {
+    const { towingRequestId } = req.validated?.params;
+
+    const existing = await prisma.towingRequest.findUnique({
+      where: { requestId: towingRequestId },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    await prisma.towingRequest.delete({
+      where: { requestId: towingRequestId },
+    });
+
+    return res.status(200).json({
+      message: "Request deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
