@@ -1,5 +1,5 @@
 import express from "express";
-import { authorize } from "../middleware/AuthMiddleware";
+import { authorize, authenticate } from "../middleware/AuthMiddleware";
 import { validate } from "../validators/validate";
 
 import {
