@@ -30,6 +30,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvb
 ######
 POST http://localhost:3000/api/auth/signup
 Content-Type: application/json
+
 { 
     "email":"driver6@gmail.com",
     "fName":"Driver",
@@ -40,6 +41,24 @@ Content-Type: application/json
     "role":"DRIVER" ,
     "drivingLicense":"abc123456"
 } 
+
+#####
+
+######
+POST http://localhost:3000/api/auth/signup
+Content-Type: application/json
+
+{ 
+    "email":"driver7@gmail.com",
+    "fName":"Driver",
+    "lName":"Driver",
+    "password":"Driver7@12345678",
+    "phone":["01122226666"],
+    "address":"abcd",
+    "role":"DRIVER" ,
+    "drivingLicense":"abc123456"
+} 
+
 #####
 
 POST http://localhost:3000/api/auth/signup
