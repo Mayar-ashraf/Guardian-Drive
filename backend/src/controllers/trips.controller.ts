@@ -26,12 +26,9 @@ async function createTrip(req: Request, res: Response) {
         // };
         const dataFromZod: any = req.validated?.body
 
-        // change after zod
         if (dataFromZod.driverId !== undefined) {
-            // data.driverId = Number(driverId);
             const driver = await prisma.driver.findUnique({
                 where: {
-                    // id: driverId
                     id: dataFromZod.driverId
                 }
             })
@@ -52,7 +49,6 @@ async function createTrip(req: Request, res: Response) {
         }
         const assignedFleetManager = await prisma.user.findUnique({
             where: {
-                // id: fleetManagerId
                 id: dataFromZod.fleetManagerId
             }
         })
@@ -60,9 +56,16 @@ async function createTrip(req: Request, res: Response) {
 
             return res.status(422).json({ message: "Fleet manager doesn't exist" })
         }
-        //do same for car
 
-
+        const tripDuplicate = await prisma.trip.findFirst({
+            where: {
+                driverId: dataFromZod.driverId,
+                plannedStartTime: dataFromZod.plannedStartTime
+            }
+        })
+        if (tripDuplicate) {
+            return res.status(409).json({ message: "Trip already exists for this driver at the given planned start time" })
+        }
         const trip = await prisma.trip.create({
             data: {
                 ...dataFromZod,
@@ -325,6 +328,8 @@ async function updateTrip(req: Request, res: Response) {
                     return res.status(422).json({ message: "Car doesn't exist" })
                 }
             }
+
+            // i can assign to a diff fleet manager
             if (updates.fleetManagerId !== undefined) {
                 const fleetManager = await prisma.user.findUnique({
                     where: {
@@ -342,7 +347,17 @@ async function updateTrip(req: Request, res: Response) {
             if (updates.status === "COMPLETED") {
                 allowedUpdates.endTime = updates.endTime ?? new Date();
             }
-            const trip = await prisma.trip.update({
+            let trip = await prisma.trip.findUniqueOrThrow({
+                where: {
+                    tripId: tripId
+                }
+            })
+            if (trip.fleetManagerId !== user.userId) {
+                return res.status(403).json({ message: "Forbidden" });
+
+            }
+
+            trip = await prisma.trip.update({
                 where: { tripId: tripId },
                 data: allowedUpdates
             })
@@ -350,15 +365,15 @@ async function updateTrip(req: Request, res: Response) {
 
         } else {
             //driver can only edit trip status which changes end and start time
-            let trip = await prisma.trip.findUnique({
+            let trip = await prisma.trip.findUniqueOrThrow({
                 where: {
                     tripId: tripId
                 }
             })
 
-            if (!trip) {
-                return res.status(404).json({ message: "Trip not found" });
-            }
+            // if (!trip) {
+            //     return res.status(404).json({ message: "Trip not found" });
+            // }
             if (trip.driverId !== user?.userId) {
                 return res.status(403).json({ message: "Forbidden" });
             }

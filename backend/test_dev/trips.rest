@@ -1,6 +1,6 @@
 POST http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NjcxMTI1NSwiZXhwIjoxNzc2Nzk3NjU1fQ.BoC0b0G5_EPnwId83_HTIxQEsNnP4lLO1c7Kk3wm-Fc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc3NjUzNzU1LCJleHAiOjE3Nzc3NDAxNTV9.c73B-EOWx0roPbkqm9Y6S6EUqVwo9J2SrA3Mi8SRSvY
 
 { 
     "startPoint":"Alexandria",
@@ -12,14 +12,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
 #########
 POST http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc3NjUzNzU1LCJleHAiOjE3Nzc3NDAxNTV9.c73B-EOWx0roPbkqm9Y6S6EUqVwo9J2SrA3Mi8SRSvY
 
 { 
     "startPoint":"Alexandria",
     "destPoint":"China",
-    "plannedStartTime": "2026-04-20T20:30:00.000Z",
-    "driverId": 6,
-    "fleetManagerId": 3
+    "plannedStartTime": "2026-07-20T20:30:00.000Z",
+    "driverId": 5,
+    "fleetManagerId": 4
 } 
 
 ########get all trips admin or fleet manager
@@ -80,11 +80,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb
 }
 
 ######### patch as driver
-PATCH  http://localhost:3000/api/trips/14
+PATCH  http://localhost:3000/api/trips/8
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc3NjUzNzU1LCJleHAiOjE3Nzc3NDAxNTV9.c73B-EOWx0roPbkqm9Y6S6EUqVwo9J2SrA3Mi8SRSvY
 
 { 
-    "endTime": "2026-04-20T20:30:00.000Z",
     "status": "ONGOING"
 } 
