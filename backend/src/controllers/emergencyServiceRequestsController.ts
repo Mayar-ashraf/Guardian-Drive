@@ -1,24 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma"
 import { requestStatus } from "../../generated/prisma/enums";
-/*
-POST /api/emergency-service-requests 
-GET /api/emergency-services-requests
-GET  /api/emergency-services-requests/:emergencyRequestId
-PATCH  /api/emergency_service_requests/:emergencyRequestId
-DELETE  /api/emergency-services-requests/:emergencyRequestId
-*/
 async function createEmergencyServiceRequest(req: Request, res: Response) {
-    //   requestId        Int           @id @default(autoincrement())
-    //   status           requestStatus
-    //   requestTime      DateTime      @default(now())
-    //   phone            String
-    //   completionTime   DateTime?
-    //   hospitalAssigned String
-
-    //   alertId Int   @unique
-    //   alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
-    // }
     try {
         const validatedData = req.validated?.body
         const alert = await prisma.alert.findUnique({
@@ -28,6 +11,14 @@ async function createEmergencyServiceRequest(req: Request, res: Response) {
         })
         if (!alert) {
             return res.status(422).json({ message: "Alert doesn't exist" })
+        }
+        const emergencyServiceRequestDuplicate = await prisma.emergencyServiceRequest.findUnique({
+            where: {
+                alertId: validatedData.alertId
+            }
+        })
+        if (emergencyServiceRequestDuplicate) {
+            return res.status(409).json({ message: "Emergency request already exists for this alert" })
         }
         const emergencyServiceRequest = await prisma.emergencyServiceRequest.create({
             data: {
@@ -39,12 +30,15 @@ async function createEmergencyServiceRequest(req: Request, res: Response) {
         return res.status(201).json({ message: "Emergency service request created successfully", emergencyServiceRequest });
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ message: "Server Error" })
 
     }
 }
 async function readEmerencyServiceRequests(req: Request, res: Response) {
+    // can he see all requests
     try {
+        const user = req.user
         const validatedQuery = req.validated?.query
         const { limit, orderBy, page } = validatedQuery
         const skip = (page - 1) * limit;
@@ -56,8 +50,12 @@ async function readEmerencyServiceRequests(req: Request, res: Response) {
                 hospitalAssigned: {
                     contains: validatedQuery.hospitalAssigned
                 }
-            }) //like
-
+            }), //like
+            alert: {
+                trip: {
+                    fleetManagerId: user?.userId
+                }
+            }
         }
         //from to request and completion
         const completionTimeFilter: any = {};
@@ -124,6 +122,9 @@ async function updateEmergenceServiceRequest(req: Request, res: Response) {
     try {
         const requestId = req.validated?.params.requestId
         const validatedBody = req.validated?.body
+        if (validatedBody.status === "COMPLETED" && !validatedBody.completionTime) {
+            validatedBody.completionTime = new Date()
+        }
         const emergencyServiceRequest = await prisma.emergencyServiceRequest.update({
             where: {
                 requestId: requestId
@@ -133,6 +134,7 @@ async function updateEmergenceServiceRequest(req: Request, res: Response) {
         return res.status(200).json({ emergencyServiceRequest });
 
     } catch (error: any) {
+        console.log(error)
         if (error.code === "P2025") {
             return res.status(404).json({ message: "Emergency service request not found" });
         }

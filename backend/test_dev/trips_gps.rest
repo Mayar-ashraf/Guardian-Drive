@@ -10,3 +10,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb
 {
     "latitude" : 2.1121
 }
+#######
+POST http://localhost:3000/api/trips/1/gps
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzczOTc0NjgsImV4cCI6MTc3NzQ4Mzg2OH0.b2rl87tt81T0xH7eujxlwavaPLNZEQszjRTsd9Lnw0o
+
+{
+    "latitude" : 2.1125,
+    "longitude": 2.1121
+}

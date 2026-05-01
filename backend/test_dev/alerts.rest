@@ -1,0 +1,11 @@
+Post http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc3NjYyMjAxLCJleHAiOjE3Nzc3NDg2MDF9.waj57GGsWmyuIa4Oiyj-k_v92SYqxjYazeypBKizrko
+
+{
+    "type": "SOS",
+    "tripId": 23,
+    "triggeredLocationId": 3,
+    "temp": 37.5,
+    "heartRange":"120"
+}

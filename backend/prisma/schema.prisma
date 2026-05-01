@@ -38,13 +38,15 @@ model Driver {
   avgHealthReadings AvgHealthReadings[]
   trips             Trip[]
 
-  wearableBand      WearableBand?
+  wearableBand WearableBand?
 }
 
 model Trip {
   tripId           Int            @id @default(autoincrement())
-  startPoint       String
-  destPoint        String
+  startLatitude    Float
+  startLongitude   Float
+  destLatitude     Float
+  destLongitude    Float
   plannedStartTime DateTime
   startTime        DateTime? //this will be the actual start time when driver clicks start
   endTime          DateTime?
@@ -56,7 +58,7 @@ model Trip {
   driver   Driver? @relation(fields: [driverId], references: [id])
   driverId Int?
 
- car      Car?    @relation(fields: [engineId], references: [engineId])
+  car      Car?    @relation(fields: [engineId], references: [engineId])
   engineId String?
 
   fleetManagerId Int
@@ -92,13 +94,14 @@ model Location {
 // NOTE : INDEXING NEEDS TO BE ADDED LATER
 
 model Car {
-  engineId  String   @id
-  plateNo   String
-  color     String
-  status    carStatus
+  engineId String    @id
+  plateNo  String
+  color    String
+  status   carStatus
 
-  trips     Trip[]
+  trips Trip[]
 }
+
 enum carStatus {
   ACTIVE
   IN_TRIP
@@ -133,6 +136,7 @@ model Alert {
 
   healthEvent             HealthEvent?
   emergencyServiceRequest EmergencyServiceRequest?
+  towingRequest           TowingRequest?
 }
 
 enum alertStatus {
@@ -151,9 +155,9 @@ model WearableBand {
   sensorList   String[]
   batteryLevel Int
   isConnected  Boolean
-  
-  driverId     Int?    @unique
-  driver       Driver? @relation(fields: [driverId], references: [id])
+
+  driverId Int?    @unique
+  driver   Driver? @relation(fields: [driverId], references: [id])
 }
 
 // Can add later BloodPressure too? and Blood Type?
@@ -197,8 +201,10 @@ model TowingRequest {
   completionTime DateTime?
   towingCompany  String
 
-  tripId Int  @unique
-  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+  tripId  Int   @unique
+  trip    Trip  @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+  alertId Int   @unique
+  alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
 }
 
 enum requestStatus {

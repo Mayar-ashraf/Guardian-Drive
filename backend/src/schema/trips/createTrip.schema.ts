@@ -1,8 +1,10 @@
 import { z } from "zod"
 const createTripSchema = z.object({
     body: z.object({
-        startPoint: z.string().min(1),
-        destPoint: z.string().min(1),
+        startLatitude: z.coerce.number().min(-90).max(90),
+        startLongitude: z.coerce.number().min(-180).max(180),
+        destLatitude: z.coerce.number().min(-90).max(90),
+        destLongitude: z.coerce.number().min(-180).max(180),
         plannedStartTime: z.iso.datetime(),
         fleetManagerId: z.coerce.number().int().positive(),
         engineId: z.string().optional(),
