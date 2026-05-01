@@ -1,3 +1,19 @@
-GET http://localhost:3000/api/wearablebands/2
+GET http://localhost:3000/api/wearablebands
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3NzczOTY3MDIsImV4cCI6MTc3NzQ4MzEwMn0.-4i9HKXpJRbWHXaw5htdbg6hBWy8Es3F53_I8pjf_6c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NzU4Njg5MCwiZXhwIjoxNzc3NjczMjkwfQ.i9XioDg6ipZEdOTCYvvba9j7QAXCqqSeCAwO-olYN7I
+
+{
+
+}
+
+######
+
+POST http://localhost:3000/api/wearablebands
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NzU4Njg5MCwiZXhwIjoxNzc3NjczMjkwfQ.i9XioDg6ipZEdOTCYvvba9j7QAXCqqSeCAwO-olYN7I
+
+{
+    "sensorList": ["gps"],
+    "driverId": 13
+    
+}
