@@ -12,14 +12,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvb
 #########
 POST http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc3NjUzNzU1LCJleHAiOjE3Nzc3NDAxNTV9.c73B-EOWx0roPbkqm9Y6S6EUqVwo9J2SrA3Mi8SRSvY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzY2MDUzMCwiZXhwIjoxNzc3NzQ2OTMwfQ.9oZgNUJkHXOVzC_B1jvGwsAKMk2Nkk1Poai3C53Xggg
 
 { 
-    "startPoint":"Alexandria",
-    "destPoint":"China",
-    "plannedStartTime": "2026-07-20T20:30:00.000Z",
-    "driverId": 5,
-    "fleetManagerId": 4
+    "startLatitude":    1.21,
+    "startLongitude":   1.33,
+    "destLatitude": 1.22,
+    "destLongitude": 1.33,
+    "plannedStartTime": "2028-05-02T20:30:00.000Z",
+    "driverId": 12,
+    "fleetManagerId": 10
 } 
 
 ########get all trips admin or fleet manager
@@ -71,9 +73,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
     
 } 
 ########DELETE TRIP fleet manager
-DELETE  http://localhost:3000/api/trips/14
+DELETE  http://localhost:3000/api/trips/11
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzE5OTM2OCwiZXhwIjoxNzc3Mjg1NzY4fQ.flF57hsD178fNTGXgffvtzw9jERyPKjm-Z48Kmax9kc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzY2MDUzMCwiZXhwIjoxNzc3NzQ2OTMwfQ.9oZgNUJkHXOVzC_B1jvGwsAKMk2Nkk1Poai3C53Xggg
 
 { 
     

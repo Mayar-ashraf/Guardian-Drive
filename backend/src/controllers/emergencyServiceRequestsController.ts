@@ -38,6 +38,7 @@ async function createEmergencyServiceRequest(req: Request, res: Response) {
 async function readEmerencyServiceRequests(req: Request, res: Response) {
     // can he see all requests
     try {
+        const user = req.user
         const validatedQuery = req.validated?.query
         const { limit, orderBy, page } = validatedQuery
         const skip = (page - 1) * limit;
@@ -49,8 +50,12 @@ async function readEmerencyServiceRequests(req: Request, res: Response) {
                 hospitalAssigned: {
                     contains: validatedQuery.hospitalAssigned
                 }
-            }) //like
-
+            }), //like
+            alert: {
+                trip: {
+                    fleetManagerId: user?.userId
+                }
+            }
         }
         //from to request and completion
         const completionTimeFilter: any = {};

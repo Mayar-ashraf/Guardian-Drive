@@ -25,7 +25,11 @@ async function createTrip(req: Request, res: Response) {
         //     fleetManagerId
         // };
         const dataFromZod: any = req.validated?.body
-
+        if (new Date(dataFromZod.plannedStartTime) < new Date()) {
+            return res.status(400).json({
+                message: "plannedStartTime cannot be in the past"
+            });
+        }
         if (dataFromZod.driverId !== undefined) {
             const driver = await prisma.driver.findUnique({
                 where: {

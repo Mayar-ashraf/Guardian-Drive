@@ -5,13 +5,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvb
 { 
     "phone":"01100040",
     "hospitalAssigned":"China Hospital",
-    "alertId": 2
+    "alertId": 4
     
 }
 #########
 GET http://localhost:3000/api/emergency-service-request/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc3Mzk2ODkwLCJleHAiOjE3Nzc0ODMyOTB9.yYDcNkGg5f9W7MNIV7WPparZXZnsENbuV86l4C8Qszo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzY2Mjc4OCwiZXhwIjoxNzc3NzQ5MTg4fQ.3EeHFnGFrMSvhdiqfLIMLHMSJp2EdCzA6fzI6XhYe9k
 
 { 
    
