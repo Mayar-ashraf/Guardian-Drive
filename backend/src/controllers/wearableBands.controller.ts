@@ -28,7 +28,6 @@ export const getAllWearableBands = async (req: Request, res: Response) => {
         return sendSuccess(res, { message: "Success", data: wearableBands });
 
     } catch (error) {
-        console.error(error);
         return sendError(res);
     }
 }
@@ -50,7 +49,6 @@ export const getWearableBandById = async (req: Request, res: Response) => {
 
         return res.json({ wearableBand });
     } catch (error) {
-        console.error(error);
         return sendError(res);
     }
 }
@@ -76,23 +74,15 @@ export const addWearableBand = async (req: Request, res: Response) => {
                 return sendBadRequest(res, "Driver with this driver id already owns a wearable band.");
             }
         }
-        /*
-        const bandExists = await prisma.wearableBand.findUnique({
-            where: {
-                deviceId: body.deviceId
-            }
-        });
-        if (bandExists) {
-            return sendBadRequest(res, "Band already exists.");
-        }
-        */
         const addedWearableBand = await prisma.wearableBand.create(({
             data: body
         }));
 
         return sendCreated(res, addedWearableBand, "Wearable Band added successfully");
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        if (error.code === "P2002") {
+            return sendBadRequest(res, "Band already exists.");
+        }
         return sendError(res);
     }
 }
@@ -116,17 +106,36 @@ export const deleteWearableBand = async (req: Request, res: Response) => {
 
 export const updateWearableBand = async (req: Request, res: Response) => {
     try {
+        const body = req.validated!.body;
         const deviceId = req.validated!.params.deviceId;
+
+        if(body.driverId){
+            const driver = await prisma.driver.findUnique({
+                where: {
+                    id: body.driverId
+                },
+                include: {
+                    wearableBand: true
+                }
+            });
+            if (!driver) {
+                return sendBadRequest(res, "Driver with this driver id does not exist.");
+            }
+            if(driver.wearableBand && driver.wearableBand.deviceId !== deviceId){
+                return sendBadRequest(res, "Driver with this driver id already owns a wearable band.");
+            }
+        }
         await prisma.wearableBand.update({
             where: {
                 deviceId: deviceId
             },
             data: req.validated!.body
         });
+        return sendSuccess(res, "Wearable band updated successfully");
 
     } catch (error: any) {
         if (error.code === "P2025") {
-            return sendError(res, "wearable Band not found");
+            return sendError(res, "Wearable Band not found.");
         }
         return sendError(res);
     }
