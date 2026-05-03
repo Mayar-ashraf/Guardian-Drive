@@ -151,7 +151,7 @@ enum alertType {
 }
 
 model WearableBand {
-  deviceId     Int      @id @default(autoincrement())
+  deviceId     Int      @id
   sensorList   String[]
   batteryLevel Int
   isConnected  Boolean
