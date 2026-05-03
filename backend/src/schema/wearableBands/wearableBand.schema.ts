@@ -27,17 +27,17 @@ export const getWearableBandSchema = z.object({
 });
 
 export const wearableBandSchema = z.object({
-    sensorList: z.array(z.string().trim().min(1, "Sensor List should not be empty").toLowerCase()),
+    sensorList: z.array(z.string("Sensors should be string").trim().min(1, "Sensor List should not be empty").toLowerCase()),
     batteryLevel: z.number("Battery level must be a valid number").int("Battery level must be an integer").min(0, "Battery level cannot be below 0").max(100, "Battery level cannot exceed 100").optional().default(100),
     isConnected: z.coerce.boolean({ error: "isConnected must be a valid boolean value" }).optional().default(false),
     driverId: z.coerce.number("Driver Id must be a valid number").int("Driver Id must be an integer").positive("Driver Id must be positive").optional()
 }).strict();
 
 export const addWearableBandSchema = z.object({
-    params: z.object({}).strict(),
     body: wearableBandSchema,
+    params: z.object({}).strict(),
     query: z.object({}).strict()
-}).strict();
+});
 
 export const deleteBandSchema = z.object({
     params: deviceIdSchema,

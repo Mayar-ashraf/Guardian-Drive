@@ -15,7 +15,7 @@ PATCH /api/wearable-bands/:deviceID
 */
 router.get('/', authorize("ADMIN"), validate(getAllWearableBandsSchema), getAllWearableBands);
 router.get('/:deviceId', authorize("ADMIN", "DRIVER"), validate(getWearableBandSchema), getWearableBandById);
-router.post('', authorize('ADMIN'), validate(wearableBandSchema), addWearableBand);
+router.post('', authorize('ADMIN'), validate(addWearableBandSchema), addWearableBand);
 router.delete('/:deviceId', authorize('ADMIN'), validate(deleteBandSchema), deleteWearableBand);
 router.patch('/:deviceId', authorize('ADMIN'), validate(updateBandSchema), updateWearableBand);
 export default router
