@@ -37,3 +37,7 @@ export const sendValidationError = (res: Response, errors: { field: string; mess
 export const sendBadRequest = (res: Response, error = "Bad Request") => {
   sendError(res, error, 400)
 };
+
+export const sendConflict = (res: Response, error = "Conflict") => {
+  sendError(res, error, 409)
+};

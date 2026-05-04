@@ -61,8 +61,9 @@ model Trip {
   car      Car?    @relation(fields: [engineId], references: [engineId])
   engineId String?
 
-  fleetManagerId Int
-  fleetManager   User @relation(fields: [fleetManagerId], references: [id])
+  fleetManagerId    Int
+  fleetManager      User               @relation(fields: [fleetManagerId], references: [id])
+  avgHealthReadings AvgHealthReadings?
 }
 
 enum tripStatus {
@@ -162,28 +163,46 @@ model WearableBand {
 
 // Can add later BloodPressure too? and Blood Type?
 model MedicalInformation {
-  recordId    Int      @id @default(autoincrement())
-  conditions  String[]
-  medications String[]
+  recordId     Int      @id @default(autoincrement())
+  conditions   String[]
+  medications  String[]
+  // sensors data
+  avgHeartRate Float
+  avgTemp      Float
+  avgSpo2      Float
 
-  driverId Int @unique
+  minHeartRate Float
+  minTemp      Float
+  minSpo2      Float
 
+  maxHeartRate Float
+  maxTemp      Float
+  maxSpo2      Float
+
+  driverId     Int           @unique
   driver       Driver        @relation(fields: [driverId], references: [id], onDelete: Cascade)
   healthEvents HealthEvent[]
 }
 
 model AvgHealthReadings {
-  heartRateRange String
-  tempRange      String
-  driverId       Int    @unique
-  driver         Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  avgHeartRate Float
+  avgTemp      Float
+  avgSpo2      Float
+
+  tripId Int  @id
+  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
+
+  driverId Int
+  driver   Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
 }
 
 model HealthEvent {
   eventId          Int      @id @default(autoincrement())
   eventDate        DateTime @default(now())
-  heartRate        String
-  temp             Float
+  // sensors data
+  avgHeartRate     Float
+  avgTemp          Float
+  avgSpo2          Float
   firstAidGuidance String? // added to save firstAidGuidance response
 
   recordId Int
@@ -197,7 +216,6 @@ model TowingRequest {
   requestId      Int           @id @default(autoincrement())
   status         requestStatus
   requestTime    DateTime      @default(now())
-  //updatedAt        DateTime      @updatedAt
   completionTime DateTime?
   towingCompany  String
 
@@ -218,7 +236,6 @@ model EmergencyServiceRequest {
   status           requestStatus
   requestTime      DateTime      @default(now())
   phone            String
-  //updatedAt        DateTime      @updatedAt
   completionTime   DateTime?
   hospitalAssigned String
 

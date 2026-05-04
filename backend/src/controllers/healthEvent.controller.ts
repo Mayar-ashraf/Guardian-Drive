@@ -6,7 +6,9 @@ import { Prisma } from "../../generated/prisma/client";
 
 // only system can do it (is only called from CreateAlert() ), no route to this function -> therefore no Http Req and Res
 // note this is now always created as transaction - created with alert atomically
-export const createHealthEvent = async (heartRange: string, temp: number, alertId: number, driverId: number, firstAidGuidance?: string, tx?: Prisma.TransactionClient) => {
+export const createHealthEvent = async (heartRate: number, temp: number, spo2: number,
+    alertId: number, driverId: number, firstAidGuidance?: string,
+    tx?: Prisma.TransactionClient) => {
     const client = tx ?? prisma;  // use transaction if provided, otherwise use prisma
     try {
         // driverId and AlertId already checked in CreateAlert()
@@ -20,8 +22,9 @@ export const createHealthEvent = async (heartRange: string, temp: number, alertI
 
         const healthEvent = await client.healthEvent.create({
             data: {
-                temp: temp,
-                heartRate: heartRange,
+                avgTemp: temp,
+                avgHeartRate: heartRate,
+                avgSpo2: spo2,
                 recordId: medicalRecord.recordId,
                 alertId: alertId,
                 firstAidGuidance: firstAidGuidance ?? undefined,

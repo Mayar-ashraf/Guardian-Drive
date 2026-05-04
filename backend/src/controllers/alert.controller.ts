@@ -4,8 +4,6 @@ import * as HttpResponses from "../utils/HttpResponses"
 import { alertStatus, alertType, Role } from './../../generated/prisma/enums';
 import { createHealthEvent, updateHealthEvent } from "./healthEvent.controller";
 import { HealthEventError } from "../utils/InternalErrors";
-import { Request, Response } from "express";
-import { sendError, sendForbidden, sendNotFound } from "../utils/HttpResponses";
 
 // would want to add driver avg readings too?? <--------------------- 
 
@@ -150,7 +148,9 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
 // driver can create sos alerts only <--- how to limit while system also use the same endpoint with the same driverId token
 export const createAlert = async (req: express.Request, res: express.Response) => {
     try {
-        const driverId = req.user?.userId
+        // its okay like that because validation schema already validates if driver is sending other than SOS alert
+        const driverId = req.user?.userId ?? req.validated?.params.driverId;
+
         const driver = await prisma.driver.findUnique({
             where: { id: driverId },
         });
@@ -159,7 +159,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         }
 
         // all are required for database success
-        const { type, tripId, triggeredLocationId, temp, heartRange, firstAidGuidance } = req.validated?.body;
+        const { type, tripId, triggeredLocationId, avgTemp, avgHeartRate, avgSpo2, firstAidGuidance } = req.validated?.body;
 
         const tripExists = await prisma.trip.findUnique({
             where: { tripId: tripId },
@@ -179,7 +179,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         });
 
         if (existingAlert) {
-            return HttpResponses.sendError(res, "Duplicate Alert Per Trip", 409)
+            return HttpResponses.sendConflict(res, "Duplicate Alert Per Trip")
         }
 
 
@@ -200,7 +200,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
             });
 
             const healthEvent = await createHealthEvent(
-                heartRange, temp, alert.alertId, driverId, firstAidGuidance, tx)
+                avgHeartRate, avgTemp, avgSpo2, alert.alertId, driverId, firstAidGuidance, tx)
 
             return { alert, healthEvent };
         });
@@ -215,7 +215,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         if (error instanceof Error) {
             return HttpResponses.sendError(res, error.message)
         }
-        return HttpResponses.sendError(res,)
+        return HttpResponses.sendError(res)
     }
 }
 
@@ -243,7 +243,7 @@ export const updateAlertById = async (req: express.Request, res: express.Respons
 
         // 1. ensure resolved alert can't be reassigned to either Resolved or Active
         if (alert.status === alertStatus.RESOLVED) {
-            return HttpResponses.sendError(res, "Alert is already resolved", 409); // conflict
+            return HttpResponses.sendConflict(res, "Alert is already resolved");
         }
 
         // status MUST be RESOLVED OR NULL/undefined
@@ -325,7 +325,7 @@ const stripPassword = (alert: any) => {
     return safeAlert
 }
 
-export const getFirstAid  = async (req: Request, res: Response) => {
+export const getFirstAid = async (req: express.Request, res: express.Response) => {
     try {
         const alertId = req.validated?.params.alertId;
         const user = req.user;
@@ -339,12 +339,12 @@ export const getFirstAid  = async (req: Request, res: Response) => {
             },
         });
         if (!alert) {
-            return sendNotFound(res, "Alert with this alert Id doesn't exist");
+            return HttpResponses.sendNotFound(res, "Alert with this alert Id doesn't exist");
 
         }
 
         if (!alert.healthEvent) {
-            return sendNotFound(res, "No Health event found for this alert");
+            return HttpResponses.sendNotFound(res, "No Health event found for this alert");
         }
 
         const isADMIN = (user?.role === "ADMIN");
@@ -352,12 +352,12 @@ export const getFirstAid  = async (req: Request, res: Response) => {
         const isAuthorizedDriver = (user?.role === "DRIVER" && alert?.trip.driverId === user.userId);
 
         if (!isADMIN && !isAuthorizedFleetManager && !isAuthorizedDriver) {
-            return sendForbidden(res, "You are unauthorized to make this request");
+            return HttpResponses.sendForbidden(res, "You are unauthorized to make this request");
         }
-        res.json({ First_Aid_Guidance: alert.healthEvent.firstAidGuidance});
-        
+        res.json({ First_Aid_Guidance: alert.healthEvent.firstAidGuidance });
+
     } catch (error) {
-        sendError(res);
+        HttpResponses.sendError(res);
     }
 };
 

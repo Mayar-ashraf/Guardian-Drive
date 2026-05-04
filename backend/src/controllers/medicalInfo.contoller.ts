@@ -61,13 +61,24 @@ export const createMedicalRecord = async (req: express.Request, res: express.Res
             return HttpResponses.sendError(res, "Medical Records for this driver already exists", 409)
         }
 
-        const { conditions, medications } = req.validated?.body
+        const { conditions, medications, temp, spo2, heartRate } = req.validated?.body
 
         const medicalRecord = await prisma.medicalInformation.create({
             data: {
                 driverId,
                 conditions,
                 medications,
+                maxTemp: temp,
+                minTemp: temp,
+                avgTemp: temp,
+
+                minSpo2: spo2,
+                maxSpo2: spo2,
+                avgSpo2: spo2,
+
+                maxHeartRate: heartRate,
+                minHeartRate: heartRate,
+                avgHeartRate: heartRate,
             },
         });
 
@@ -133,4 +144,36 @@ export const updateMedicalRecord = async (req: express.Request, res: express.Res
         return HttpResponses.sendError(res);
     }
 
+}
+
+export const getCustomThresholds = async (req: express.Request, res: express.Response) => {
+    try {
+        const driverId = req.user?.userId
+
+        const driver = await prisma.driver.findUnique({
+            where: { id: driverId },
+        });
+
+        if (!driver) {
+            return HttpResponses.sendNotFound(res, "Driver not found");
+        }
+
+        const customThresholds = await prisma.medicalInformation.findUnique({
+            where: { driverId: driverId },
+            select: {
+                minHeartRate: true, maxHeartRate: true, avgHeartRate: true,
+                minSpo2: true, maxSpo2: true, avgSpo2: true,
+                minTemp: true, maxTemp: true, avgTemp: true
+            },
+        });
+
+        if (!customThresholds) {
+            return HttpResponses.sendNotFound(res, "Thresholds Not found")
+        }
+
+        return HttpResponses.sendSuccess(res, customThresholds);
+
+    } catch (error) {
+        return HttpResponses.sendError(res);
+    }
 }

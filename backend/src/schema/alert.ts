@@ -5,12 +5,31 @@ import { Param } from "@prisma/client/runtime/client";
 // ================= CREATE =================
 export const CreateAlertSchema = z.object({
     body: z.object({
-        type: z.enum(alertType),
+        type: z.literal(alertType.SOS, { message: "Alert type must be SOS for driver-triggered alerts" }),
         tripId: z.number().int().positive(),
         triggeredLocationId: z.number().int().positive(),
         stoppedLocationId: z.number().int().positive().optional(),
-        heartRange: z.string(), // required for the health event creation
-        temp: z.number(),
+        // required for the health event creation
+        avgHeartRate: z.number().max(300),
+        avgtTemp: z.number().min(30).max(45),
+        avgSpo2: z.number().min(50).max(100),
+        firstAidGuidance: z.string().optional(),
+    })
+});
+
+export const CreateAlertSystemSchema = z.object({
+    params: z.object({
+        driverId: z.coerce.number().int().positive(),
+    }),
+    body: z.object({
+        type: z.literal(alertType.HEALTH_ABNORMAL, { message: "Alert type must be HEALTH_ABNORMAL for System-triggered alerts" }),
+        tripId: z.number().int().positive(),
+        triggeredLocationId: z.number().int().positive(),
+        stoppedLocationId: z.number().int().positive().optional(),
+        // required for the health event creation
+        avgHeartRate: z.number().max(300),
+        avgtTemp: z.number().min(30).max(45),
+        avgSpo2: z.number().min(50).max(100),
         firstAidGuidance: z.string().optional(),
     })
 });
@@ -57,12 +76,6 @@ export const getAlertByIdSchema = z.object({
         alertId: z.coerce.number().int().positive(),
     })
 });
-
-export const alertIdSchema = z.object({
-    alertId: z.coerce.number("Alert Id must be a valid number")
-    .int("Alert Id must be an integer")
-    .positive("Alert Id must be positive")
-}).strict();
 
 export type CreateAlertInput = z.infer<typeof CreateAlertSchema>;
 export type UpdateAlertInput = z.infer<typeof UpdateAlertSchema>;
