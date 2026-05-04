@@ -1,6 +1,6 @@
 import express from "express"
 import { Role } from "../../generated/prisma/client";
-import { getAlerts, createAlert, getAlertById, updateAlertById, getFirstAid } from "../controllers/alert.controller"
+import { getAlerts, createAlert, getAlertById, updateAlertById, getFirstAid } from "../controllers/alerts.controller"
 import { CreateAlertSchema, CreateAlertSystemSchema, FilterAlertSchema, getAlertByIdSchema, UpdateAlertSchema } from "../schema/alert"
 import { authenticate, authorize } from "../middleware/AuthMiddleware";
 import { validate } from "../validators/validate";

@@ -1,7 +1,7 @@
 import express from "express"
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses"
-import { alertStatus, alertType, Role, tripStatus } from './../../generated/prisma/enums';
+import { alertStatus, alertType, Role, tripStatus } from '../../generated/prisma/enums';
 import { createHealthEvent, updateHealthEvent } from "./healthEvent.controller";
 import { HealthEventError } from "../utils/InternalErrors";
 
