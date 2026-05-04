@@ -163,9 +163,10 @@ model WearableBand {
 
 // Can add later BloodPressure too? and Blood Type?
 model MedicalInformation {
-  recordId     Int      @id @default(autoincrement())
-  conditions   String[]
-  medications  String[]
+  recordId    Int      @id @default(autoincrement())
+  conditions  String[]
+  medications String[]
+
   // sensors data
   avgHeartRate Float
   avgTemp      Float
@@ -197,12 +198,14 @@ model AvgHealthReadings {
 }
 
 model HealthEvent {
-  eventId          Int      @id @default(autoincrement())
-  eventDate        DateTime @default(now())
+  eventId   Int      @id @default(autoincrement())
+  eventDate DateTime @default(now())
+
   // sensors data
-  avgHeartRate     Float
-  avgTemp          Float
-  avgSpo2          Float
+  heartRate Float
+  temp      Float
+  spo2      Float
+
   firstAidGuidance String? // added to save firstAidGuidance response
 
   recordId Int

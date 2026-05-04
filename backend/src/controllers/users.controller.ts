@@ -307,7 +307,7 @@ export const deleteuserbyID = async (req: express.Request, res: express.Response
             });
         }
         const { newFleetManagerId, newDriverId } = req.validated?.body;
-       
+
         if (user.role === Role.DRIVER) {
 
             const tripsCount = await prisma.trip.count({

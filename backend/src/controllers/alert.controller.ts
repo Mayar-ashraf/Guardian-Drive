@@ -1,7 +1,7 @@
 import express from "express"
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses"
-import { alertStatus, alertType, Role } from './../../generated/prisma/enums';
+import { alertStatus, alertType, Role, tripStatus } from './../../generated/prisma/enums';
 import { createHealthEvent, updateHealthEvent } from "./healthEvent.controller";
 import { HealthEventError } from "../utils/InternalErrors";
 
@@ -159,7 +159,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         }
 
         // all are required for database success
-        const { type, tripId, triggeredLocationId, avgTemp, avgHeartRate, avgSpo2, firstAidGuidance } = req.validated?.body;
+        const { type, tripId, triggeredLocationId, temp, heartRate, spo2, firstAidGuidance } = req.validated?.body;
 
         const tripExists = await prisma.trip.findUnique({
             where: { tripId: tripId },
@@ -169,6 +169,10 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         }
         if (!tripExists.driverId || (tripExists.driverId != driverId)) { // if no driver or driver issue the endpoint not the same as driver token
             return HttpResponses.sendForbidden(res, "Not Valid Driver For The Trip !!")
+        }
+
+        if (tripExists.status !== tripStatus.ONGOING) {
+            return HttpResponses.sendBadRequest(res, "trip must be ONGOING")
         }
 
         // no two alerts per the same trip
@@ -200,9 +204,19 @@ export const createAlert = async (req: express.Request, res: express.Response) =
             });
 
             const healthEvent = await createHealthEvent(
-                avgHeartRate, avgTemp, avgSpo2, alert.alertId, driverId, firstAidGuidance, tx)
+                heartRate, temp, spo2, alert.alertId, driverId, firstAidGuidance, tx)
 
-            return { alert, healthEvent };
+            // trip is updated to cancelled at creating alert
+            const trip = await tx.trip.update({
+                where: { tripId },
+                data: {
+                    status: tripStatus.CANCELLED,
+                    endTime: new Date()
+                }
+
+            });
+
+            return { alert, healthEvent, trip };
         });
 
         // either both are created successfully or one of them throw an error catched in try block

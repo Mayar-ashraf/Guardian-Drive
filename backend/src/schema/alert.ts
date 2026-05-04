@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { alertType, alertStatus } from "../../generated/prisma/enums";
-import { Param } from "@prisma/client/runtime/client";
 
 // ================= CREATE =================
 export const CreateAlertSchema = z.object({
@@ -10,9 +9,9 @@ export const CreateAlertSchema = z.object({
         triggeredLocationId: z.number().int().positive(),
         stoppedLocationId: z.number().int().positive().optional(),
         // required for the health event creation
-        avgHeartRate: z.number().max(300),
-        avgtTemp: z.number().min(30).max(45),
-        avgSpo2: z.number().min(50).max(100),
+        heartRate: z.number().max(300),
+        temp: z.number().min(30).max(45),
+        spo2: z.number().min(50).max(100),
         firstAidGuidance: z.string().optional(),
     })
 });
@@ -27,9 +26,9 @@ export const CreateAlertSystemSchema = z.object({
         triggeredLocationId: z.number().int().positive(),
         stoppedLocationId: z.number().int().positive().optional(),
         // required for the health event creation
-        avgHeartRate: z.number().max(300),
-        avgtTemp: z.number().min(30).max(45),
-        avgSpo2: z.number().min(50).max(100),
+        heartRate: z.number().max(300),
+        temp: z.number().min(30).max(45),
+        spo2: z.number().min(50).max(100),
         firstAidGuidance: z.string().optional(),
     })
 });

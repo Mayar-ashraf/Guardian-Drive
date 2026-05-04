@@ -8,10 +8,17 @@ export const createMedicalInfoSchema = z.object({
         conditions: z.array(z.string()).default([]), // default for empty assignment - no value set
         medications: z.array(z.string()).default([]),
 
-        // these are ones that are set for all min,max,avg , can also create MIN , MAX , AVG per each
-        temp: z.coerce.number().min(30).max(45),
-        heartRate: z.coerce.number().positive().max(300),
-        spo2: z.coerce.number().min(50).max(100),
+        avgTemp: z.number().min(30).max(45),
+        avgHeartRate: z.number().positive().max(300),
+        avgSpo2: z.number().min(50).max(100),
+
+        minTemp: z.number().min(30).max(45).optional(),
+        minHeartRate: z.number().positive().max(300).optional(),
+        minSpo2: z.number().min(50).max(100).optional(),
+
+        maxTemp: z.number().min(30).max(45).optional(),
+        maxHeartRate: z.number().positive().max(300).optional(),
+        maxSpo2: z.number().min(50).max(100).optional(),
 
     })
 });
@@ -23,6 +30,18 @@ export const UpdateMedicalRecordSchema = z.object({
     body: z.object({
         conditions: z.array(z.string()).optional(),
         medications: z.array(z.string()).optional(),
+
+        avgTemp: z.number().min(30).max(45).optional(),
+        avgHeartRate: z.number().positive().max(300).optional(),
+        avgSpo2: z.number().min(50).max(100).optional(),
+
+        minTemp: z.number().min(30).max(45).optional(),
+        minHeartRate: z.number().positive().max(300).optional(),
+        minSpo2: z.number().min(50).max(100).optional(),
+
+        maxTemp: z.number().min(30).max(45).optional(),
+        maxHeartRate: z.number().positive().max(300).optional(),
+        maxSpo2: z.number().min(50).max(100).optional(),
     })
 });
 

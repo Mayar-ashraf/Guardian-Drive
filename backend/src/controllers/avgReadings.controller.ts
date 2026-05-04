@@ -1,8 +1,10 @@
 import express from "express"
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses"
-import { tripStatus } from "../../generated/prisma/enums";
+import { alertStatus, tripStatus } from "../../generated/prisma/enums";
 
+
+const NUMBER_OF_AVG_ROWS = 10
 
 // creates avgReading/trip AND update medical info thresholds
 export const createDriverAvgReadings = async (req: express.Request, res: express.Response) => {
@@ -17,10 +19,13 @@ export const createDriverAvgReadings = async (req: express.Request, res: express
 
         if (!trip) {
             return HttpResponses.sendNotFound(res, "Trip not Found")
-        }/*
-        if (trip.status !== tripStatus.COMPLETED) {
-            return HttpResponses.sendBadRequest(res, "Vitals can only be submitted for completed trips");
-        }*/
+        }
+
+        // create avg readings only for finished trips
+        if (trip.status !== tripStatus.COMPLETED && trip.status !== tripStatus.CANCELLED) {
+            return HttpResponses.sendBadRequest(res, "Vitals can only be submitted for finished trips");
+        }
+
         if (!trip.driverId || driverId != trip.driverId) {
             return HttpResponses.sendBadRequest(res, "Driver Not valid for this trip");
         }
@@ -51,11 +56,14 @@ export const createDriverAvgReadings = async (req: express.Request, res: express
             },
         });
 
-        // findMany last 10 then compute manually averages
-        const last10Rows = await prisma.avgHealthReadings.findMany({
-            where: { driverId: driverId },
+        // findMany last NUMBER_OF_AVG_ROWS then compute manually averages
+        const lastRows = await prisma.avgHealthReadings.findMany({
+            where: {
+                driverId: driverId,
+                trip: { status: tripStatus.COMPLETED }
+            },
             orderBy: { trip: { startTime: "desc" } },
-            take: 10,
+            take: NUMBER_OF_AVG_ROWS,
             select: {
                 avgHeartRate: true,
                 avgSpo2: true,
@@ -63,45 +71,49 @@ export const createDriverAvgReadings = async (req: express.Request, res: express
             },
         });
 
-        // helper avg arrow function
-        const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+        if (lastRows.length === NUMBER_OF_AVG_ROWS) {
 
-        const heartRates = last10Rows.map(r => r.avgHeartRate);
-        const spo2s = last10Rows.map(r => r.avgSpo2);
-        const temps = last10Rows.map(r => r.avgTemp);
+            // helper avg arrow function
+            const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
 
-        const minHeartRate = Math.min(...heartRates);
-        const maxHeartRate = Math.max(...heartRates);
-        const newAvgHeartRate = avg(heartRates);
+            const heartRates = lastRows.map(r => r.avgHeartRate);
+            const spo2s = lastRows.map(r => r.avgSpo2);
+            const temps = lastRows.map(r => r.avgTemp);
 
-        const minSpo2 = Math.min(...spo2s);
-        const maxSpo2 = Math.max(...spo2s);
-        const newAvgSpo2 = avg(spo2s);
+            const minHeartRate = Math.min(...heartRates);
+            const maxHeartRate = Math.max(...heartRates);
+            const newAvgHeartRate = avg(heartRates);
 
-        const minTemp = Math.min(...temps);
-        const maxTemp = Math.max(...temps);
-        const newAvgTemp = avg(temps);
+            const minSpo2 = Math.min(...spo2s);
+            const maxSpo2 = Math.max(...spo2s);
+            const newAvgSpo2 = avg(spo2s);
+
+            const minTemp = Math.min(...temps);
+            const maxTemp = Math.max(...temps);
+            const newAvgTemp = avg(temps);
 
 
 
-        const updatedMedicalRecord = await prisma.medicalInformation.update({
-            where: { driverId: driverId },
-            data: {
-                maxHeartRate,
-                minHeartRate,
-                avgHeartRate: newAvgHeartRate,
+            const updatedMedicalRecord = await prisma.medicalInformation.update({
+                where: { driverId: driverId },
+                data: {
+                    maxHeartRate,
+                    minHeartRate,
+                    avgHeartRate: newAvgHeartRate,
 
-                maxTemp,
-                minTemp,
-                avgTemp: newAvgTemp,
+                    maxTemp,
+                    minTemp,
+                    avgTemp: newAvgTemp,
 
-                maxSpo2,
-                minSpo2,
-                avgSpo2: newAvgSpo2,
-            },
-        });
+                    maxSpo2,
+                    minSpo2,
+                    avgSpo2: newAvgSpo2,
+                },
+            });
 
-        return HttpResponses.sendSuccess(res, { createdAvgReadings, updatedMedicalRecord })
+            return HttpResponses.sendSuccess(res, { createdAvgReadings, updatedMedicalRecord })
+        }
+        return HttpResponses.sendSuccess(res, createdAvgReadings)
 
     }
     catch (error) {
@@ -132,8 +144,6 @@ export const getDriverAvgReadings = async (req: express.Request, res: express.Re
                 trip: true
             }
         });
-
-        // strict it to fleetManagers of this trip only or not ?<--------------------
 
         return HttpResponses.sendSuccess(res, avgReadingsTrips)
 

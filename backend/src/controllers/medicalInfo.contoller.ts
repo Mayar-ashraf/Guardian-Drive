@@ -61,24 +61,30 @@ export const createMedicalRecord = async (req: express.Request, res: express.Res
             return HttpResponses.sendError(res, "Medical Records for this driver already exists", 409)
         }
 
-        const { conditions, medications, temp, spo2, heartRate } = req.validated?.body
+        const {
+            conditions, medications,
+            minHeartRate, maxHeartRate, avgHeartRate,
+            minSpo2, maxSpo2, avgSpo2,
+            minTemp, maxTemp, avgTemp
+        } = req.validated?.body;
 
         const medicalRecord = await prisma.medicalInformation.create({
             data: {
                 driverId,
                 conditions,
                 medications,
-                maxTemp: temp,
-                minTemp: temp,
-                avgTemp: temp,
 
-                minSpo2: spo2,
-                maxSpo2: spo2,
-                avgSpo2: spo2,
+                maxTemp: maxTemp ?? avgTemp + 0.5,
+                minTemp: minTemp ?? avgTemp - 0.5,
+                avgTemp: avgTemp,
 
-                maxHeartRate: heartRate,
-                minHeartRate: heartRate,
-                avgHeartRate: heartRate,
+                minSpo2: maxSpo2 ?? avgSpo2 - 2.5,
+                maxSpo2: minSpo2 ?? 100,
+                avgSpo2: avgSpo2,
+
+                maxHeartRate: maxHeartRate ?? avgHeartRate + 20,
+                minHeartRate: minHeartRate ?? avgHeartRate - 20,
+                avgHeartRate: avgHeartRate,
             },
         });
 
@@ -97,7 +103,12 @@ export const updateMedicalRecord = async (req: express.Request, res: express.Res
         const driverId = req.validated?.params?.driverId;
 
         // the only parameters right now other than avg health readings , Can add later BloodPressure too? and Blood Type?
-        const { conditions, medications } = req.validated?.body;
+        const {
+            conditions, medications,
+            minHeartRate, maxHeartRate, avgHeartRate,
+            minSpo2, maxSpo2, avgSpo2,
+            minTemp, maxTemp, avgTemp
+        } = req.validated?.body;
 
         // check if the driver i am looking for his records exits at all
         const driver = await prisma.driver.findUnique({
@@ -119,10 +130,21 @@ export const updateMedicalRecord = async (req: express.Request, res: express.Res
 
         const updatedMedicalInfo = await prisma.medicalInformation.update({
             where: { driverId },
-            data: {         // to push on an existing array instead of full replace, problem , Can't Remove only append
+            data: {
                 conditions: conditions ? { push: conditions } : undefined,
                 medications: medications ? { push: medications } : undefined,
 
+                minHeartRate: minHeartRate ?? driverMedicalInfo.minHeartRate,
+                maxHeartRate: maxHeartRate ?? driverMedicalInfo.maxHeartRate,
+                avgHeartRate: avgHeartRate ?? driverMedicalInfo.avgHeartRate,
+
+                minSpo2: minSpo2 ?? driverMedicalInfo.minSpo2,
+                maxSpo2: maxSpo2 ?? driverMedicalInfo.maxSpo2,
+                avgSpo2: avgSpo2 ?? driverMedicalInfo.avgSpo2,
+
+                minTemp: minTemp ?? driverMedicalInfo.minTemp,
+                maxTemp: maxTemp ?? driverMedicalInfo.maxTemp,
+                avgTemp: avgTemp ?? driverMedicalInfo.avgTemp,
             },
         });
 

@@ -22,9 +22,9 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
 
         const healthEvent = await client.healthEvent.create({
             data: {
-                avgTemp: temp,
-                avgHeartRate: heartRate,
-                avgSpo2: spo2,
+                temp: temp,
+                heartRate: heartRate,
+                spo2: spo2,
                 recordId: medicalRecord.recordId,
                 alertId: alertId,
                 firstAidGuidance: firstAidGuidance ?? undefined,

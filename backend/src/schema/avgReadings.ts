@@ -7,7 +7,7 @@ export const createAvgReadingsSchema = z.object({
     }),
     body: z.object({
         tripId: z.number().int().positive(),
-        avgHeartRate: z.coerce.number().positive("avgHeartRate must be positive")
+        avgHeartRate: z.number().positive("avgHeartRate must be positive")
             .max(300, "avgHeartRate out of realistic range"),
 
         avgSpo2: z

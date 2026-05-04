@@ -91,7 +91,7 @@ export const getTowingRequests = async (req: Request, res: Response) => {
             car: true,
           },
         },
-        alert: true, 
+        alert: true,
       },
 
       orderBy: {
@@ -122,7 +122,7 @@ export const getTowingRequestById = async (req: Request, res: Response) => {
             car: true,
           },
         },
-        alert: true, 
+        alert: true,
       },
     });
 

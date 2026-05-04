@@ -86,17 +86,17 @@ export const getCarById = async (req: Request, res: Response) => {
 };
 export const createCar = async (req: Request, res: Response) => {
   try {
-   /* const caller = req.user;
+    /* const caller = req.user;
+ 
+     if (!caller) {
+       return res.status(401).json({ message: "Missing or invalid token" });
+     }
+ 
+     if (caller.role === Role.DRIVER || caller.role === Role.FLEET_MANAGER) {
+       return res.status(403).json({ message: "You are unauthorized to make this request " });
+     }*/
 
-    if (!caller) {
-      return res.status(401).json({ message: "Missing or invalid token" });
-    }
-
-    if (caller.role === Role.DRIVER || caller.role === Role.FLEET_MANAGER) {
-      return res.status(403).json({ message: "You are unauthorized to make this request " });
-    }*/
-
-    const { engineId, plateNo, color, status } = req.validated ?.body;
+    const { engineId, plateNo, color, status } = req.validated?.body;
 
     if (!engineId || !plateNo || !color) {
       return res.status(400).json({ message: "Missing fields" });
@@ -125,37 +125,37 @@ export const createCar = async (req: Request, res: Response) => {
 };
 async function updateCar(req: Request, res: Response) {
 
-    try {
-        const engineId = req.validated?.params.engineId
-        const updates = req.validated?.body
-        const car = await prisma.car.update({
-            where: { engineId: engineId },
-            data: updates
-        })
-        return res.status(200).json({ car });
+  try {
+    const engineId = req.validated?.params.engineId
+    const updates = req.validated?.body
+    const car = await prisma.car.update({
+      where: { engineId: engineId },
+      data: updates
+    })
+    return res.status(200).json({ car });
 
-    } catch (error: any) {
-        if (error.code === "P2025") {
-            return res.status(404).json({ message: "Car not found" });
-        }
-        return res.status(500).json({ message: "Server Error" })
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Car not found" });
     }
+    return res.status(500).json({ message: "Server Error" })
+  }
 }
 async function deleteCar(req: Request, res: Response) {
-    try {
-        const engineId = req.validated?.params.engineId
-        await prisma.car.delete({
-            where: {
-                engineId: engineId
-            }
-        })
-        return res.status(204).send();
-    } catch (error: any) {
-        if (error.code === "P2025") {
-            return res.status(404).json({ message: "Car not found" });
-        }
-        return res.status(500).json({ message: "Server Error" })
+  try {
+    const engineId = req.validated?.params.engineId
+    await prisma.car.delete({
+      where: {
+        engineId: engineId
+      }
+    })
+    return res.status(204).send();
+  } catch (error: any) {
+    if (error.code === "P2025") {
+      return res.status(404).json({ message: "Car not found" });
     }
+    return res.status(500).json({ message: "Server Error" })
+  }
 
 }
 export { updateCar, deleteCar }
