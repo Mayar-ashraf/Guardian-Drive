@@ -1,0 +1,7 @@
+GET http://localhost:3000/api/reports/emergency-performance?from=2026-05-01&to=2026-05-04
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3Nzg0MDIxOSwiZXhwIjoxNzc3OTI2NjE5fQ.tKPu9UHgVJcO9H6NK5k3sG-lwOOzlFIhGXGK67ZeC1c
+
+{
+
+}

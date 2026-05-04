@@ -10,10 +10,32 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
 
 POST http://localhost:3000/api/wearablebands
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NzU4Njg5MCwiZXhwIjoxNzc3NjczMjkwfQ.i9XioDg6ipZEdOTCYvvba9j7QAXCqqSeCAwO-olYN7I
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3Nzg0MDIxOSwiZXhwIjoxNzc3OTI2NjE5fQ.tKPu9UHgVJcO9H6NK5k3sG-lwOOzlFIhGXGK67ZeC1c
 
 {
-    "sensorList": ["gps"],
-    "driverId": 13
-    
+    "deviceId": 2,
+    "sensorList": ["gps"]
+
+}
+
+######
+DELETE http://localhost:3000/api/wearablebands/2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3Nzg0MDIxOSwiZXhwIjoxNzc3OTI2NjE5fQ.tKPu9UHgVJcO9H6NK5k3sG-lwOOzlFIhGXGK67ZeC1c
+
+{
+   
+
+}
+
+#####
+PATCH http://localhost:3000/api/wearablebands/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3Nzg0MDIxOSwiZXhwIjoxNzc3OTI2NjE5fQ.tKPu9UHgVJcO9H6NK5k3sG-lwOOzlFIhGXGK67ZeC1c
+
+{
+   "sensorList" : ["sensor1", "Sensor2"], 
+   "driverId" : 2,
+   "isConnected": true
+
 }
