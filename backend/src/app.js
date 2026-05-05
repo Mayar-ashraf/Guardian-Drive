@@ -12,7 +12,7 @@ import alertRoutes from "./routes/alerts.route.ts";
 import wearablebandsRoutes from "./routes/wearableBands.route.ts";
 import towingRequestRoutes from "./routes/towingRequests.route.ts";
 import reportsRoutes from "./routes/reports.route.ts";
-import firstAidGuidanceRoutes from "./routes/firstAidGuidances.route.ts"
+import firstAidGuidanceRoutes from "./routes/firstAidGuidance.route.ts"
 
 const app = express();
 app.use(express.json())

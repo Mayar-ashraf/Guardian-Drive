@@ -29,18 +29,9 @@ export const getGuidanceByAlertId = async (req: Request, res: Response) => {
 
 
 // this function isn't API service  - called from createHealthEvent at alert creation (CreateAlert)
-export const getGuidance = async (alertId: number) => {
+export const getGuidance = async (guidances: FirstAidGuidance[]) => {
 
-    const healthEvent = await prisma.healthEvent.findUnique({
-        where: { alertId },
-        include: {
-            guidances: true
-        }
-    });
-
-    if (!healthEvent) throw new HealthEventError("At fetching first aid guidance , Health Event is not Found")
-
-    return TranslateGuidanceConditions(healthEvent.guidances)
+    return TranslateGuidanceConditions(guidances)
 
 }
 

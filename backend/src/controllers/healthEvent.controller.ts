@@ -62,17 +62,20 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
                 guidances: {
                     connect: guidances.map(g => ({ guidanceId: g.guidanceId }))
                 }
+            }, include: {
+                guidances: true
             }
         })
 
         // 4- return health event + first-aid-guidance guidance 
-        const response = await getGuidance(alertId)
+        const response = await getGuidance(healthEvent.guidances)
 
         // null is added to always return response for compatabilty
         return { healthEvent, response: response ?? null }
     }
     catch (error) {
-        throw new HealthEventError("Creating Health Event Failed")
+        const message = error instanceof Error ? error.message : String(error);
+        throw new HealthEventError(`Creating Health Event Failed: \n${message}`);
     }
 
 }

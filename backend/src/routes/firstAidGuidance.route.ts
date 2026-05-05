@@ -24,3 +24,5 @@ router.patch("/:guidanceId", authenticate, authorize(Role.FLEET_MANAGER, Role.AD
 
 // 6. DELETE /first-aid-guidance/:guidanceId
 router.delete('/:guidanceId', authenticate, authorize(Role.FLEET_MANAGER, Role.ADMIN), validate(DeleteGuidanceSchema), deleteGuidance)
+
+export default router;
