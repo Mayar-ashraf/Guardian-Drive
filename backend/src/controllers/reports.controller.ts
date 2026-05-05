@@ -180,7 +180,7 @@ export const alertsPerConditionReport = async (req: Request, res: Response) => {
     for (const alert of alerts) {
       if (!alert.healthEvent) continue;
 
-      const heartRate = parseInt(alert.healthEvent.heartRate);
+      const heartRate = alert.healthEvent.heartRate;
       const temp = alert.healthEvent.temp;
 
       let condition = "normal";
