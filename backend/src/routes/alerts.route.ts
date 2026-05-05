@@ -4,7 +4,7 @@ import { getAlerts, createAlert, getAlertById, updateAlertById } from "../contro
 import { authenticate, authorize } from "../middleware/AuthMiddleware";
 import { validate } from "../validators/validate";
 import { authorizeSystem } from "../middleware/AuthSystem";
-import { getAlertGuidance } from "../controllers/firstAidGuidance.controller";
+import { getGuidanceByAlertId } from "../controllers/firstAidGuidance.controller";
 import { GetAlertGuidanceSchema } from "../schema/firstAidGuidance/getAlertGuidance.schema";
 import { CreateAlertSchema, CreateAlertSystemSchema } from "../schema/alerts/createAlert.schema";
 import { FilterAlertSchema } from "../schema/alerts/FilterAlert.schema";
@@ -30,7 +30,7 @@ router.patch('/:alertId', authenticate, authorize(Role.FLEET_MANAGER, Role.ADMIN
 
 
 // note for driver the guidance is returned with the alert created variable
-router.get('/:alertId/first-aid-guidance', authenticate, authorize(Role.ADMIN, Role.FLEET_MANAGER), validate(GetAlertGuidanceSchema), getAlertGuidance);
+router.get('/:alertId/first-aid-guidance', authenticate, authorize(Role.ADMIN, Role.FLEET_MANAGER), validate(GetAlertGuidanceSchema), getGuidanceByAlertId);
 
 // added get driver alerts, But is it really needed?-> Driver limited read already handled in getAlerts with the filtering and all
 // uncomment if needed by fleet Manager or Admin with already implemented controller method

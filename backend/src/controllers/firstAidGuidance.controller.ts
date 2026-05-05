@@ -6,7 +6,7 @@ import { HealthEventError } from "../utils/InternalErrors";
 import { FirstAidGuidance } from "../../generated/prisma/client";
 
 
-export const getAlertGuidance = async (req: Request, res: Response) => {
+export const getGuidanceByAlertId = async (req: Request, res: Response) => {
     try {
         const alertId = req.validated?.params.alertId;
 
@@ -28,7 +28,7 @@ export const getAlertGuidance = async (req: Request, res: Response) => {
 };
 
 
-// this function isn't API service
+// this function isn't API service  - called from createHealthEvent at alert creation (CreateAlert)
 export const getGuidance = async (alertId: number) => {
 
     const healthEvent = await prisma.healthEvent.findUnique({
