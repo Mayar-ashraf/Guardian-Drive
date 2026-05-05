@@ -8,7 +8,7 @@ import passwordRoutes from "./routes/password.route.ts";
 import carsRoutes from "./routes/cars.route.ts";
 import path from "path"
 import usersRoutes from "./routes/users.route.ts";
-import alertRoutes from "./routes/alert.route.ts";
+import alertRoutes from "./routes/alerts.route.ts";
 import wearablebandsRoutes from "./routes/wearableBands.route.ts";
 import towingRequestRoutes from "./routes/towingRequests.route.ts";
 import reportsRoutes from "./routes/reports.route.ts";
