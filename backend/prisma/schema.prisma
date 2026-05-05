@@ -206,13 +206,41 @@ model HealthEvent {
   temp      Float
   spo2      Float
 
-  firstAidGuidance String? // added to save firstAidGuidance response
-
   recordId Int
   medical  MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
 
   alertId Int   @unique
   alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+
+  guidances FirstAidGuidance[] // many to many relationship
+}
+
+model FirstAidGuidance {
+  guidanceId     Int               @id @default(autoincrement())
+  condition      ConditionType
+  severity       ConditionSeverity
+  description    String // unique per condition — what is happening
+  specificAction String? // this action may be added specifically for this case if not , will return the general case of the severity action
+
+  healthEvents HealthEvent[]
+
+  @@unique([condition, severity]) // enforces one record with the same condition + severity
+}
+
+enum ConditionType {
+  LOW_SPO2 // nothing like "high spo2" XX in real world 
+  // its only for patients with supplemental oxygen OR Risk of oxygen toxicity (ICU-level situations)
+  HIGH_HEART_RATE
+  LOW_HEART_RATE
+  HIGH_TEMP
+  LOW_TEMP
+}
+
+// each severity has an action that will return constantly
+enum ConditionSeverity {
+  MILD
+  MODERATE
+  CRITICAL
 }
 
 model TowingRequest {

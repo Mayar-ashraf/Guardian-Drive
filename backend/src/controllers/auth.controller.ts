@@ -17,28 +17,21 @@ async function signup(req: Request, res: Response) {
         try {
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
-            const user = await prisma.user.create({
-                data: {
-                    email: email,
-                    fName: fName,
-                    lName: lName,
-                    password: hashedPassword,
-                    phone: phone,
-                    address: address,
-                    role: role
-                }
-            })
-            if (role === Role.DRIVER) {
-                await prisma.driver.create({
-                    data: {
-                        drivingLicense: drivingLicense,
-                        user: {
-                            connect: { id: user.id }
-                        }
-                    }
+            const createdUser = await prisma.$transaction(async (tx) => {
+                const user = await tx.user.create({
+                    data: { email, fName, lName, password: hashedPassword, phone, address, role }
                 });
-            }
-            return res.status(201).json({ message: "User created successfully" });
+
+                if (role === Role.DRIVER) {
+                    const driverInfo = await tx.driver.create({
+                        data: { drivingLicense, user: { connect: { id: user.id } } }
+                    });
+                    return { user, driverInfo }
+                }
+                return user
+            });
+
+            return sendCreated(res, createdUser, "User Created Successfully")
 
 
         } catch (error: any) {

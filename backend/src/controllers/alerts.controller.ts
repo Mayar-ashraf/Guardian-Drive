@@ -2,7 +2,7 @@ import express from "express"
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses"
 import { alertStatus, alertType, Role, tripStatus } from '../../generated/prisma/enums';
-import { createHealthEvent, updateHealthEvent } from "./healthEvent.controller";
+import { createHealthEvent } from "./healthEvent.controller";
 import { HealthEventError } from "../utils/InternalErrors";
 
 // would want to add driver avg readings too?? <--------------------- 
@@ -149,6 +149,7 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
 export const createAlert = async (req: express.Request, res: express.Response) => {
     try {
         // its okay like that because validation schema already validates if driver is sending other than SOS alert
+        // driverId coming from user token if driver endpoint and from params if system endpoint
         const driverId = req.user?.userId ?? req.validated?.params.driverId;
 
         const driver = await prisma.driver.findUnique({
@@ -159,7 +160,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         }
 
         // all are required for database success
-        const { type, tripId, triggeredLocationId, temp, heartRate, spo2, firstAidGuidance } = req.validated?.body;
+        const { type, tripId, triggeredLocationId, temp, heartRate, spo2 } = req.validated?.body;
 
         const tripExists = await prisma.trip.findUnique({
             where: { tripId: tripId },
@@ -203,8 +204,9 @@ export const createAlert = async (req: express.Request, res: express.Response) =
                 data: { type, tripId, triggeredLocationId, status: alertStatus.ACTIVE },
             });
 
+            // healthEvent with guidance response if guidance is available or null if no guidance (there is guidance fallback so that supposed to not happen)
             const healthEvent = await createHealthEvent(
-                heartRate, temp, spo2, alert.alertId, driverId, firstAidGuidance, tx)
+                heartRate, temp, spo2, alert.alertId, driverId, tx)
 
             // trip is updated to cancelled at creating alert
             const trip = await tx.trip.update({
@@ -215,7 +217,6 @@ export const createAlert = async (req: express.Request, res: express.Response) =
                 }
 
             });
-
             return { alert, healthEvent, trip };
         });
 
@@ -261,7 +262,7 @@ export const updateAlertById = async (req: express.Request, res: express.Respons
         }
 
         // status MUST be RESOLVED OR NULL/undefined
-        const { status, stoppedLocationId, firstAidGuidance } = req.validated?.body
+        const { status, stoppedLocationId } = req.validated?.body
 
         // Validate stoppedLocationId exists if provided
         // 2. ensure valid stopped Location
@@ -306,11 +307,7 @@ export const updateAlertById = async (req: express.Request, res: express.Respons
                 emergencyServiceRequest: true,
             },
         });
-        let updatedHealthEvent = updatedAlert.healthEvent;
-
-        if (firstAidGuidance !== undefined) {
-            updatedHealthEvent = await updateHealthEvent(alertId, firstAidGuidance);
-        }
+        let updatedHealthEvent = updatedAlert.healthEvent
 
         // strip password before returning
         if (updatedAlert.trip.driver?.user) {
@@ -338,7 +335,7 @@ const stripPassword = (alert: any) => {
     };
     return safeAlert
 }
-
+/*
 export const getFirstAid = async (req: express.Request, res: express.Response) => {
     try {
         const alertId = req.validated?.params.alertId;
@@ -375,7 +372,6 @@ export const getFirstAid = async (req: express.Request, res: express.Response) =
     }
 };
 
-/*
 // is this really needed?  --- uncomment if needed from alert.route
 export const getAlertsByDriverId = async (req: express.Request, res: express.Response) => {
     try {

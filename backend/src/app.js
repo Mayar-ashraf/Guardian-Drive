@@ -12,6 +12,7 @@ import alertRoutes from "./routes/alerts.route.ts";
 import wearablebandsRoutes from "./routes/wearableBands.route.ts";
 import towingRequestRoutes from "./routes/towingRequests.route.ts";
 import reportsRoutes from "./routes/reports.route.ts";
+import firstAidGuidanceRoutes from "./routes/firstAidGuidance.route.ts"
 
 const app = express();
 app.use(express.json())
@@ -20,6 +21,7 @@ app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/medical-information", medicalInfoRoutes)
 app.use("/api/alerts", alertRoutes);
+app.use("/first-aid-guidance", firstAidGuidanceRoutes)
 app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
