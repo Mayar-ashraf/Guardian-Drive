@@ -1,43 +1,7 @@
-import express from "express"
 import { prisma } from "../lib/prisma";
 import { HealthEventError } from "../utils/InternalErrors";
-import { Prisma } from "../../generated/prisma/client";
-
-
-// only system can do it (is only called from CreateAlert() ), no route to this function -> therefore no Http Req and Res
-// note this is now always created as transaction - created with alert atomically
-export const createHealthEvent = async (heartRate: number, temp: number, spo2: number,
-    alertId: number, driverId: number, firstAidGuidance?: string,
-    tx?: Prisma.TransactionClient) => {
-    const client = tx ?? prisma;  // use transaction if provided, otherwise use prisma
-    try {
-        // driverId and AlertId already checked in CreateAlert()
-        // can add driverId and AlertId checks but thats redundant and unnecessary overhead
-        const medicalRecord = await client.medicalInformation.findUnique({
-            where: { driverId: driverId }
-        })
-        if (!medicalRecord) {
-            throw new HealthEventError("Medical Record Not Found")
-        }
-
-        const healthEvent = await client.healthEvent.create({
-            data: {
-                temp: temp,
-                heartRate: heartRate,
-                spo2: spo2,
-                recordId: medicalRecord.recordId,
-                alertId: alertId,
-                firstAidGuidance: firstAidGuidance ?? undefined,
-            }
-        })
-
-        return healthEvent
-    }
-    catch (error) {
-        throw new HealthEventError("Server Failed")
-    }
-
-}
+import { ConditionSeverity, ConditionType, Prisma } from "../../generated/prisma/client";
+import { getGuidance } from "./firstAidGuidances.controller";
 
 // can return HealthEvent type or null
 export const getHealthEventByAlertId = async (alertId: number) => {
@@ -52,12 +16,59 @@ export const getHealthEventByAlertId = async (alertId: number) => {
     }
 }
 
-export const updateHealthEvent = async (alertId: number, firstAidGuidance: string) => {
+
+// only system can do it (is only called from CreateAlert() ), no route to this function -> therefore no Http Req and Res
+// note this is now always created as transaction - created with alert atomically
+export const createHealthEvent = async (heartRate: number, temp: number, spo2: number,
+    alertId: number, driverId: number, tx?: Prisma.TransactionClient) => {
+    const client = tx ?? prisma;  // use transaction if provided, otherwise use prisma
     try {
-        const healthEvent = await prisma.healthEvent.update({
-            where: { alertId: alertId },
-            data: { firstAidGuidance: firstAidGuidance }
+        // 1- check valid records
+
+        // driverId and AlertId already checked in CreateAlert()
+        // can add driverId and AlertId checks but thats redundant and unnecessary overhead
+        const medicalRecord = await client.medicalInformation.findUnique({
+            where: { driverId: driverId }
+        })
+        if (!medicalRecord) {
+            throw new HealthEventError("Medical Record Not Found")
+        }
+
+        // 2- fetch first-aid-guidance
+
+        // classify vitals and fetch matching guidance rows
+        const classifications = classifyReadings(heartRate, temp, spo2);
+
+
+        // what does this do ??????????????
+        const guidances = await client.firstAidGuidance.findMany({
+            where: {
+                OR: classifications.map(({ condition, severity }) => ({ condition, severity }))
+            }
         });
+
+        // 3- create healthEvent with readings + first-aid-guidance
+        const healthEvent = await client.healthEvent.create({
+            data: {
+                temp: temp,
+                heartRate: heartRate,
+                spo2: spo2,
+                recordId: medicalRecord.recordId,
+                alertId: alertId,
+                // connect matched guidance rows
+                guidances: {
+                    connect: guidances.map(g => ({ guidanceId: g.guidanceId }))
+                }
+            }
+        })
+
+        // 4- return health event + first-aid-guidance guidance 
+        const response = await getGuidance(alertId)
+
+        if (response) {
+            return { healthEvent, response }
+        }
+
         return healthEvent
     }
     catch (error) {
@@ -65,4 +76,33 @@ export const updateHealthEvent = async (alertId: number, firstAidGuidance: strin
     }
 
 }
+
+
+// helper function to classify the vitals for the correct condition - and then - guidance
+
+const classifyReadings = (heartRate: number, spo2: number, temp: number): { condition: ConditionType; severity: ConditionSeverity }[] => {
+    const results: { condition: ConditionType; severity: ConditionSeverity }[] = [];
+
+    // Heart Rate
+    if (heartRate > 150) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.CRITICAL });
+    else if (heartRate > 120) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MODERATE });
+    else if (heartRate > 100) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MILD });
+    else if (heartRate < 40) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.CRITICAL });
+    else if (heartRate < 50) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.MODERATE });
+    else if (heartRate < 60) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.MILD });
+
+    // SPO2
+    if (spo2 < 88) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.CRITICAL });
+    else if (spo2 < 92) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.MODERATE });
+    else if (spo2 < 95) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.MILD });
+
+    // Temperature
+    if (temp > 39.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.CRITICAL });
+    else if (temp > 38) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MODERATE });
+    else if (temp > 37.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MILD });
+    else if (temp < 35) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.CRITICAL });
+    else if (temp < 36) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.MODERATE });
+
+    return results
+};
 // the functions above AREN'T API services
