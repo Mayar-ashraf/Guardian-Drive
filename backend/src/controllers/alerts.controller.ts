@@ -149,6 +149,7 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
 export const createAlert = async (req: express.Request, res: express.Response) => {
     try {
         // its okay like that because validation schema already validates if driver is sending other than SOS alert
+        // driverId coming from user token if driver endpoint and from params if system endpoint
         const driverId = req.user?.userId ?? req.validated?.params.driverId;
 
         const driver = await prisma.driver.findUnique({
@@ -159,7 +160,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
         }
 
         // all are required for database success
-        const { type, tripId, triggeredLocationId, temp, heartRate, spo2, firstAidGuidance } = req.validated?.body;
+        const { type, tripId, triggeredLocationId, temp, heartRate, spo2 } = req.validated?.body;
 
         const tripExists = await prisma.trip.findUnique({
             where: { tripId: tripId },
@@ -203,6 +204,7 @@ export const createAlert = async (req: express.Request, res: express.Response) =
                 data: { type, tripId, triggeredLocationId, status: alertStatus.ACTIVE },
             });
 
+            // healthEvent with guidance response if guidance is available or null if no guidance (there is guidance fallback so that supposed to not happen)
             const healthEvent = await createHealthEvent(
                 heartRate, temp, spo2, alert.alertId, driverId, tx)
 
@@ -215,7 +217,6 @@ export const createAlert = async (req: express.Request, res: express.Response) =
                 }
 
             });
-
             return { alert, healthEvent, trip };
         });
 
@@ -261,7 +262,7 @@ export const updateAlertById = async (req: express.Request, res: express.Respons
         }
 
         // status MUST be RESOLVED OR NULL/undefined
-        const { status, stoppedLocationId, firstAidGuidance } = req.validated?.body
+        const { status, stoppedLocationId } = req.validated?.body
 
         // Validate stoppedLocationId exists if provided
         // 2. ensure valid stopped Location

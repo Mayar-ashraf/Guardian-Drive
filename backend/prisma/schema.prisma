@@ -223,6 +223,8 @@ model FirstAidGuidance {
   specificAction String? // this action may be added specifically for this case if not , will return the general case of the severity action
 
   healthEvents HealthEvent[]
+
+  @@unique([condition, severity]) // enforces one record with the same condition + severity
 }
 
 enum ConditionType {

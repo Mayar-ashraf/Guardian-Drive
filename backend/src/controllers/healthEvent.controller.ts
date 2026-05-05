@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { HealthEventError } from "../utils/InternalErrors";
 import { ConditionSeverity, ConditionType, Prisma } from "../../generated/prisma/client";
-import { getGuidance } from "./firstAidGuidances.controller";
+import { getGuidance } from "./firstAidGuidance.controller";
 
 // can return HealthEvent type or null
 export const getHealthEventByAlertId = async (alertId: number) => {
@@ -40,7 +40,10 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
         const classifications = classifyReadings(heartRate, temp, spo2);
 
 
-        // what does this do ??????????????
+
+        // this used to fetch exactly the guidance rows that match the driver's abnormal readings —no more, no less. 
+        // Each OR condition is a pair, not individual fields,
+        // so HIGH_HEART_RATE + MODERATE won't accidentally match HIGH_HEART_RATE + CRITICAL.
         const guidances = await client.firstAidGuidance.findMany({
             where: {
                 OR: classifications.map(({ condition, severity }) => ({ condition, severity }))
@@ -65,14 +68,11 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
         // 4- return health event + first-aid-guidance guidance 
         const response = await getGuidance(alertId)
 
-        if (response) {
-            return { healthEvent, response }
-        }
-
-        return healthEvent
+        // null is added to always return response for compatabilty
+        return { healthEvent, response: response ?? null }
     }
     catch (error) {
-        throw new HealthEventError("Server Failed")
+        throw new HealthEventError("Creating Health Event Failed")
     }
 
 }
@@ -102,6 +102,12 @@ const classifyReadings = (heartRate: number, spo2: number, temp: number): { cond
     else if (temp > 37.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MILD });
     else if (temp < 35) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.CRITICAL });
     else if (temp < 36) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.MODERATE });
+
+    // fallback — readings appear normal but alert was still triggered
+    // can add General Type in conditionType and use it as fallback condition But for now let it be like that
+    if (results.length === 0) {
+        results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MILD });
+    }
 
     return results
 };
