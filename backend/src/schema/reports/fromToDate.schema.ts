@@ -1,12 +1,11 @@
-import { brotliDecompressSync } from 'node:zlib';
 import { z } from 'zod'
 
-export const emergencyPerformanceSchema = z.object({
+export const fromToDateSchema = z.object({
     params: z.object({}).strict(),
     body: z.object({}).strict(),
     query: z.object({
-        from: z.coerce.date(),
-        to: z.coerce.date()
+        from: z.coerce.date("A valid 'from' date is required"),
+        to: z.coerce.date("A valid 'to' date is required")
     }).refine(
         (data) => data.from <= data.to,
         {
