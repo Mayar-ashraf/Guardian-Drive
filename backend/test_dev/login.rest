@@ -3,8 +3,7 @@ Content-Type: application/json
 
 { 
     "email":"admin@gmail.com",
-    "password":"123@123"
-
+    "password":"Admin@12345678"
 } 
 
 ###############

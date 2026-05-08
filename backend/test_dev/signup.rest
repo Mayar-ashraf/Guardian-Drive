@@ -65,10 +65,10 @@ POST http://localhost:3000/api/auth/signup
 Content-Type: application/json
 
 { 
-    "email":"admin11@gmail.com",
+    "email":"admin@gmail.com",
     "fName":"AdminfName",
     "lName":"AdminlName",
-    "password":"Admin11@12345678",
+    "password":"Admin@12345678",
     "phone":["01122226666"],
     "address":"abcd",
     "role":"ADMIN" 
