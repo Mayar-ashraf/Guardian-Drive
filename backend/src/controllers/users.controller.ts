@@ -3,103 +3,82 @@ import { prisma } from "../lib/prisma"
 import { Role } from "../../generated/prisma/enums";
 import { id } from "zod/locales";
 import { validate } from "../validators/validate";
-export const getAllusers = async (req: express.Request, res: express.Response) => {
+export const getAllUsers = async (req: express.Request, res: express.Response) => {
     try {
         const role = req.user?.role;
-
+        const userId = req.user?.userId;
         if (role === Role.DRIVER) {
             return res.status(403).json({ message: "You are unauthorized to make this request" });
         }
 
-        const trips = await prisma.trip.findMany();
-        if (role === Role.ADMIN) {
+        const { role: roleQuery, email, name } = req.validated?.query;
+        const where: any = {};
 
-            const users = await prisma.user.findMany({
-                select: {
-                    id: true,
-                    email: true,
-                    role: true,
-                    fName: true,
-                    lName: true,
-                    phone: true,
-                    address: true,
+        if (roleQuery) {
+            where.role = roleQuery;
+        }
 
-                    driver: {
-                        select: {
-                            drivingLicense: true,
-                            avgHealthReadings: true,
-                            medicalInformation: true
-                        }
-                    }
-                }
-            });
+        if (email) {
+            where.email = {
+                contains: email as string,
+                mode: "insensitive"
+            };
+        }
 
-            const Users = users.map((user) => {
-
-                if (user.role === Role.DRIVER && user.driver) {
-                    return {
-                        ...user,
-                        driver: {
-                            ...user.driver,
-                            trips: trips.filter(t => t.driverId === user.id)
-                        }
-                    };
-                }
-                if (user.role === Role.FLEET_MANAGER) {
-                    return {
-                        ...user,
-                        trips: trips.filter(t => t.fleetManagerId === user.id)
-                    };
-                }
-                const { driver, ...cleanUser } = user;
-                return cleanUser;
-            });
-
-            return res.json(Users);
+        if (name) {
+            where.OR = [
+                { fName: { startsWith: name as string, mode: "insensitive" } },
+                { lName: { startsWith: name as string, mode: "insensitive" } }
+            ];
         }
         if (role === Role.FLEET_MANAGER) {
-
-            const users = await prisma.user.findMany({
-                where: { role: Role.DRIVER },
-                select: {
-                    id: true,
-                    email: true,
-                    role: true,
-                    fName: true,
-                    lName: true,
-                    phone: true,
-                    address: true,
-
-                    driver: {
-                        select: {
-                            drivingLicense: true,
-                            avgHealthReadings: true,
-                            medicalInformation: true
-                        }
+            where.role = Role.DRIVER;
+        }
+        const users = await prisma.user.findMany({
+            where,
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                fName: true,
+                lName: true,
+                phone: true,
+                address: true,
+                driver: {
+                    select: {
+                        drivingLicense: true,
+                        avgHealthReadings: true,
+                        medicalInformation: true
                     }
                 }
-            });
-
-            const Drivers = users.map((user) => {
-                const driverTrips = trips.filter(t => t.driverId === user.id);
-
+            }
+        });
+        const trips = await prisma.trip.findMany({
+            where: {
+                ...(role === Role.FLEET_MANAGER && { fleetManagerId: userId })
+            }
+        });
+        const result = users.map((user) => {
+            if (user.role === Role.DRIVER && user.driver) {
                 return {
                     ...user,
-                    ...(user.driver && {
-                        driver: {
-                            ...user.driver,
-                            trips: driverTrips
-                        }
-                    })
+                    driver: {
+                        ...user.driver,
+                        trips: trips.filter(t => t.driverId === user.id)
+                    }
                 };
-            });
-
-            return res.json(Drivers);
-        }
-
-        return res.status(403).json({
-            message: "unauthorized"
+            }
+            if (user.role === Role.FLEET_MANAGER) {
+                return {
+                    ...user,
+                    trips: trips.filter(t => t.fleetManagerId === user.id)
+                };
+            }
+            const { driver, ...cleanUser } = user;
+            return cleanUser;
         });
+
+        return res.status(200).json(result);
 
     } catch (error) {
         console.error(error);
@@ -112,14 +91,14 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
     try {
         const caller = req.user;
         const role = caller?.role;
-        
-      
-        
+
+
+
         const ID = Number(req.validated?.params.id);
 
-     /*   if (isNaN(ID)) {
-            return res.status(400).json({ message: "Invalid user id" });
-        }*/
+        /*   if (isNaN(ID)) {
+               return res.status(400).json({ message: "Invalid user id" });
+           }*/
 
         const trips = await prisma.trip.findMany();
 
@@ -143,10 +122,17 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
                 }
             }
         });
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
+        if (role == Role.DRIVER) {
+            return res.status(403).json({ message: "You can only access your own profile" });
         }
+        if (!user) {
+
+            return res.status(400).json({ message: "User not found" });
+
+        }
+
+
+
         const { driver, ...baseUser } = user;
 
         const driverWithTrips =
@@ -159,6 +145,9 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
 
         const fleetTrips = trips.filter(t => t.fleetManagerId === user.id);
         if (role === Role.ADMIN) {
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
 
             if (user.role === Role.DRIVER) {
                 return res.json({
@@ -178,6 +167,9 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
         }
 
         if (role === Role.FLEET_MANAGER) {
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
 
             if (user.role !== Role.DRIVER) {
                 return res.status(403).json({
@@ -190,19 +182,7 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
                 ...(driverWithTrips ? { driver: driverWithTrips } : {})
             });
         }
-        if (role === Role.DRIVER) {
 
-            if (caller?.userId !== ID) {
-                return res.status(403).json({
-                    message: "You can only access your own profile"
-                });
-            }
-
-            return res.json({
-                ...baseUser,
-                ...(driverWithTrips ? { driver: driverWithTrips } : {})
-            });
-        }
 
         return res.status(403).json({ message: "Unauthorized" });
 
@@ -222,9 +202,9 @@ export const edituserbyID = async (req: express.Request, res: express.Response) 
 
         const userId = Number(req.validated?.params.id);
 
-      /*  if (isNaN(userId)) {
-            return res.status(400).json({ message: "Invalid user id" });
-        }*/
+        /*  if (isNaN(userId)) {
+              return res.status(400).json({ message: "Invalid user id" });
+          }*/
 
         const { email, fName, lName, phone, address } = req.validated?.body;
 
@@ -299,68 +279,116 @@ export const deleteuserbyID = async (req: express.Request, res: express.Response
         const role = req.user?.role;
 
         if (role !== Role.ADMIN) {
-            return res.status(403).json({ message: "unauthorized" });
+            return res.status(403).json({
+                message: "You are unauthorized to make this request"
+            });
         }
 
         const userId = Number(req.validated?.params.id);
-        const { newFleetManagerId,newdriverID } = req.validated?.body;
-       // const { newdriverID } = req.body;
 
-        /*if (isNaN(userId)) {
-            return res.status(400).json({ message: "Invalid user id" });
-        }*/
 
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { id: userId }
         });
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({
+                message: "User not found"
+            });
         }
-        if (user.role == Role.DRIVER) {
-            const trips = await prisma.trip.findMany({
+
+        if (user.role === Role.ADMIN) {
+            await prisma.user.delete({
+                where: { id: userId }
+            });
+
+            return res.status(200).json({
+                message: "Admin deleted successfully"
+            });
+        }
+        const { newFleetManagerId, newDriverId } = req.validated?.body;
+
+        if (user.role === Role.DRIVER) {
+
+            const tripsCount = await prisma.trip.count({
                 where: { driverId: userId }
             });
-            if (trips.length > 0 && !newdriverID) {
-                return res.status(400).json({ message: "this driver has trips ,give newdriverID to reassign them" });
-            }
-            if (newdriverID) {
-                const newdriver = await prisma.user.findUnique({
-                    where: { id: newdriverID }
+
+
+            if (tripsCount > 0) {
+
+                if (!newDriverId) {
+                    return res.status(400).json({ message: "Please Provide new driver ID to reassign trips" });
+                }
+                if (newFleetManagerId) {
+                    return res.status(400).json({
+                        message: "Driver deletion requires newDriverID only "
+                    });
+                }
+
+                if (newDriverId === userId) {
+                    return res.status(400).json({
+                        message: "Cannot reassign to the same driver"
+                    });
+                }
+
+                const newDriver = await prisma.user.findFirst({
+                    where: {
+                        id: newDriverId,
+                        role: Role.DRIVER
+                    }
                 });
 
-                if (!newdriver || newdriver.role != Role.DRIVER) {
-                    return res.status(400).json({ message: "invalid new driver id " });
+                if (!newDriver) {
+                    return res.status(400).json({
+                        message: "Invalid new driver ID"
+                    });
                 }
 
                 await prisma.trip.updateMany({
                     where: { driverId: userId },
-                    data: { driverId: newdriverID }
+                    data: { driverId: newDriverId }
                 });
             }
-
         }
+
 
         if (user.role === Role.FLEET_MANAGER) {
 
-            const trips = await prisma.trip.findMany({
+            const tripsCount = await prisma.trip.count({
                 where: { fleetManagerId: userId }
             });
 
-            if (trips.length > 0 && !newFleetManagerId) {
-                return res.status(400).json({
-                    message: "This fleet manager has trips ,give newFleetManagerId to reassign them."
-                });
-            }
 
-            if (newFleetManagerId) {
-                const newManager = await prisma.user.findUnique({
-                    where: { id: newFleetManagerId }
-                });
 
-                if (!newManager || newManager.role !== Role.FLEET_MANAGER) {
+            if (tripsCount > 0) {
+                if (newDriverId) {
                     return res.status(400).json({
-                        message: "Invalid new fleet manager"
+                        message: "Fleet Manager deletion requires newFleetManagerId only"
+                    });
+                }
+                if (!newFleetManagerId) {
+                    return res.status(400).json({
+                        message: "please provide new fleet manager ID to reassign trips"
+                    });
+                }
+
+                if (newFleetManagerId === userId) {
+                    return res.status(400).json({
+                        message: "Cannot reassign to the same fleet manager"
+                    });
+                }
+
+                const newManager = await prisma.user.findFirst({
+                    where: {
+                        id: newFleetManagerId,
+                        role: Role.FLEET_MANAGER
+                    }
+                });
+
+                if (!newManager) {
+                    return res.status(400).json({
+                        message: "Invalid fleet manager ID"
                     });
                 }
 
@@ -371,14 +399,20 @@ export const deleteuserbyID = async (req: express.Request, res: express.Response
             }
         }
 
+
         await prisma.user.delete({
-            where: { id: userId },
+            where: { id: userId }
         });
 
-        return res.json({ message: "User deleted successfully and trips are reassigned" });
+        return res.status(200).json({
+            message: "User deleted successfully"
+        });
 
     } catch (error) {
         console.error("DELETE ERROR:", error);
-        return res.status(500).json({ message: "Internal Server Error" });
+
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
     }
 };

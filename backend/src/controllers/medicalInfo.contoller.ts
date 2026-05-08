@@ -61,13 +61,30 @@ export const createMedicalRecord = async (req: express.Request, res: express.Res
             return HttpResponses.sendError(res, "Medical Records for this driver already exists", 409)
         }
 
-        const { conditions, medications } = req.validated?.body
+        const {
+            conditions, medications,
+            minHeartRate, maxHeartRate, avgHeartRate,
+            minSpo2, maxSpo2, avgSpo2,
+            minTemp, maxTemp, avgTemp
+        } = req.validated?.body;
 
         const medicalRecord = await prisma.medicalInformation.create({
             data: {
                 driverId,
                 conditions,
                 medications,
+
+                maxTemp: maxTemp ?? avgTemp + 0.5,
+                minTemp: minTemp ?? avgTemp - 0.5,
+                avgTemp: avgTemp,
+
+                minSpo2: maxSpo2 ?? avgSpo2 - 2.5,
+                maxSpo2: minSpo2 ?? 100,
+                avgSpo2: avgSpo2,
+
+                maxHeartRate: maxHeartRate ?? avgHeartRate + 20,
+                minHeartRate: minHeartRate ?? avgHeartRate - 20,
+                avgHeartRate: avgHeartRate,
             },
         });
 
@@ -86,7 +103,12 @@ export const updateMedicalRecord = async (req: express.Request, res: express.Res
         const driverId = req.validated?.params?.driverId;
 
         // the only parameters right now other than avg health readings , Can add later BloodPressure too? and Blood Type?
-        const { conditions, medications } = req.validated?.body;
+        const {
+            conditions, medications,
+            minHeartRate, maxHeartRate, avgHeartRate,
+            minSpo2, maxSpo2, avgSpo2,
+            minTemp, maxTemp, avgTemp
+        } = req.validated?.body;
 
         // check if the driver i am looking for his records exits at all
         const driver = await prisma.driver.findUnique({
@@ -108,10 +130,21 @@ export const updateMedicalRecord = async (req: express.Request, res: express.Res
 
         const updatedMedicalInfo = await prisma.medicalInformation.update({
             where: { driverId },
-            data: {         // to push on an existing array instead of full replace, problem , Can't Remove only append
+            data: {
                 conditions: conditions ? { push: conditions } : undefined,
                 medications: medications ? { push: medications } : undefined,
 
+                minHeartRate: minHeartRate ?? driverMedicalInfo.minHeartRate,
+                maxHeartRate: maxHeartRate ?? driverMedicalInfo.maxHeartRate,
+                avgHeartRate: avgHeartRate ?? driverMedicalInfo.avgHeartRate,
+
+                minSpo2: minSpo2 ?? driverMedicalInfo.minSpo2,
+                maxSpo2: maxSpo2 ?? driverMedicalInfo.maxSpo2,
+                avgSpo2: avgSpo2 ?? driverMedicalInfo.avgSpo2,
+
+                minTemp: minTemp ?? driverMedicalInfo.minTemp,
+                maxTemp: maxTemp ?? driverMedicalInfo.maxTemp,
+                avgTemp: avgTemp ?? driverMedicalInfo.avgTemp,
             },
         });
 
@@ -133,4 +166,36 @@ export const updateMedicalRecord = async (req: express.Request, res: express.Res
         return HttpResponses.sendError(res);
     }
 
+}
+
+export const getCustomThresholds = async (req: express.Request, res: express.Response) => {
+    try {
+        const driverId = req.user?.userId
+
+        const driver = await prisma.driver.findUnique({
+            where: { id: driverId },
+        });
+
+        if (!driver) {
+            return HttpResponses.sendNotFound(res, "Driver not found");
+        }
+
+        const customThresholds = await prisma.medicalInformation.findUnique({
+            where: { driverId: driverId },
+            select: {
+                minHeartRate: true, maxHeartRate: true, avgHeartRate: true,
+                minSpo2: true, maxSpo2: true, avgSpo2: true,
+                minTemp: true, maxTemp: true, avgTemp: true
+            },
+        });
+
+        if (!customThresholds) {
+            return HttpResponses.sendNotFound(res, "Thresholds Not found")
+        }
+
+        return HttpResponses.sendSuccess(res, customThresholds);
+
+    } catch (error) {
+        return HttpResponses.sendError(res);
+    }
 }

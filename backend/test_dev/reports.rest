@@ -10,3 +10,27 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzgyNjc5NTEsImV4cCI6MTc3ODM1NDM1MX0.LCNp1nwuR7OyCTfQMOgVTZ6H0pKy291cM9T5KpSXjQ0
 
 {}
+#########
+GET http://localhost:3000/api/reports/emergency-performance?from=2026-05-01&to=2026-05-04
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODA5NDI5MywiZXhwIjoxNzc4MTgwNjkzfQ.zzAts9TtY8OOzBvb71mdX63LTA8D0N99uYzarblk9To
+
+{
+
+}
+###
+GET http://localhost:3000/api/reports/alerts/yearly?fromYear=2026&toYear=2026
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODA5NDI5MywiZXhwIjoxNzc4MTgwNjkzfQ.zzAts9TtY8OOzBvb71mdX63LTA8D0N99uYzarblk9To
+
+{
+
+}
+### 
+GET http://localhost:3000/api/reports/fleet-managers/trips?from=1969-01-01&to=2028-08-04
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODA5NDI5MywiZXhwIjoxNzc4MTgwNjkzfQ.zzAts9TtY8OOzBvb71mdX63LTA8D0N99uYzarblk9To
+
+{
+
+}
