@@ -111,6 +111,7 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
                                 user: true,  // to get driver name, phone etc.
                             },
                         },
+                        car: true
                     },
                 },
                 healthEvent: true,
