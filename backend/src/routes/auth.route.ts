@@ -1,11 +1,8 @@
 import express from "express"
-import { signup, login } from "../controllers/auth.controller"
-import { SignupSchema } from "../schema/users"
-import { validate } from "../validators/validate"
+import { login } from "../controllers/auth.controller"
 
 const router = express.Router()
 
-router.post("/signup", validate(SignupSchema), signup)
 
 router.post('/login', login)
 

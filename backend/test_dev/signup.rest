@@ -61,15 +61,29 @@ Content-Type: application/json
 
 #####
 
-POST http://localhost:3000/api/auth/signup
+POST http://localhost:3000/api/users
 Content-Type: application/json
 
 { 
-    "email":"admin11@gmail.com",
+    "email":"admin@gmail.com",
     "fName":"AdminfName",
     "lName":"AdminlName",
-    "password":"Admin11@12345678",
+    "password":"Admin@12345678",
     "phone":["01122226666"],
     "address":"abcd",
     "role":"ADMIN" 
+} 
+########
+POST http://localhost:3000/api/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzgyNjc5NTEsImV4cCI6MTc3ODM1NDM1MX0.LCNp1nwuR7OyCTfQMOgVTZ6H0pKy291cM9T5KpSXjQ0
+
+{ 
+    "email":"driver@gmail.com",
+    "fName":"Dri",
+    "lName":"ver",
+    "password":"Driver@12345678",
+    "phone":["01122226666"],
+    "address":"abcd",
+    "role":"DRIVER" 
 } 

@@ -114,7 +114,6 @@ export const createCar = async (req: Request, res: Response) => {
     return res.status(201).json({ message: "Car created", car });
 
   } catch (error: any) {
-    console.error(error);
 
     if (error.code === "P2002") {
       return res.status(400).json({ message: "Car already exists" });

@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { prisma } from "../lib/prisma"
 import sgMail from "@sendgrid/mail";
 import bcrypt from "bcrypt";
+import { Role } from "../../generated/prisma/enums";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -15,7 +16,11 @@ export const forgetPass = async (req: express.Request, res: express.Response) =>
   });
 
   if (!user) {
-    return res.status(404).json({ message: "User not Found" });
+    return res.status(404).json({ message: "This email is not registered. Please enter a valid email." });
+  }
+  const role = user.role;
+  if (role != Role.DRIVER){
+    return res.status(403).json({ message: "Only drivers can reset their password through this portal." });
   }
 
   const resettoken = crypto.randomBytes(32).toString("hex");
@@ -29,7 +34,7 @@ export const forgetPass = async (req: express.Request, res: express.Response) =>
     },
   });
 
-  const resetLink = `http://localhost:3000/reset-password.html?token=${resettoken}`;
+const resetLink = `http://10.0.2.2:3000/api/password/reset-password?token=${resettoken}`;
   await sgMail.send({
     to: email,
     from: process.env.EMAIL_FROM!,
@@ -100,7 +105,7 @@ export const resetPass = async (req: any, res: any) => {
     const updatedUser = await prisma.user.update({
       where: { id: user.id },
       data: {
-        password: newPassword,
+        password: hashedPassword,
         resetToken: null,
         resetTokenExpiry: null,
       },

@@ -97,24 +97,33 @@ async function readTrips(req: Request, res: Response) {
     try {
         const user = req.user
         // const { engineId, driverId, status, fromDate, toDate, fleetManagerId } = req.query
-        const query = req.validated?.query
-        const { limit, orderBy, page } = query
+        const validatedQuery = req.validated?.query
+        const { limit, orderBy, page } = validatedQuery
         const skip = (page - 1) * limit;
+        if (
+            validatedQuery.fromStartDate &&
+            validatedQuery.toStartDate &&
+            new Date(validatedQuery.fromStartDate) > new Date(validatedQuery.toStartDate)
+        ) {
+            return res.status(400).json({
+                message: "fromStartDate cannot be after toStartDate"
+            });
+        }
         const whereConditions = {
-            ...(req.validated?.query.engineId && { engineId: req.validated?.query.engineId }),
-            ...(req.validated?.query.driverId && { driverId: req.validated?.query.engineId }),
-            ...(req.validated?.query.fleetManagerId && { fleetManagerId: req.validated?.query.engineId }),
-            ...(req.validated?.query.status && { status: req.validated?.query.status })
+            ...(validatedQuery.engineId && { engineId: validatedQuery.engineId }),
+            ...(validatedQuery.driverId && { driverId: validatedQuery.engineId }),
+            ...(validatedQuery.fleetManagerId && { fleetManagerId: validatedQuery.engineId }),
+            ...(validatedQuery.status && { status: validatedQuery.status })
 
         }
         const startTimeFilter: any = {};
 
-        if (req.validated?.query.fromStartDate) {
-            startTimeFilter.gte = req.validated?.query.fromStartDate;
+        if (validatedQuery.fromStartDate) {
+            startTimeFilter.gte = validatedQuery.fromStartDate;
         }
 
-        if (req.validated?.query.toStartDate) {
-            startTimeFilter.lte = req.validated?.query.toStartDate;
+        if (validatedQuery.toStartDate) {
+            startTimeFilter.lte = validatedQuery.toStartDate;
         }
 
         if (Object.keys(startTimeFilter).length > 0) {
@@ -132,7 +141,7 @@ async function readTrips(req: Request, res: Response) {
             skip,
             take: limit,
             orderBy: {
-                startTime: req.validated?.query.orderBy
+                startTime: validatedQuery.orderBy
             }
 
         })

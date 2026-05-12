@@ -7,11 +7,12 @@ import { getAllUsersSchema } from "../schema/user/getAllUsers.schema";
 import { getUserbyIDschema } from "../schema/user/getUserbyID.schema";
 import { deleteUserbyIDschema } from "../schema/user/deleteUserbyID.schema";
 import { edituserbyIDschema } from "../schema/user/editUserbyID.schema";
-
+import { SignupSchema } from "../schema/users"
+import { createUser } from "../controllers/users.controller";
 
 
 const router = express.Router();
-
+router.post("/", authenticate, authorize(Role.ADMIN), validate(SignupSchema), createUser)
 router.get("/", authenticate, authorize(Role.ADMIN, Role.FLEET_MANAGER), validate(getAllUsersSchema), getAllUsers);
 
 router.get("/:id", authenticate, authorize(Role.ADMIN, Role.FLEET_MANAGER, Role.DRIVER), validate(getUserbyIDschema), getuserbyID);
