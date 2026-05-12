@@ -1,3 +1,59 @@
-GET http://localhost:3000/api/alerts/11/first-aid-guidance
+
+### ─────────────────────────────────────────
+### GET
+### ─────────────────────────────────────────
+
+### Get guidance for a HEALTH_ABNORMAL alert — has guidances
+GET http://localhost:3000/api/alerts/2/guidance
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzczODA3NTcsImV4cCI6MTc3NzQ2NzE1N30.e-ezM_3QqaLQQ55BI5Yikv_UTZWsowN-eS6zHMim8Ro
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Get guidance — driver owns the alert
+GET http://localhost:3000/api/alerts/2/guidance
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+########
+
+### Get guidance — driver does NOT own the alert (should 403)
+GET http://localhost:3000/api/alerts/5/guidance
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+########
+
+### Get guidance for SOS alert — no health event (should 404)
+GET http://localhost:3000/api/alerts/1/guidance
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Get guidance — alert not found (should 404)
+GET http://localhost:3000/api/alerts/9999/guidance
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+
+
+### ─────────────────────────────────────────
+### POST
+### ─────────────────────────────────────────
+
+
+
+
+
+### ─────────────────────────────────────────
+### UPDATE
+### ─────────────────────────────────────────
+
+
+
+
+
+### ─────────────────────────────────────────
+### Delete
+### ─────────────────────────────────────────

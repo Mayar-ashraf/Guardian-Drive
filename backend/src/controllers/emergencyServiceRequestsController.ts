@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma"
 import { requestStatus } from "../../generated/prisma/enums";
+
 async function createEmergencyServiceRequest(req: Request, res: Response) {
     try {
         const validatedData = req.validated?.body

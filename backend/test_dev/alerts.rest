@@ -1,11 +1,287 @@
-Post http://localhost:3000/api/alerts
+### ─────────────────────────────────────────
+### ALERTS — CREATE
+### ─────────────────────────────────────────
+
+### Create SOS alert (Driver only)
+POST http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc3NjYyMjAxLCJleHAiOjE3Nzc3NDg2MDF9.waj57GGsWmyuIa4Oiyj-k_v92SYqxjYazeypBKizrko
+Authorization: Bearer DRIVER_TOKEN
 
 {
-    "type": "SOS",
-    "tripId": 23,
-    "triggeredLocationId": 3,
+    "type":"SOS",
+    "tripId": 14,
+    "triggeredLocationId": 1,
     "temp": 37.5,
-    "heartRange":"120"
+    "heartRange":120,
+    "spo2":90
 }
+
+### Create HEALTH_ABNORMAL alert (SYSTEM only) - mild heart rate
+
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer SYSTEM_TOKEN
+
+{
+    "type":"HEALTH_ABNORMAL",
+    "tripId": 14,
+    "triggeredLocationId": 1,
+    "heartRate":  112,
+    "temp": 37.0,
+    "spo2": 97
+}
+
+### Create HEALTH_ABNORMAL alert — moderate heart rate + mild temp
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "type":                "HEALTH_ABNORMAL",
+    "tripId":              14,
+    "triggeredLocationId": 1,
+    "heartRate":           128,
+    "temp":                37.8,
+    "spo2":                96
+}
+
+### Create HEALTH_ABNORMAL alert — critical readings (multiple conditions)
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "type":                "HEALTH_ABNORMAL",
+    "tripId":              14,
+    "triggeredLocationId": 1,
+    "heartRate":           155,
+    "temp":                39.5,
+    "spo2":                88
+}
+
+### Create HEALTH_ABNORMAL alert — low heart rate + low temp
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "type":                "HEALTH_ABNORMAL",
+    "tripId":              14,
+    "triggeredLocationId": 1,
+    "heartRate":           48,
+    "temp":                35.2,
+    "spo2":                95
+}
+
+
+### Create alert — driver tries to send HEALTH_ABNORMAL (should be forbidden)
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "type":                "HEALTH_ABNORMAL",
+    "tripId":              14,
+    "triggeredLocationId": 1,
+    "heartRate":           48,
+    "temp":                35.2,
+    "spo2":                95
+}
+
+### create alert - incomplete data (should be forbidden)
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "type":                "HEALTH_ABNORMAL",
+    "tripId":              14,
+    "triggeredLocationId": 1
+}
+
+### Create alert — invalid tripId (should 404)
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "type":   "SOS",
+    "tripId": 9999,
+    "triggeredLocationId": 1
+}
+
+########
+
+### Create alert — location not belonging to trip 
+POST http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "type":                "SOS",
+    "tripId":              14,
+    "triggeredLocationId": 999
+}
+
+
+### ─────────────────────────────────────────
+### ALERTS — UPDATE
+### ─────────────────────────────────────────
+
+### Update stoppedLocationId (car has stopped)
+PATCH http://localhost:3000/api/alerts/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "stoppedLocationId": 2
+}
+
+########
+
+### Resolve alert — all checks pass
+PATCH http://localhost:3000/api/alerts/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "status":            "RESOLVED",
+    "stoppedLocationId": 2
+}
+
+########
+
+### Resolve alert — no stoppedLocationId (should 400)
+PATCH http://localhost:3000/api/alerts/2
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "status": "RESOLVED"
+}
+
+########
+
+### Resolve already resolved alert (should 400)
+PATCH http://localhost:3000/api/alerts/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "status": "RESOLVED"
+}
+
+########
+
+### Driver tries to update alert (should 403)
+PATCH http://localhost:3000/api/alerts/1
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "status": "RESOLVED"
+}
+
+########
+
+### Send empty body (should 400 — at least one field required)
+PATCH http://localhost:3000/api/alerts/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{}
+
+
+
+### ─────────────────────────────────────────
+### ALERTS — GET
+### ─────────────────────────────────────────
+
+### Get all alerts — admin sees all
+GET http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+########
+
+### Get all alerts — fleet manager sees all
+GET http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Get all alerts — driver sees only their own
+GET http://localhost:3000/api/alerts
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+########
+
+### Filter by type
+GET http://localhost:3000/api/alerts?type=SOS
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Filter by status
+GET http://localhost:3000/api/alerts?status=ACTIVE
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Filter by type + status
+GET http://localhost:3000/api/alerts?type=HEALTH_ABNORMAL&status=ACTIVE
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Filter by date range
+GET http://localhost:3000/api/alerts?from=2026-01-01&to=2026-12-31
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Filter by driverId
+GET http://localhost:3000/api/alerts?driverId=6
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Filter by from date only (invalid range — from after to, should 400)
+GET http://localhost:3000/api/alerts?from=2026-12-31&to=2026-01-01
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Get specific alert — admin
+GET http://localhost:3000/api/alerts/1
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+########
+
+### Get specific alert — driver owns it
+GET http://localhost:3000/api/alerts/1
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+########
+
+### Get specific alert — driver does NOT own it (should 403)
+GET http://localhost:3000/api/alerts/5
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+########
+
+### Get specific alert — not found (should 404)
+GET http://localhost:3000/api/alerts/9999
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN

@@ -116,7 +116,7 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
                 healthEvent: true,
                 triggeredLocation: true,
                 stoppedLocation: true,
-                emergencyServiceRequest: true,  //  these should be added when implemented Normally <------------------
+                emergencyServiceRequest: true,
             },
         });
         if (!alert) {
