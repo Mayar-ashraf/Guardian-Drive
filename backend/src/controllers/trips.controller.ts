@@ -87,7 +87,7 @@ async function createTrip(req: Request, res: Response) {
 
         return res.status(201).json({ message: "Trip created successfully", trip });
     } catch (error) {
-        console.error("FULL ERROR:", error);
+        //console.error("FULL ERROR:", error);
         return res.status(500).json({ message: "Server Error" })
     }
 
@@ -111,8 +111,8 @@ async function readTrips(req: Request, res: Response) {
         }
         const whereConditions = {
             ...(validatedQuery.engineId && { engineId: validatedQuery.engineId }),
-            ...(validatedQuery.driverId && { driverId: validatedQuery.engineId }),
-            ...(validatedQuery.fleetManagerId && { fleetManagerId: validatedQuery.engineId }),
+            ...(validatedQuery.driverId && { driverId: validatedQuery.driverId }),
+            ...(validatedQuery.fleetManagerId && { fleetManagerId: validatedQuery.fleetManagerId }),
             ...(validatedQuery.status && { status: validatedQuery.status })
 
         }

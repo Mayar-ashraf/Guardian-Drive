@@ -1,4 +1,4 @@
-import express from "express"
+import express, { response } from "express"
 import authRoutes from "./routes/auth.route.ts"
 import tripsRoutes from "./routes/trips.route.ts"
 import medicalInfoRoutes from "./routes/medicalInfo.route.ts"
@@ -14,9 +14,11 @@ import towingRequestRoute from "./routes/towingRequests.route.ts";
 import reportsRoute from "./routes/reports.route.ts"
 import firstAidGuidanceRoutes from "./routes/firstAidGuidance.route.ts"
 import { Role } from "../generated/prisma/enums";
+//import cors from "cors"
 
 const app = express();
 app.use(express.json())
+//app.use(cors({ origin: '*' })); // Allow everything for now
 app.use("/api/auth", authRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
@@ -34,7 +36,6 @@ app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);
 app.use("/api/reports", authMiddleware.authenticate, authMiddleware.authorize(Role.ADMIN), reportsRoute)
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.urlencoded({ extended: true }));
-
 app.listen(3000, () => {
     console.log("server is running on http://localhost:3000")
 })
