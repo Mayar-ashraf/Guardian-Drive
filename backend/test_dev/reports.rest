@@ -14,7 +14,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
 
 }
 ### 
-GET http://localhost:3000/api/reports/fleet-managers/trips?from=1969-01-01&to=2028-08-04
+GET http://localhost:3000/api/reports/fleet-managers/trips?from=1969-01-01&to=2025-08
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODA5NDI5MywiZXhwIjoxNzc4MTgwNjkzfQ.zzAts9TtY8OOzBvb71mdX63LTA8D0N99uYzarblk9To
 

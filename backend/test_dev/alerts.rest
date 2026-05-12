@@ -9,3 +9,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb
     "temp": 37.5,
     "heartRange":"120"
 }
+
+### DRIVER7
+GET http://localhost:3000/api/alerts 
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3ODU4NjcwNSwiZXhwIjoxNzc4NjczMTA1fQ.1qcB6txKYEmgB9En957bjoTGUC9e45eFlOjxICIJujk
+
+{
+    
+}
