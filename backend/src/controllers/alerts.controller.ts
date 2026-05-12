@@ -49,30 +49,30 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
                 },
             }),
         };
-        const [alerts, total] = await prisma.$transaction([
-            prisma.alert.findMany({
-                where: whereConditions,
-                include: {
-                    trip: {
-                        include: {
-                            towingRequest: true,
-                            driver: {
-                                include: { user: true },
-                            },
+        const alerts = await prisma.alert.findMany({
+            where: whereConditions,
+            include: {
+                trip: {
+                    include: {
+                        towingRequest: true,
+                        driver: {
+                            include: { user: true },
                         },
                     },
-                    healthEvent: true,
-                    triggeredLocation: true,
-                    stoppedLocation: true,
-                    emergencyServiceRequest: true,
                 },
-                orderBy: { generatedAt: orderBy ?? "desc" },
-                skip,
-                take: limit,
-            }),
-            prisma.alert.count({ where: whereConditions }),
-        ]);
+                healthEvent: true,
+                triggeredLocation: true,
+                stoppedLocation: true,
+                emergencyServiceRequest: true,
+            },
+            orderBy: { generatedAt: orderBy ?? "desc" },
+            skip,
+            take: limit,
+        });
 
+        const total = await prisma.alert.count({
+            where: whereConditions,
+        });
         const safeAlerts = alerts.map(alert => {
             if (alert.trip.driver?.user) {
                 return stripPassword(alert);
@@ -82,7 +82,7 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
 
         console.log(safeAlerts)
         return HttpResponses.sendSuccess(res, {
-            ...safeAlerts,
+            alerts: safeAlerts,
             page,
             limit,
             total,
@@ -111,6 +111,7 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
                                 user: true,  // to get driver name, phone etc.
                             },
                         },
+                        car: true
                     },
                 },
                 healthEvent: true,
@@ -122,10 +123,11 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
         if (!alert) {
             return HttpResponses.sendNotFound(res, "Alert Not Found !!")
         }
-        if (alert.trip.driverId !== req.user!.userId) {   // driver should only see his alerts
+        if (req.user!.role === Role.DRIVER && alert.trip.driverId !== req.user!.userId) {   // driver should only see his alerts
             return HttpResponses.sendForbidden(res);
         }
-
+        console.log(req.user);
+        console.log(req.user!.role);
         // then strip password from returned value
         if (alert && alert.trip.driver?.user) { // the ? because trip may not be assigned a driver 
             // this is not a normal case as alert would be for a driver assigned trip of course but to prevent crashes

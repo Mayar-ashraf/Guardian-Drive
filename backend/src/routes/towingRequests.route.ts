@@ -2,9 +2,7 @@ import express from "express";
 import { authorize, authenticate } from "../middleware/AuthMiddleware";
 import { validate } from "../validators/validate";
 
-import {
-  createTowingRequest, getTowingRequests, getTowingRequestById, updateTowingRequest, deleteTowingRequest,
-} from "../controllers/towingRequests.controller";
+import {createTowingRequest, getTowingRequests, getTowingRequestById, updateTowingRequest, deleteTowingRequest,} from "../controllers/towingRequests.controller";
 
 import { createTowingRequestSchema, getTowingRequestsSchema, getTowingRequestByIdSchema, updateTowingRequestSchema, deleteTowingRequestSchema, } from "../schema/towingRequests/towingRequests.schema";
 
