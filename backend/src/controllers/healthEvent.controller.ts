@@ -80,7 +80,4 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
 
 }
 
-
-
-
 // the functions above AREN'T API services

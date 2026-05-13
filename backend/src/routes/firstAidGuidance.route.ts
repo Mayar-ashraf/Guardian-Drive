@@ -9,7 +9,7 @@ import { DeleteGuidanceSchema } from "../schema/firstAidGuidance/deleteGuidance.
 
 const router = express.Router()
 
-// 1. GET /first-aid-guidances
+// 1. GET /first-aid-guidance
 router.get("/", authenticate, authorize(Role.FLEET_MANAGER, Role.ADMIN), getAllGuidances)
 
 // 3. GET /api/alerts/:alertId/first-aid-guidance — get guidance for a specific alert

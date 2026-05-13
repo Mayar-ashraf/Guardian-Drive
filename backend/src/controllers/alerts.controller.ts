@@ -114,7 +114,11 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
                         car: true
                     },
                 },
-                healthEvent: true,
+                healthEvent: {
+                    include: {
+                        guidances: true
+                    }
+                },
                 triggeredLocation: true,
                 stoppedLocation: true,
                 emergencyServiceRequest: true,

@@ -5,14 +5,14 @@
 ### Create SOS alert (Driver only)
 POST http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer DRIVER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc4NjMxMDM4LCJleHAiOjE3Nzg3MTc0Mzh9.moMvglmKs0ILOtyYQAG4NXNvlf2Q2ZxwDQzQwiJO5po
 
 {
     "type":"SOS",
-    "tripId": 14,
-    "triggeredLocationId": 1,
-    "temp": 37.5,
-    "heartRange":120,
+    "tripId": 27,
+    "triggeredLocationId": 9,
+    "temp": 39,
+    "heartRate":120,
     "spo2":90
 }
 
@@ -198,9 +198,9 @@ Authorization: Bearer FLEET_MANAGER_TOKEN
 ### ─────────────────────────────────────────
 
 ### Get all alerts — admin sees all
-GET http://localhost:3000/api/alerts
+GET http://localhost:3000/api/alerts/12
 Content-Type: application/json
-Authorization: Bearer ADMIN_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzg2Mjk0NDMsImV4cCI6MTc3ODcxNTg0M30.s8-yGOTSJbWCqUnR1HGngURDn7T9tC_-u7vC1dENqVA
 
 ########
 

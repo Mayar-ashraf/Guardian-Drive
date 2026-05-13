@@ -35,7 +35,7 @@ export const getGuidance = async (guidances: FirstAidGuidance[]) => {
 
 }
 
-export const getAllGuidances = async (res: Response) => {
+export const getAllGuidances = async (req: Request, res: Response) => {
     try {
         const guidances = await prisma.firstAidGuidance.findMany({
             orderBy: [
