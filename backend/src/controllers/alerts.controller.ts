@@ -2,7 +2,7 @@ import express from "express"
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses"
 import { alertStatus, alertType, Role, tripStatus } from '../../generated/prisma/enums';
-import { createHealthEvent } from "./healthEvent.controller";
+import { createHealthEvent } from "../services/healthEvent.service";
 import { HealthEventError } from "../utils/InternalErrors";
 
 // would want to add driver avg readings too?? <--------------------- 

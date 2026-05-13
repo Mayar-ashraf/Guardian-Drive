@@ -1,8 +1,8 @@
 import { prisma } from "../lib/prisma";
 import { HealthEventError } from "../utils/InternalErrors";
 import { ConditionSeverity, ConditionType, Prisma } from "../../generated/prisma/client";
-import { getGuidance } from "./firstAidGuidance.controller";
-import { classifyReadings } from "../services/classifyReadings.service";
+import { getGuidance } from "../controllers/firstAidGuidance.controller";
+import { classifyReadings } from "./classifyReadings.service";
 
 // can return HealthEvent type or null
 export const getHealthEventByAlertId = async (alertId: number) => {
