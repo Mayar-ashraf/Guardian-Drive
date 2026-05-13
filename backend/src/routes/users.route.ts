@@ -13,9 +13,13 @@ import { createUser } from "../controllers/users.controller";
 
 const router = express.Router();
 router.post("/", authenticate, authorize(Role.ADMIN), validate(SignupSchema), createUser)
+//router.post("/", authenticate, validate(SignupSchema), createUser)
+
 router.get("/", authenticate, authorize(Role.ADMIN, Role.FLEET_MANAGER), validate(getAllUsersSchema), getAllUsers);
 
 router.get("/:id", authenticate, authorize(Role.ADMIN, Role.FLEET_MANAGER, Role.DRIVER), validate(getUserbyIDschema), getuserbyID);
+
+//router.get("/:id", validate(getUserbyIDschema), getuserbyID);
 
 router.put("/:id", authenticate, authorize(Role.ADMIN, Role.FLEET_MANAGER), validate(edituserbyIDschema), edituserbyID);
 router.delete("/:id", authenticate, authorize(Role.ADMIN), validate(deleteUserbyIDschema), deleteuserbyID);
