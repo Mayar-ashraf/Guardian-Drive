@@ -2,7 +2,7 @@ import express from "express"
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses"
 import { alertStatus, alertType, Role, tripStatus } from '../../generated/prisma/enums';
-import { createHealthEvent } from "./healthEvent.controller";
+import { createHealthEvent } from "../services/healthEvent.service";
 import { HealthEventError } from "../utils/InternalErrors";
 
 // would want to add driver avg readings too?? <--------------------- 
@@ -114,10 +114,14 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
                         car: true
                     },
                 },
-                healthEvent: true,
+                healthEvent: {
+                    include: {
+                        guidances: true
+                    }
+                },
                 triggeredLocation: true,
                 stoppedLocation: true,
-                emergencyServiceRequest: true,  //  these should be added when implemented Normally <------------------
+                emergencyServiceRequest: true,
             },
         });
         if (!alert) {

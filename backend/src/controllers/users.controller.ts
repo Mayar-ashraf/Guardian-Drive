@@ -170,9 +170,34 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
                 }
             }
         });
-        if (role == Role.DRIVER) {
-            return res.status(403).json({ message: "You can only access your own profile" });
-        }
+         if (role === Role.DRIVER && caller?.userId !== ID) {
+      return res.status(403).json({
+        message: "Drivers can only access their own profile",
+      });
+    }
+    if (role==Role.DRIVER&&caller?.userId==ID){
+        const user = await prisma.user.findUnique({
+      where: { id: ID },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        fName: true,
+        lName: true,
+        phone: true,
+        address: true,
+
+        driver: {
+          select: {
+            drivingLicense: true,
+            avgHealthReadings: true,
+            medicalInformation: true,
+          },
+        },
+      },
+    });
+    return res.json(user);
+    }
         if (!user) {
 
             return res.status(400).json({ message: "User not found" });

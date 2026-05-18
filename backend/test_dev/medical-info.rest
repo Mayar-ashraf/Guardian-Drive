@@ -1,0 +1,64 @@
+# ================================================================
+# POST
+# ================================================================
+
+
+POST http://localhost:3000/api/medical-information/6
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+{
+    "conditions":  ["diabetes", "hypertension"],
+    "medications": ["metformin", "lisinopril"],
+    "avgHeartRate" : 120,
+    "avgTemp" : 37,
+    "avgSpo2" : 55
+}
+
+
+
+# ================================================================
+# Get
+# ================================================================
+
+
+### Get All Medical Records
+GET http://localhost:3000/api/drivers/medical-records
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+###
+
+### Get Medical Record By Driver Id
+GET http://localhost:3000/api/medical-information/6
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+
+###
+
+# ================================================================
+# UPDATE
+# ================================================================
+
+
+### Update Medical Record 
+PATCH http://localhost:3000/api/medical-information/6
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+{
+    "conditions": ["astigmatism"],
+    "avgHeartRate" : 110,
+    "avgTemp" : 37,
+    "avgSpo2" : 60
+}
+
+
+PATCH http://localhost:3000/api/medical-information/6
+Content-Type: application/json
+Authorization: Bearer ADMIN_TOKEN
+
+{
+    "conditions": ["astigmatism"]
+}

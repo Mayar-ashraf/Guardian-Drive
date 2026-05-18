@@ -1,11 +1,11 @@
 import express from "express";
-import { forgetPass, resetPass } from "../controllers/password.controller";
+import { forgetPass, resetPass,validateToken } from "../controllers/password.controller";
 
 const router = express.Router();
 
 router.post("/forget-password", forgetPass);
 router.post("/reset-password", resetPass);
-
+router.post("/validate-reset-token", validateToken);
 
 router.get("/reset-password", (req, res) => {
   const token = req.query.token;

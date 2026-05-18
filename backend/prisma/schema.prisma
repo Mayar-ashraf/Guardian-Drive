@@ -17,96 +17,61 @@ model User {
   hiredAt          DateTime  @default(now())
   address          String
   role             Role
-  driver           Driver?
   resetToken       String?
   resetTokenExpiry DateTime?
+  driver           Driver?
   trips            Trip[]
-}
-
-enum Role {
-  ADMIN
-  FLEET_MANAGER
-  DRIVER
 }
 
 model Driver {
   id                 Int                 @id
   drivingLicense     String
-  medicalInformation MedicalInformation?
+  avgHealthReadings  AvgHealthReadings[]
   user               User                @relation(fields: [id], references: [id], onDelete: Cascade)
-
-  avgHealthReadings AvgHealthReadings[]
-  trips             Trip[]
-
-  wearableBand WearableBand?
+  medicalInformation MedicalInformation?
+  trips              Trip[]
+  wearableBand       WearableBand?
 }
 
 model Trip {
-  tripId           Int            @id @default(autoincrement())
-  startLatitude    Float
-  startLongitude   Float
-  destLatitude     Float
-  destLongitude    Float
-  plannedStartTime DateTime
-  startTime        DateTime? //this will be the actual start time when driver clicks start
-  endTime          DateTime?
-  status           tripStatus
-  location         Location[]
-  alerts           Alert[]
-  towingRequest    TowingRequest?
-
-  driver   Driver? @relation(fields: [driverId], references: [id])
-  driverId Int?
-
-  car      Car?    @relation(fields: [engineId], references: [engineId])
-  engineId String?
-
+  tripId            Int                @id @default(autoincrement())
+  startTime         DateTime?
+  endTime           DateTime?
+  status            tripStatus
+  driverId          Int?
+  engineId          String?
   fleetManagerId    Int
-  fleetManager      User               @relation(fields: [fleetManagerId], references: [id])
+  plannedStartTime  DateTime
+  destLatitude      Float
+  destLongitude     Float
+  startLatitude     Float
+  startLongitude    Float
+  alerts            Alert[]
   avgHealthReadings AvgHealthReadings?
-}
-
-enum tripStatus {
-  PLANNED
-  ONGOING
-  CANCELLED
-  COMPLETED
+  location          Location[]
+  towingRequest     TowingRequest?
+  driver            Driver?            @relation(fields: [driverId], references: [id])
+  car               Car?               @relation(fields: [engineId], references: [engineId])
+  fleetManager      User               @relation(fields: [fleetManagerId], references: [id])
 }
 
 model Location {
-  // locationId is pk to be able to make it auto-increment
-  locationId Int      @id @default(autoincrement())
-  time       DateTime @default(now())
-  longitude  Float
-  latitude   Float
-
-  tripId Int
-  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
-
-  // multiple alerts can happen at the same point in time
-  // Named back-relations to match the two relations on Alert
-  triggeredAlerts Alert[] @relation("AlertTriggeredLocation")
-  stoppedAlerts   Alert[] @relation("AlertStoppedLocation")
+  locationId      Int      @id @default(autoincrement())
+  time            DateTime @default(now())
+  longitude       Float
+  latitude        Float
+  tripId          Int
+  stoppedAlerts   Alert[]  @relation("AlertStoppedLocation")
+  triggeredAlerts Alert[]  @relation("AlertTriggeredLocation")
+  trip            Trip     @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 }
-
-// the enforce consistency at the service layer when creating an alert:
-// SO, tripId is always derived from the location's trip — never independently set
-
-// NOTE : INDEXING NEEDS TO BE ADDED LATER
 
 model Car {
   engineId String    @id
   plateNo  String
   color    String
   status   carStatus
-
-  trips Trip[]
-}
-
-enum carStatus {
-  ACTIVE
-  IN_TRIP
-  DISABLED
+  trips    Trip[]
 }
 
 model HardwareAddOn {
@@ -118,37 +83,20 @@ model HardwareAddOn {
 }
 
 model Alert {
-  alertId     Int         @id @default(autoincrement())
-  type        alertType
-  status      alertStatus
-  generatedAt DateTime    @default(now())
-  solvedAt    DateTime?
-
-  tripId Int
-  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
-
-  // Where the alert was triggered
-  triggeredLocationId Int
-  triggeredLocation   Location @relation("AlertTriggeredLocation", fields: [triggeredLocationId], references: [locationId], onDelete: Cascade)
-
-  // Where the car actually stopped (nullable — filled in once car stops)
-  stoppedLocationId Int?
-  stoppedLocation   Location? @relation("AlertStoppedLocation", fields: [stoppedLocationId], references: [locationId], onDelete: SetNull)
-
-  healthEvent             HealthEvent?
+  alertId                 Int                      @id @default(autoincrement())
+  type                    alertType
+  status                  alertStatus
+  generatedAt             DateTime                 @default(now())
+  solvedAt                DateTime?
+  tripId                  Int
+  stoppedLocationId       Int?
+  triggeredLocationId     Int
+  stoppedLocation         Location?                @relation("AlertStoppedLocation", fields: [stoppedLocationId], references: [locationId])
+  triggeredLocation       Location                 @relation("AlertTriggeredLocation", fields: [triggeredLocationId], references: [locationId], onDelete: Cascade)
+  trip                    Trip                     @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
   emergencyServiceRequest EmergencyServiceRequest?
+  healthEvent             HealthEvent?
   towingRequest           TowingRequest?
-}
-
-enum alertStatus {
-  ACTIVE
-  RESOLVED
-}
-
-enum alertType {
-  HEALTH_ABNORMAL // automatic trigger
-  SOS // manual trigger
-  // VEHICLE_EMERGENCY
 }
 
 model WearableBand {
@@ -156,91 +104,61 @@ model WearableBand {
   sensorList   String[]
   batteryLevel Int
   isConnected  Boolean
-
-  driverId Int?    @unique
-  driver   Driver? @relation(fields: [driverId], references: [id])
+  driverId     Int?     @unique
+  driver       Driver?  @relation(fields: [driverId], references: [id])
 }
 
-// Can add later BloodPressure too? and Blood Type?
 model MedicalInformation {
-  recordId    Int      @id @default(autoincrement())
-  conditions  String[]
-  medications String[]
-
-  // sensors data
-  avgHeartRate Float
-  avgTemp      Float
-  avgSpo2      Float
-
-  minHeartRate Float
-  minTemp      Float
-  minSpo2      Float
-
-  maxHeartRate Float
-  maxTemp      Float
-  maxSpo2      Float
-
+  recordId     Int           @id @default(autoincrement())
+  conditions   String[]
+  medications  String[]
   driverId     Int           @unique
-  driver       Driver        @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  avgHeartRate Float
+  avgSpo2      Float
+  avgTemp      Float
+  maxHeartRate Float
+  maxSpo2      Float
+  maxTemp      Float
+  minHeartRate Float
+  minSpo2      Float
+  minTemp      Float
   healthEvents HealthEvent[]
+  driver       Driver        @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  //bloodtype ?
 }
 
 model AvgHealthReadings {
+  driverId     Int
   avgHeartRate Float
-  avgTemp      Float
   avgSpo2      Float
-
-  tripId Int  @id
-  trip   Trip @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
-
-  driverId Int
-  driver   Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  avgTemp      Float
+  tripId       Int    @id
+  driver       Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  trip         Trip   @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 }
 
 model HealthEvent {
-  eventId   Int      @id @default(autoincrement())
-  eventDate DateTime @default(now())
-
-  // sensors data
-  heartRate Float
+  eventId   Int                @id @default(autoincrement())
+  eventDate DateTime           @default(now())
   temp      Float
+  recordId  Int
+  alertId   Int                @unique
   spo2      Float
-
-  recordId Int
-  medical  MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
-
-  alertId Int   @unique
-  alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
-
-  guidances FirstAidGuidance[] // many to many relationship
+  heartRate Float
+  alert     Alert              @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+  medical   MedicalInformation @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
+  guidances FirstAidGuidance[] @relation("FirstAidGuidanceToHealthEvent")
 }
 
 model FirstAidGuidance {
   guidanceId     Int               @id @default(autoincrement())
   condition      ConditionType
   severity       ConditionSeverity
-  description    String // unique per condition — what is happening
-  specificAction String? // this action may be added specifically for this case if not , will return the general case of the severity action
+  description    String
+  specificAction String?
+  healthEvents   HealthEvent[]     @relation("FirstAidGuidanceToHealthEvent")
 
-  healthEvents HealthEvent[]
-
-  @@unique([condition, severity]) // enforces one record with the same condition + severity
-}
-
-enum ConditionType {
-  LOW_SPO2 // nothing like "high spo2" XX in real world 
-  // its only for patients with supplemental oxygen OR Risk of oxygen toxicity (ICU-level situations)
-  HIGH_HEART_RATE
-  LOW_HEART_RATE
-  HIGH_TEMP
-  LOW_TEMP
-}
-
-// each severity has an action that will return constantly
-enum ConditionSeverity {
-  MILD
-  MODERATE
-  CRITICAL
+  @@unique([condition, severity])
 }
 
 model TowingRequest {
@@ -249,17 +167,10 @@ model TowingRequest {
   requestTime    DateTime      @default(now())
   completionTime DateTime?
   towingCompany  String
-
-  tripId  Int   @unique
-  trip    Trip  @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
-  alertId Int   @unique
-  alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
-}
-
-enum requestStatus {
-  REQUESTED
-  INPROGRESS
-  COMPLETED
+  tripId         Int           @unique
+  alertId        Int           @unique
+  alert          Alert         @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+  trip           Trip          @relation(fields: [tripId], references: [tripId], onDelete: Cascade)
 }
 
 model EmergencyServiceRequest {
@@ -269,7 +180,55 @@ model EmergencyServiceRequest {
   phone            String
   completionTime   DateTime?
   hospitalAssigned String
+  alertId          Int           @unique
+  alert            Alert         @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+}
 
-  alertId Int   @unique
-  alert   Alert @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+enum Role {
+  ADMIN
+  FLEET_MANAGER
+  DRIVER
+}
+
+enum tripStatus {
+  PLANNED
+  ONGOING
+  CANCELLED
+  COMPLETED
+}
+
+enum carStatus {
+  ACTIVE
+  IN_TRIP
+  DISABLED
+}
+
+enum alertStatus {
+  ACTIVE
+  RESOLVED
+}
+
+enum alertType {
+  HEALTH_ABNORMAL
+  SOS
+}
+
+enum ConditionType {
+  LOW_SPO2
+  HIGH_HEART_RATE
+  LOW_HEART_RATE
+  HIGH_TEMP
+  LOW_TEMP
+}
+
+enum ConditionSeverity {
+  MILD
+  MODERATE
+  CRITICAL
+}
+
+enum requestStatus {
+  REQUESTED
+  INPROGRESS
+  COMPLETED
 }

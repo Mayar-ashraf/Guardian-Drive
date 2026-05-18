@@ -77,14 +77,29 @@ const resetLink = `http://10.0.2.2:3000/api/password/reset-password?token=${rese
 
   return res.json({ message: "Password reset link sent to your email" });
 };
+export const validateToken =async(req:any,res:any)=>{
+  const { token } = req.query;
 
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: {
+        gt: new Date(),
+      },
+    },
+  }); 
+  if (!user) {
+    return res.status(400).json({ message: "Invalid or expired token!" });
+  } else {
+    return res.json({ message: "Token is valid." });
+  }
+}
 export const resetPass = async (req: any, res: any) => {
   const { token, newPassword } = req.body;
 
   try {
     console.log("RESET REQUEST RECEIVED:", req.body);
 
-    // 1. FIND USER
     const user = await prisma.user.findFirst({
       where: {
         resetToken: token,

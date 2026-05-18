@@ -1,7 +1,8 @@
 import { prisma } from "../lib/prisma";
 import { HealthEventError } from "../utils/InternalErrors";
 import { ConditionSeverity, ConditionType, Prisma } from "../../generated/prisma/client";
-import { getGuidance } from "./firstAidGuidance.controller";
+import { getGuidance } from "../controllers/firstAidGuidance.controller";
+import { classifyReadings } from "./classifyReadings.service";
 
 // can return HealthEvent type or null
 export const getHealthEventByAlertId = async (alertId: number) => {
@@ -15,7 +16,6 @@ export const getHealthEventByAlertId = async (alertId: number) => {
         throw new HealthEventError("Server Failed")
     }
 }
-
 
 // only system can do it (is only called from CreateAlert() ), no route to this function -> therefore no Http Req and Res
 // note this is now always created as transaction - created with alert atomically
@@ -75,43 +75,9 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
     }
     catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        throw new HealthEventError(`Creating Health Event Failed: \n${message}`);
+        throw new HealthEventError(`Creating Health Event Failed: \n ${message}`);
     }
 
 }
 
-
-// helper function to classify the vitals for the correct condition - and then - guidance
-
-const classifyReadings = (heartRate: number, spo2: number, temp: number): { condition: ConditionType; severity: ConditionSeverity }[] => {
-    const results: { condition: ConditionType; severity: ConditionSeverity }[] = [];
-
-    // Heart Rate
-    if (heartRate > 150) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.CRITICAL });
-    else if (heartRate > 120) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MODERATE });
-    else if (heartRate > 100) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MILD });
-    else if (heartRate < 40) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.CRITICAL });
-    else if (heartRate < 50) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.MODERATE });
-    else if (heartRate < 60) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.MILD });
-
-    // SPO2
-    if (spo2 < 88) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.CRITICAL });
-    else if (spo2 < 92) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.MODERATE });
-    else if (spo2 < 95) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.MILD });
-
-    // Temperature
-    if (temp > 39.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.CRITICAL });
-    else if (temp > 38) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MODERATE });
-    else if (temp > 37.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MILD });
-    else if (temp < 35) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.CRITICAL });
-    else if (temp < 36) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.MODERATE });
-
-    // fallback — readings appear normal but alert was still triggered
-    // can add General Type in conditionType and use it as fallback condition But for now let it be like that
-    if (results.length === 0) {
-        results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MILD });
-    }
-
-    return results
-};
 // the functions above AREN'T API services

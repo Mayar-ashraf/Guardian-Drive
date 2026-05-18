@@ -24,7 +24,7 @@ app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/medical-information", medicalInfoRoutes)
 app.use("/api/alerts", alertRoute);
-app.use("/first-aid-guidance", firstAidGuidanceRoutes)
+app.use("/api/first-aid-guidance", firstAidGuidanceRoutes)
 app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
