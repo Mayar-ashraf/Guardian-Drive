@@ -51,19 +51,39 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
         };
         const alerts = await prisma.alert.findMany({
             where: whereConditions,
-            include: {
+            select: {
+                alertId: true,
                 trip: {
-                    include: {
-                        towingRequest: true,
+                    select: {
                         driver: {
-                            include: { user: true },
+                            select: {
+                                user: {
+                                    select: {
+                                        email: true,
+                                        fName: true,
+                                        lName: true,
+                                        phone: true
+                                    }
+                                },
+                            }
                         },
                     },
                 },
-                healthEvent: true,
-                triggeredLocation: true,
-                stoppedLocation: true,
-                emergencyServiceRequest: true,
+                healthEvent: {
+                    select: {
+                        eventDate: true,
+                        eventId: true,
+                        temp: true,
+                        spo2: true,
+                        heartRate: true,
+                    }
+                },
+                status: true,
+                solvedAt: true,
+                generatedAt: true,
+                type: true,
+                triggeredLocationId: true,
+                stoppedLocationId: true,
             },
             orderBy: { generatedAt: orderBy ?? "desc" },
             skip,
@@ -100,30 +120,101 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
     try {
         const alertId = req.validated?.params?.alertId;
         // alert should include (user info - health Event - emergency requestTime , emergency completetionTime, towing request times too)
-        const alert = await prisma.alert.findUnique({
-            where: { alertId },
-            include: {
-                trip: {
-                    include: {
-                        towingRequest: true,
-                        driver: {
-                            include: {
-                                user: true,  // to get driver name, phone etc.
+        const userRole = req.user?.role;
+        var alert = null;
+        if (userRole != Role.DRIVER) {
+            alert = await prisma.alert.findUnique({
+                where: { alertId },
+                include: {
+                    trip: {
+                        include: {
+                            towingRequest: true,
+                            driver: {
+                                select: {
+                                    id: true,
+                                    drivingLicense: true,
+                                    user: {
+                                        select: {
+                                            email: true,
+                                            fName: true,
+                                            lName: true,
+                                            phone: true,
+                                            address: true,
+                                            hiredAt: true,
+                                        }
+                                    },  // to get driver name, phone etc.
+                                },
                             },
+                            car: true
                         },
-                        car: true
                     },
+                    healthEvent: {
+                        include: {
+                            guidances: true
+                        }
+                    },
+                    triggeredLocation: true,
+                    stoppedLocation: true,
+                    emergencyServiceRequest: true,
                 },
-                healthEvent: {
-                    include: {
-                        guidances: true
-                    }
+            });
+        }
+        else {
+            alert = await prisma.alert.findUnique({
+                where: { alertId },
+                select: {
+                    alertId: true,
+                    type: true,
+                    status: true,
+                    generatedAt: true,
+                    solvedAt: true,
+                    triggeredLocationId: true,
+                    triggeredLocation: {
+                        select: {
+                            locationId: true,
+                            time: true,
+                            latitude: true,
+                            longitude: true,
+                        }
+                    },
+                    trip: {
+                        select: {
+                            car: {
+                                select: {
+                                    engineId: true,
+                                    plateNo: true,
+                                    color: true,
+                                    status: true,
+                                }
+                            },
+                            driverId: true,
+                        }
+                    },
+                    healthEvent: {
+                        select: {
+                            heartRate: true,
+                            temp: true,
+                            spo2: true,
+                            guidances: true,
+                        }
+                    },
+                    emergencyServiceRequest: {
+                        select: {
+                            completionTime: true,
+                        }
+                    },/*
+                    stoppedLocationId: true,
+                    stoppedLocation: {
+                        select: {
+                            locationId: true,
+                            time: true,
+                            latitude: true,
+                            longitude: true,
+                        }
+                    },*/
                 },
-                triggeredLocation: true,
-                stoppedLocation: true,
-                emergencyServiceRequest: true,
-            },
-        });
+            });
+        }
         if (!alert) {
             return HttpResponses.sendNotFound(res, "Alert Not Found !!")
         }
@@ -132,14 +223,36 @@ export const getAlertById = async (req: express.Request, res: express.Response) 
         }
         console.log(req.user);
         console.log(req.user!.role);
-        // then strip password from returned value
+        // then strip password from returned value  <--- not needed now
+        /*
         if (alert && alert.trip.driver?.user) { // the ? because trip may not be assigned a driver 
             // this is not a normal case as alert would be for a driver assigned trip of course but to prevent crashes
             const safeAlert = stripPassword(alert)
             return HttpResponses.sendSuccess(res, safeAlert);
         }
+        */
 
-        return HttpResponses.sendSuccess(res, alert);
+        // map the guidance severity into the driver vitals condition -- done only for driver ?
+
+        if (userRole != Role.DRIVER) {
+            return HttpResponses.sendSuccess(res, alert);
+        }
+        // else
+        const guidances = alert.healthEvent?.guidances ?? [];
+        const result = {
+            ...alert,
+            healthEvent: alert.healthEvent ? {
+                heartRate: alert.healthEvent.heartRate,
+                temp: alert.healthEvent.temp,
+                spo2: alert.healthEvent.spo2,
+                heartRateStatus: guidances.find(g => g.condition === "HIGH_HEART_RATE")?.severity ?? "NORMAL",
+                tempStatus: guidances.find(g => g.condition === "HIGH_TEMP")?.severity ?? "NORMAL",
+                spo2Status: guidances.find(g => g.condition === "LOW_SPO2")?.severity ?? "NORMAL",
+            } : null,
+        };
+
+        return HttpResponses.sendSuccess(res, result);
+
     } catch (error) {
         if (error instanceof HealthEventError) {
             return HttpResponses.sendError(res, `Health Event Failed: ${error.message}`);

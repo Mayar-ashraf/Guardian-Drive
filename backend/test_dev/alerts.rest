@@ -197,17 +197,17 @@ Authorization: Bearer FLEET_MANAGER_TOKEN
 ### ALERTS — GET
 ### ─────────────────────────────────────────
 
-### Get all alerts — admin sees all
+### Get all alerts — admin sees all (Admin Token or fleet token)
 GET http://localhost:3000/api/alerts/12
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzg2Mjk0NDMsImV4cCI6MTc3ODcxNTg0M30.s8-yGOTSJbWCqUnR1HGngURDn7T9tC_-u7vC1dENqVA
+Authorization: Bearer ADMIN_TOKEN
 
 ########
 
 ### Get all alerts — fleet manager sees all
 GET http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer FLEET_MANAGER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3OTI4Njk0MywiZXhwIjoxNzc5MzczMzQzfQ.ExbU_5Nxt4MVtcEpqmavg0vgt7ttQFDTspzKW4NpVzA
 
 ########
 
@@ -268,9 +268,9 @@ Authorization: Bearer ADMIN_TOKEN
 ########
 
 ### Get specific alert — driver owns it
-GET http://localhost:3000/api/alerts/1
+GET http://localhost:3000/api/alerts/14
 Content-Type: application/json
-Authorization: Bearer DRIVER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc5Mjg5MjQwLCJleHAiOjE3NzkzNzU2NDB9.I2PqnhLWH1UkQ_9PG8poo41OFGzlaBbX0Pq5Z4J1O2A
 
 ########
 
