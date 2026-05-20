@@ -93,16 +93,18 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
         const total = await prisma.alert.count({
             where: whereConditions,
         });
+        /*
         const safeAlerts = alerts.map(alert => {
             if (alert.trip.driver?.user) {
                 return stripPassword(alert);
             }
             return alert;
         });
+        */
 
-        console.log(safeAlerts)
+        console.log(alerts)
         return HttpResponses.sendSuccess(res, {
-            alerts: safeAlerts,
+            alerts: alerts,
             page,
             limit,
             total,
