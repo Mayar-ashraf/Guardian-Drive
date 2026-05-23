@@ -79,3 +79,11 @@ Content-Type: application/json
     "password":"Fleet@123"
 }
 
+###
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email":"driver@test.com",
+    "password":"Driver7@12345678"
+}

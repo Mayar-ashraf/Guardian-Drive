@@ -285,3 +285,14 @@ Authorization: Bearer DRIVER_TOKEN
 GET http://localhost:3000/api/alerts/9999
 Content-Type: application/json
 Authorization: Bearer ADMIN_TOKEN
+
+###
+GET http://localhost:3000/api/alerts?limit=10&page=2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE5LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc5MTQ5OTM2LCJleHAiOjE3NzkyMzYzMzZ9.KGSenmtd2slvfSDUe586j6P43D3QIV53jDdSvWdwiwk
+
+### 
+
+GET http://localhost:3000/api/alerts?limit=10&page=2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3Nzk1NzY5MDIsImV4cCI6MTc3OTY2MzMwMn0.tjoFUSF1nwHn4uKsRY9-0G2AulcNcRev3z386CHWVpE
