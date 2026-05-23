@@ -75,7 +75,7 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "email":"FleetOmnia@gmail.com",
+    "email":"fleetOmnia@gmail.com",
     "password":"Fleet@123"
 }
 

@@ -49,6 +49,7 @@ export const getWearableBandById = async (req: Request, res: Response) => {
 
         return res.json({ wearableBand });
     } catch (error) {
+        console.error(error);
         return sendError(res);
     }
 }

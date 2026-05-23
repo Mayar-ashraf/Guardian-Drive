@@ -165,7 +165,8 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
                     select: {
                         drivingLicense: true,
                         avgHealthReadings: true,
-                        medicalInformation: true
+                        medicalInformation: true,
+                        wearableBand: true,
                     }
                 }
             }
@@ -192,6 +193,7 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
             drivingLicense: true,
             avgHealthReadings: true,
             medicalInformation: true,
+            wearableBand: true,
           },
         },
       },
