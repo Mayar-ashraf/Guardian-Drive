@@ -89,16 +89,30 @@ export const validateToken =async(req:any,res:any)=>{
     },
   }); 
   if (!user) {
-    return res.status(400).json({ message: "Invalid or expired token!" });
-  } else {
+    return res.status(400);
+  } 
+  else {
     return res.json({ message: "Token is valid." });
   }
 }
+const isStrongPassword = (password: string) => {
+  const strongRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._#^-])[A-Za-z\d@$!%*?&._#^-]{8,}$/;
+
+  return strongRegex.test(password);
+};
 export const resetPass = async (req: any, res: any) => {
   const { token, newPassword } = req.body;
 
   try {
     console.log("RESET REQUEST RECEIVED:", req.body);
+
+    if (!isStrongPassword(newPassword)) {
+      return res.status(404).json({
+        message:
+          "Weak password. Must be at least 8 characters and include uppercase, lowercase, number, and special character.",
+      });
+    }
 
     const user = await prisma.user.findFirst({
       where: {
@@ -112,7 +126,7 @@ export const resetPass = async (req: any, res: any) => {
     console.log("USER FOUND:", user);
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token!" });
+      return res.status(400);
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
