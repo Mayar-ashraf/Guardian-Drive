@@ -89,7 +89,7 @@ export const validateToken =async(req:any,res:any)=>{
     },
   }); 
   if (!user) {
-    return res.status(400);
+    return res.status(400).json({message:"Expired token. Please request a new password reset."});
   } 
   else {
     return res.json({ message: "Token is valid." });
@@ -126,7 +126,7 @@ export const resetPass = async (req: any, res: any) => {
     console.log("USER FOUND:", user);
 
     if (!user) {
-      return res.status(400);
+      return res.status(400).json({message:"Expired token. Please request a new password reset."});
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
