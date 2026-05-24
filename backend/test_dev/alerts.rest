@@ -299,6 +299,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvb
 
 ####
 
-GET http://localhost:3000/api/alerts
+GET http://localhost:3000/api/alerts/115
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE5LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc5NTg0MDc5LCJleHAiOjE3Nzk2NzA0Nzl9.KXygD9WKnBDuchIDNzlFI3oSsJMbvQ3l7h2UZBIzRVk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3Nzk2MzYzODQsImV4cCI6MTc3OTcyMjc4NH0.qLNC6eV6IRxhpT5yjDzLoNe199gwOIHrf9bsM3THuyY
