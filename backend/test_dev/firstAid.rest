@@ -3,6 +3,11 @@
 ### GET
 ### ─────────────────────────────────────────
 
+GET http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODAzMzQ0ODMsImV4cCI6MTc4MDQyMDg4M30.CfoplE07J9HtETz4zOafDqbVgd_nq92SlHka1YwtVi4
+
+
 ### Get guidance for a HEALTH_ABNORMAL alert — has guidances
 GET http://localhost:3000/api/alerts/2/guidance
 Content-Type: application/json
@@ -71,3 +76,406 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb
 ### ─────────────────────────────────────────
 ### Delete
 ### ─────────────────────────────────────────
+
+
+# First Aid Guidance & Guidance Steps — API Tests
+
+### ─────────────────────────────────────────
+### FIRST AID GUIDANCE — GET
+### ─────────────────────────────────────────
+
+### Get all guidances — any authenticated user
+GET http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+########
+
+### Get guidance by id — exists
+GET http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Get guidance by id — not found (should 404)
+GET http://localhost:3000/api/first-aid-guidance/9999
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Get guidance by id — invalid id (should 400)
+GET http://localhost:3000/api/first-aid-guidance/abc
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+### ─────────────────────────────────────────
+### FIRST AID GUIDANCE — CREATE
+### ─────────────────────────────────────────
+
+### Create guidance — valid (no steps)
+POST http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "condition":   "HIGH_HEART_RATE",
+    "severity":    "MILD",
+    "description": "Heart rate slightly above driver's normal range"
+}
+
+########
+
+### Create guidance — valid (with existing stepIds)
+POST http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "condition":   "HIGH_HEART_RATE",
+    "severity":    "MODERATE",
+    "description": "Heart rate significantly elevated above driver's normal range",
+    "stepIds": [1, 2, 3]
+}
+
+########
+
+### Create guidance — duplicate condition + severity (should 409)
+POST http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "condition":   "HIGH_HEART_RATE",
+    "severity":    "MILD",
+    "description": "Another mild heart rate guidance"
+}
+
+########
+
+### Create guidance — invalid condition enum (should 400)
+POST http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "condition":   "INVALID_CONDITION",
+    "severity":    "MILD",
+    "description": "Some description"
+}
+
+########
+
+### Create guidance — stepId doesn't exist (should 404)
+POST http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "condition":   "LOW_TEMP",
+    "severity":    "MILD",
+    "description": "Body temperature slightly below normal",
+    "stepIds": [9999]
+}
+
+########
+
+### Create guidance — driver tries to create (should 403)
+POST http://localhost:3000/api/first-aid-guidance
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "condition":   "HIGH_TEMP",
+    "severity":    "MILD",
+    "description": "Some description"
+}
+
+### ─────────────────────────────────────────
+### FIRST AID GUIDANCE — UPDATE
+### ─────────────────────────────────────────
+
+### Update description only
+PATCH http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "description": "Updated description for mild high heart rate"
+}
+
+########
+
+### Update severity
+PATCH http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "severity": "MODERATE"
+}
+
+########
+
+### Connect new steps to guidance
+PATCH http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "connectStepIds": [2, 3]
+}
+
+########
+
+### Disconnect steps from guidance
+PATCH http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "disconnectStepIds": [2]
+}
+
+########
+
+### Connect and disconnect in same request
+PATCH http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "connectStepIds":    [4],
+    "disconnectStepIds": [3]
+}
+
+########
+
+### Update — would create duplicate condition+severity (should 409)
+PATCH http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "condition": "HIGH_HEART_RATE",
+    "severity":  "MODERATE"
+}
+
+########
+
+### Update — empty body (should 400)
+PATCH http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{}
+
+########
+
+### Update — not found (should 404)
+PATCH http://localhost:3000/api/first-aid-guidance/9999
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "description": "Updated"
+}
+
+### ─────────────────────────────────────────
+### FIRST AID GUIDANCE — DELETE
+### ─────────────────────────────────────────
+
+### Delete guidance — valid
+DELETE http://localhost:3000/api/first-aid-guidance/3
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Delete guidance — not found (should 404)
+DELETE http://localhost:3000/api/first-aid-guidance/9999
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Delete guidance — driver tries to delete (should 403)
+DELETE http://localhost:3000/api/first-aid-guidance/1
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+### ─────────────────────────────────────────
+### GUIDANCE STEPS — GET
+### ─────────────────────────────────────────
+
+### Get all steps — any authenticated user
+GET http://localhost:3000/api/first-aid-guidance/steps
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+########
+
+### Get step by id — exists
+GET http://localhost:3000/api/first-aid-guidance/steps/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Get step by id — not found (should 404)
+GET http://localhost:3000/api/first-aid-guidance/steps/9999
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+### ─────────────────────────────────────────
+### GUIDANCE STEPS — CREATE
+### ─────────────────────────────────────────
+
+### Create step — no guidances connected
+POST http://localhost:3000/api/first-aid-guidance/steps
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "action":   "Pull over safely and stop the vehicle.",
+    "priority": 1
+}
+
+########
+
+### Create step — connect to existing guidances
+POST http://localhost:3000/api/first-aid-guidance/steps
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "action":      "Call emergency services immediately.",
+    "priority":    2,
+    "guidanceIds": [1, 2]
+}
+
+########
+
+### Create step — guidance not found (should 404)
+POST http://localhost:3000/api/first-aid-guidance/steps
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "action":      "Monitor vitals continuously.",
+    "priority":    5,
+    "guidanceIds": [9999]
+}
+
+########
+
+### Create step — missing required fields (should 400)
+POST http://localhost:3000/api/first-aid-guidance/steps
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "priority": 3
+}
+
+########
+
+### Create step — driver tries to create (should 403)
+POST http://localhost:3000/api/first-aid-guidance/steps
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN
+
+{
+    "action":   "Some action",
+    "priority": 1
+}
+
+### ─────────────────────────────────────────
+### GUIDANCE STEPS — UPDATE
+### ─────────────────────────────────────────
+
+### Update action text only
+PATCH http://localhost:3000/api/first-aid-guidance/steps/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "action": "Pull over immediately and stop the vehicle in a safe location."
+}
+
+########
+
+### Update priority only
+PATCH http://localhost:3000/api/first-aid-guidance/steps/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "priority": 2
+}
+
+########
+
+### Connect step to more guidances
+PATCH http://localhost:3000/api/first-aid-guidance/steps/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "connectGuidanceIds": [3, 4]
+}
+
+########
+
+### Disconnect step from guidances
+PATCH http://localhost:3000/api/first-aid-guidance/steps/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "disconnectGuidanceIds": [1]
+}
+
+########
+
+### Update — empty body (should 400)
+PATCH http://localhost:3000/api/first-aid-guidance/steps/1
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{}
+
+########
+
+### Update — not found (should 404)
+PATCH http://localhost:3000/api/first-aid-guidance/steps/9999
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+{
+    "action": "Updated action"
+}
+
+### ─────────────────────────────────────────
+### GUIDANCE STEPS — DELETE
+### ─────────────────────────────────────────
+
+### Delete step — valid
+DELETE http://localhost:3000/api/first-aid-guidance/steps/5
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Delete step — not found (should 404)
+DELETE http://localhost:3000/api/first-aid-guidance/steps/9999
+Content-Type: application/json
+Authorization: Bearer FLEET_MANAGER_TOKEN
+
+########
+
+### Delete step — driver tries to delete (should 403)
+DELETE http://localhost:3000/api/first-aid-guidance/steps/1
+Content-Type: application/json
+Authorization: Bearer DRIVER_TOKEN

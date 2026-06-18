@@ -13,8 +13,10 @@ router.get("/:driverId", authenticate, authorize(Role.DRIVER, Role.ADMIN), valid
 router.post("/:driverId", authenticate, authorize(Role.ADMIN), validate(createMedicalInfoSchema), createMedicalRecord);
 router.patch("/:driverId", authenticate, authorize(Role.ADMIN), validate(UpdateMedicalRecordSchema), updateMedicalRecord);
 
-
-// getting custom thresholds  -- no validations as there is no params , driverId out of user token
+// ---------------------
+// getting custom thresholds  
+// ----------------------
+// -- no validations as there is no params, driverId out of user token --
 router.get("/custom-threshold", authenticate, authorize(Role.DRIVER), getCustomThresholds)
 
 export default router;

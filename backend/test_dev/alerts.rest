@@ -207,8 +207,7 @@ Authorization: Bearer ADMIN_TOKEN
 ### Get all alerts — fleet manager sees all
 GET http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3OTI4Njk0MywiZXhwIjoxNzc5MzczMzQzfQ.ExbU_5Nxt4MVtcEpqmavg0vgt7ttQFDTspzKW4NpVzA
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MDI3MDM5MywiZXhwIjoxNzgwMzU2NzkzfQ.sSob78qUoDxSKf9P5t5seHz-QtNFFyubpN4D5b51YQc
 ########
 
 ### Get all alerts — driver sees only their own

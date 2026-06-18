@@ -43,12 +43,13 @@ export const TranslateGuidanceConditions = (guidances: FirstAidGuidance[]) => {
     const grouped = guidances.reduce((acc, g) => {
         if (!acc[g.severity]) acc[g.severity] = [];
         acc[g.severity].push({
+            guidanceId: g.guidanceId,
             condition: g.condition,
             description: g.description,
             specificAction: g.specificAction,
         });
         return acc;
-    }, {} as Record<ConditionSeverity, { condition: ConditionType; description: string, specificAction: string | null }[]>);
+    }, {} as Record<ConditionSeverity, { guidanceId: number, condition: ConditionType; description: string, specificAction: string | null }[]>);
 
     /*
         const grouped = guidances.reduce((acc, g) => {

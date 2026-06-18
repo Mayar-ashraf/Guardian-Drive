@@ -50,53 +50,78 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
                 },
             }),
         };
-        const alerts = await prisma.alert.findMany({
-            where: whereConditions,
-            select: {
-                alertId: true,
-                /*trip: {
-                    select: {
-                        driver: {
-                            select: {
-                                user: {
-                                    select: {
-                                        email: true,
-                                        fName: true,
-                                        lName: true,
-                                        phone: true
-                                    }
-                                },
-                            }
+        let alerts
+        if (req.user?.role == Role.DRIVER) {
+            alerts = await prisma.alert.findMany({
+                where: whereConditions,
+                select: {
+                    alertId: true,
+                    generatedAt: true,
+                    type: true,
+                    triggeredLocation: {
+                        select: {
+                            longitude: true,
+                            latitude: true
+                        }
+                    },
+                },
+                orderBy: { generatedAt: orderBy ?? "desc" },
+                skip,
+                take: limit,
+            });
+        }
+        else {
+            alerts = await prisma.alert.findMany({
+                where: whereConditions,
+                select: {
+                    alertId: true,
+                    trip: {
+                        select: {
+                            driver: {
+                                select: {
+                                    user: {
+                                        select: {
+                                            // email: true,
+                                            fName: true,
+                                            lName: true,
+                                            // phone: true
+                                        }
+                                    },
+                                }
+                            },
                         },
                     },
-                },*/
-                /*healthEvent: {
-                    select: {
-                        eventDate: true,
-                        eventId: true,
-                        temp: true,
-                        spo2: true,
-                        heartRate: true,
-                    }
-                },*/
-                // status: true,
-                // solvedAt: true,
-                generatedAt: true,
-                type: true,
-                // triggeredLocationId: true,
-                triggeredLocation: {
-                    select: {
-                        longitude: true,
-                        latitude: true
-                    }
+                    /*healthEvent: {
+                        select: {
+                            eventDate: true,
+                            eventId: true,
+                            temp: true,
+                            spo2: true,
+                            heartRate: true,
+                        }
+                    },*/
+                    status: true,
+                    // solvedAt: true,
+                    generatedAt: true,
+                    type: true,
+                    // triggeredLocationId: true,
+                    /*
+                    triggeredLocation: {
+                        select: {
+                            longitude: true,
+                            latitude: true
+                        }
+                    },
+                    */
+                    /*stoppedLocationId: true,
+                    stoppedLocation: true,*/
                 },
-                /*stoppedLocationId: true,
-                stoppedLocation: true,*/
-            },
-            orderBy: { generatedAt: orderBy ?? "desc" },
-            skip,
-            take: limit,
-        });
+                orderBy: { generatedAt: orderBy ?? "desc" },
+                skip,
+                take: limit,
+            });
+
+        }
 
         const total = await prisma.alert.count({
             where: whereConditions,

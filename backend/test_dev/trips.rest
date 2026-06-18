@@ -20,8 +20,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb
     "destLatitude": 30.06263,
     "destLongitude": 31.24967,
     "plannedStartTime": "2026-06-13T20:30:00.000Z",
-    "driverId": 17,
-    "fleetManagerId": 10
+    "driverId": 3,
+    "fleetManagerId": 18
 } 
 
 ########get all trips admin or fleet manager

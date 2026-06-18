@@ -6,25 +6,28 @@
 
 ### Create avg health readings for driver (system authorization)
 
-POST http://localhost:3000/api/avg-health-readings/6
+POST http://localhost:3000/api/users/:userId/avg-health-readings/6
 Content-Type: application/json
 Authorization: Bearer SYSTEM_TOKEN
 
 {
-    "heartRate": "60",
-    "temp": "36"
+    "heartRate": 60,
+    "temp": 36,
+    "spo2": 50
 }
 
 
 ### Create avg health readings for driver (other than system authorization) - should fail
 
-POST http://localhost:3000/api/avg-health-readings/6
+POST http://localhost:3000/api/users/:userId/avg-health-readings/6
 Content-Type: application/json
 Authorization: Bearer DRIVER_TOKEN
 
 {
-    "heartRate": "60",
-    "temp": "36"
+    "heartRate": 60,
+    "temp": 36,
+    "spo2": 50
+
 }
 
 

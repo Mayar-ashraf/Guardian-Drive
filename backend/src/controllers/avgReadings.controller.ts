@@ -9,7 +9,7 @@ const NUMBER_OF_AVG_ROWS = 10
 // creates avgReading/trip AND update medical info thresholds
 export const createDriverAvgReadings = async (req: express.Request, res: express.Response) => {
     try {
-        const driverId = req.validated?.query.driverId
+        const driverId = req.validated?.query.userId;
         const tripId = req.validated?.body.tripId
         const { avgHeartRate, avgTemp, avgSpo2 } = req.validated?.body
 
@@ -111,7 +111,7 @@ export const createDriverAvgReadings = async (req: express.Request, res: express
                 },
             });
 
-            return HttpResponses.sendSuccess(res, { createdAvgReadings, updatedMedicalRecord })
+            // return HttpResponses.sendSuccess(res, { createdAvgReadings, updatedMedicalRecord })
         }
         return HttpResponses.sendSuccess(res, createdAvgReadings)
 
@@ -127,7 +127,7 @@ export const createDriverAvgReadings = async (req: express.Request, res: express
 export const getDriverAvgReadings = async (req: express.Request, res: express.Response) => {
 
     try {
-        const driverId = req.validated?.params.driverId
+        const driverId = req.validated?.params.userId;
 
         const driver = await prisma.driver.findUnique({
             where: { id: driverId }
