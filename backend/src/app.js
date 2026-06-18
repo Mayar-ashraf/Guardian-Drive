@@ -14,11 +14,11 @@ import towingRequestRoute from "./routes/towingRequests.route.ts";
 import reportsRoute from "./routes/reports.route.ts"
 import firstAidGuidanceRoutes from "./routes/firstAidGuidance.route.ts"
 import { Role } from "../generated/prisma/enums";
-//import cors from "cors"
+import cors from "cors"
 
 const app = express();
 app.use(express.json())
-//app.use(cors({ origin: '*' })); // Allow everything for now
+app.use(cors({ origin: '*' })); // Allow everything for now
 app.use("/api/auth", authRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
