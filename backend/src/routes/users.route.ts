@@ -10,8 +10,9 @@ import { edituserbyIDschema } from "../schema/user/editUserbyID.schema";
 import { SignupSchema } from "../schema/users"
 import { createUser } from "../controllers/users.controller";
 import { authorizeSystem } from "../middleware/AuthSystem";
-import { createAvgReadingsSchema, getDriverAvgReadingsSchema } from "../schema/avgReadings";
 import { createDriverAvgReadings, getDriverAvgReadings } from "../controllers/avgReadings.controller";
+import { createAvgReadingsSchema } from "../schema/avgReadings/createAvgReadings.schema";
+import { getDriverAvgReadingsSchema } from "../schema/avgReadings/getDriverAvgReadings.schema";
 
 
 const router = express.Router();

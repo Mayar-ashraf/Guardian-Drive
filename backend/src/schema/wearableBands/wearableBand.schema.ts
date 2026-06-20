@@ -42,10 +42,9 @@ export const addWearableBandSchema = z.object({
 
 export const deleteBandSchema = z.object({
     params: deviceIdSchema,
-    query: z.object({}).strict(),
-    body: z.object({}).strict()
-}).strict();
-
+    query: z.object({}).optional(),
+    body: z.object({}).optional()
+});
 export const updateBandSchema = z.object({
     params: deviceIdSchema,
     query: z.object({}).strict(),

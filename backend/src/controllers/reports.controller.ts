@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { prisma } from "../lib/prisma"
 import { Trip } from "../../generated/prisma/client"
 import { sendError, sendNotFound, sendSuccess } from "../utils/HttpResponses";
-import { Role, tripStatus } from "../../generated/prisma/enums";
+import { carStatus, Role, tripStatus } from "../../generated/prisma/enums";
 import { id } from "zod/locales";
 import { date } from "zod";
 import { NOTFOUND } from "node:dns";
