@@ -3,7 +3,9 @@ import { getMedicalRecords, getMedicalRecordById, updateMedicalRecord, createMed
 import { authenticate, authorize } from "../middleware/AuthMiddleware";
 import { Role } from "../../generated/prisma/client";
 import { validate } from "../validators/validate";
-import { createMedicalInfoSchema, getMedicalRecordByIdSchema, UpdateMedicalRecordSchema } from "../schema/medicalInfo";
+import { getMedicalRecordByIdSchema } from "../schema/medicalInfo/getMedicalRecordById.schema";
+import { createMedicalInfoSchema } from "../schema/medicalInfo/createMedicalInfo.schema";
+import { UpdateMedicalRecordSchema } from "../schema/medicalInfo/updateMedicalInfo.schema";
 
 const router = express.Router();
 
