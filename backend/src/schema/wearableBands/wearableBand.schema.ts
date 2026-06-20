@@ -8,7 +8,7 @@ export const deviceIdSchema = z.object({
 }).strict();
 
 export const getAllWearableBandsSchema = z.object({
-    params: z.object({}).strict(),
+    // params: z.object({}).strict(),
     query: z.object({
         deviceId: z.coerce.number("Device Id must be a valid number").int("Device Id must be an integer").positive("Device Id must be positive").optional(),
         driverId: z.coerce.number("Driver Id must be a valid number").int("Driver Id must be an integer").positive("Driver Id must be positive").optional(),
@@ -18,7 +18,7 @@ export const getAllWearableBandsSchema = z.object({
         page: z.coerce.number().int().positive().default(1),
         orderBy: z.string().transform(val => val.toLowerCase()).pipe(z.enum(["asc", "desc"])).default("asc"),
     }).strict(),
-    body: z.object({}).strict()
+    // body: z.object({}).strict()
 })
 
 export const getWearableBandSchema = z.object({
@@ -42,10 +42,9 @@ export const addWearableBandSchema = z.object({
 
 export const deleteBandSchema = z.object({
     params: deviceIdSchema,
-    query: z.object({}).strict(),
-    body: z.object({}).strict()
-}).strict();
-
+    query: z.object({}).optional(),
+    body: z.object({}).optional()
+});
 export const updateBandSchema = z.object({
     params: deviceIdSchema,
     query: z.object({}).strict(),

@@ -19,13 +19,19 @@ export const getAllWearableBands = async (req: Request, res: Response) => {
             skip: skip,
             orderBy: {
                 deviceId: orderBy
+            },
+            select: {
+                deviceId: true,
+                batteryLevel: true,
+                isConnected: true,
+                sensorList: true
             }
         });
         if (wearableBands.length === 0) { // wearableBands can be [] or [value1, value2,...]
             return sendNotFound(res, "No wearable bands found.");
         }
 
-        return sendSuccess(res, { message: "Success", data: wearableBands });
+        return sendSuccess(res, wearableBands);
 
     } catch (error) {
         return sendError(res);
@@ -47,7 +53,7 @@ export const getWearableBandById = async (req: Request, res: Response) => {
             return sendUnauthorized(res, "You are unauthorized to access this wearable band");
         }
 
-        return res.json({ wearableBand });
+        return sendSuccess(res, wearableBand);
     } catch (error) {
         console.error(error);
         return sendError(res);
@@ -71,7 +77,7 @@ export const addWearableBand = async (req: Request, res: Response) => {
             if (!driver) {
                 return sendBadRequest(res, "Driver with this driver id does not exist.");
             }
-            if(driver.wearableBand){
+            if (driver.wearableBand) {
                 return sendBadRequest(res, "Driver with this driver id already owns a wearable band.");
             }
         }
@@ -110,7 +116,7 @@ export const updateWearableBand = async (req: Request, res: Response) => {
         const body = req.validated!.body;
         const deviceId = req.validated!.params.deviceId;
 
-        if(body.driverId){
+        if (body.driverId) {
             const driver = await prisma.driver.findUnique({
                 where: {
                     id: body.driverId
@@ -122,7 +128,7 @@ export const updateWearableBand = async (req: Request, res: Response) => {
             if (!driver) {
                 return sendBadRequest(res, "Driver with this driver id does not exist.");
             }
-            if(driver.wearableBand && driver.wearableBand.deviceId !== deviceId){
+            if (driver.wearableBand && driver.wearableBand.deviceId !== deviceId) {
                 return sendBadRequest(res, "Driver with this driver id already owns a wearable band.");
             }
         }

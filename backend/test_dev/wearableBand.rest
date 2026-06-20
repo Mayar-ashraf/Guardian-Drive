@@ -1,10 +1,7 @@
-GET http://localhost:3000/api/wearablebands
+GET http://localhost:3000/api/wearablebands/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NzU4Njg5MCwiZXhwIjoxNzc3NjczMjkwfQ.i9XioDg6ipZEdOTCYvvba9j7QAXCqqSeCAwO-olYN7I
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODE4MDY3MjMsImV4cCI6MTc4MTg5MzEyM30.jqCal7ksbPPXopzTKu9Xmt7IY3UNDeTLEA9F8VQWla8
 
-{
-
-}
 
 ######
 
@@ -21,13 +18,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
 ######
 DELETE http://localhost:3000/api/wearablebands/2
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3Nzg0MDIxOSwiZXhwIjoxNzc3OTI2NjE5fQ.tKPu9UHgVJcO9H6NK5k3sG-lwOOzlFIhGXGK67ZeC1c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODE5MTA5ODMsImV4cCI6MTc4MTk5NzM4M30.IiEFKXuil6_o-aG9fwpJDzYXRNRKusHaGqIituIu_zs
 
 {
-   
 
 }
-
+   
 #####
 PATCH http://localhost:3000/api/wearablebands/1
 Content-Type: application/json

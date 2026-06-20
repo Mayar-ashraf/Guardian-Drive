@@ -13,7 +13,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb
 #########
 GET http://localhost:3000/api/reports/emergency-performance?from=2026-05-01&to=2026-05-04
 Content-Type: application/json
+<<<<<<< HEAD
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODE4NjY3MzMsImV4cCI6MTc4MTk1MzEzM30.OdYdgon175I8wSgzYv20VViUbplKcoDJYOWWBJFprkI
+=======
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODE4MDY3MjMsImV4cCI6MTc4MTg5MzEyM30.jqCal7ksbPPXopzTKu9Xmt7IY3UNDeTLEA9F8VQWla8
+>>>>>>> cea0ba6dd855b084e8a528de9210855d569ba5cf
 
 ###
 GET http://localhost:3000/api/reports/alerts/yearly?fromYear=1999&toYear=2026

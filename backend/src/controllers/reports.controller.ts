@@ -232,8 +232,8 @@ export const emergencyPerformanceReport = async (req: Request, res: Response) =>
             resolved_emergency_requests: resolvedCount,
             avg_emergency_response_time_minutes: avgResponseTime,
             pending_emergency_requests: emergencies.length - resolvedCount,
-            slowestResponseMinutes: resolvedCount > 0 ? fastestResponseTime : 0,
-            fastestResponseMinutes: resolvedCount > 0 ? slowestResponseTime : 0
+            slowestResponseMinutes: resolvedCount > 0 ? slowestResponseTime : 0,
+            fastestResponseMinutes: resolvedCount > 0 ? fastestResponseTime : 0
         });
     }
     catch (error) {
