@@ -15,8 +15,13 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/", validate(getAllCarsSchema), getAllCars);
-router.get("/:engineId", validate(getCarByIdSchema), getCarById);
-router.post("/", authorize("ADMIN"), validate(createCarSchema), createCar);
-router.patch("/:engineId", authorize("ADMIN"), validate(updateCarSchema), updateCar)
-router.delete("/:engineId", authorize("ADMIN"), validate(deleteCarSchema), deleteCar)
+
+router.get("/:engineId",
+  authenticate,validate(getCarByIdSchema),getCarById);
+
+router.post("/", authenticate,authorize("ADMIN"),validate(createCarSchema),createCar);
+
+router.patch("/:engineId",authenticate,authorize("ADMIN"),validate(updateCarSchema),updateCar);
+
+router.delete("/:engineId",authenticate,authorize("ADMIN"),validate(deleteCarSchema),deleteCar);
 export default router;

@@ -6,7 +6,7 @@ const updateCarSchema = z.object({
         color: z.string().min(1),
         status: z.string().trim().transform(val => val.toUpperCase()).pipe(z.enum(carStatusValues))
     }).strict(),
-    query: z.object({}).strict(),
+query: z.object({}).optional(),
     params: z.object({
         engineId: z.string().min(1)
     }).strict()

@@ -10,11 +10,9 @@ export const createCarSchema = z.object({
       .string()
       .trim()
       .transform(val => val.toUpperCase())
-      .pipe(z.enum(carStatusValues))
-      .optional(),
+      .pipe(z.enum(carStatusValues)),
   }).strict(),
 
-  query: z.object({}).strict(),
-
-  params: z.object({}).strict(),
+query: z.object({}).optional(),
+params: z.object({}).optional(),
 });

@@ -28,7 +28,7 @@ app.use("/api/first-aid-guidance", firstAidGuidanceRoutes)
 app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
-app.use("/api/cars", authMiddleware.authenticate, carsRoutes)
+app.use("/api/cars", carsRoutes)
 
 app.use("/api/emergency-service-request", authMiddleware.authenticate, emergencyServiceRequestRoute)
 app.use("/api/towing-requests", authMiddleware.authenticate, towingRequestRoute);
