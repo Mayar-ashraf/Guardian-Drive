@@ -1,9 +1,8 @@
-// src/validators/avgHealthReadings.validator.ts
 import { z } from "zod";
 
 export const createAvgReadingsSchema = z.object({
     params: z.object({
-        driverId: z.coerce.number().int().positive()
+        userId: z.coerce.number().int().positive()
     }),
     body: z.object({
         tripId: z.number().int().positive(),
@@ -20,10 +19,3 @@ export const createAvgReadingsSchema = z.object({
 
     })
 });
-
-
-export const getDriverAvgReadingsSchema = z.object({
-    params: z.object({
-        driverId: z.coerce.number().int().positive()
-    }),
-})

@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const cars_controller_1 = require("../controllers/cars.controller");
+const AuthMiddleware_1 = require("./../middleware/AuthMiddleware");
+const validate_1 = require("../validators/validate");
+const updateCar_schema_1 = require("../schema/cars/updateCar.schema");
+const createCar_schema_1 = require("../schema/cars/createCar.schema");
+const getAllCars_schema_1 = require("../schema/cars/getAllCars.schema");
+const getCarbyID_schema_1 = require("../schema/cars/getCarbyID.schema");
+const deleteCar_schema_1 = require("../schema/cars/deleteCar.schema");
+const express_1 = require("express");
+const router = (0, express_1.Router)();
+router.get("/", (0, validate_1.validate)(getAllCars_schema_1.getAllCarsSchema), cars_controller_1.getAllCars);
+router.get("/:engineId", (0, validate_1.validate)(getCarbyID_schema_1.getCarByIdSchema), cars_controller_1.getCarById);
+router.post("/", (0, AuthMiddleware_1.authorize)("ADMIN"), (0, validate_1.validate)(createCar_schema_1.createCarSchema), cars_controller_1.createCar);
+router.patch("/:engineId", (0, AuthMiddleware_1.authorize)("ADMIN"), (0, validate_1.validate)(updateCar_schema_1.updateCarSchema), cars_controller_1.updateCar);
+router.delete("/:engineId", (0, AuthMiddleware_1.authorize)("ADMIN"), (0, validate_1.validate)(deleteCar_schema_1.deleteCarSchema), cars_controller_1.deleteCar);
+exports.default = router;

@@ -13,6 +13,7 @@ import wearablebandsRoute from "./routes/wearableBands.route.ts";
 import towingRequestRoute from "./routes/towingRequests.route.ts";
 import reportsRoute from "./routes/reports.route.ts"
 import firstAidGuidanceRoutes from "./routes/firstAidGuidance.route.ts"
+import adminRoute from "./routes/admin.route.ts"
 import { Role } from "../generated/prisma/enums";
 import cors from "cors"
 
@@ -28,12 +29,15 @@ app.use("/api/first-aid-guidance", firstAidGuidanceRoutes)
 app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
-app.use("/api/cars", authMiddleware.authenticate, carsRoutes)
+app.use("/api/cars", carsRoutes)
 
 app.use("/api/emergency-service-request", authMiddleware.authenticate, emergencyServiceRequestRoute)
 app.use("/api/towing-requests", authMiddleware.authenticate, towingRequestRoute);
 app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);
 app.use("/api/reports", authMiddleware.authenticate, authMiddleware.authorize(Role.ADMIN), reportsRoute)
+
+app.use("/api/admin", adminRoute)
+
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.urlencoded({ extended: true }));
 app.listen(3000, () => {

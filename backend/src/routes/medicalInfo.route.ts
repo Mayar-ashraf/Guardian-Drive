@@ -3,7 +3,9 @@ import { getMedicalRecords, getMedicalRecordById, updateMedicalRecord, createMed
 import { authenticate, authorize } from "../middleware/AuthMiddleware";
 import { Role } from "../../generated/prisma/client";
 import { validate } from "../validators/validate";
-import { createMedicalInfoSchema, getMedicalRecordByIdSchema, UpdateMedicalRecordSchema } from "../schema/medicalInfo";
+import { getMedicalRecordByIdSchema } from "../schema/medicalInfo/getMedicalRecordById.schema";
+import { createMedicalInfoSchema } from "../schema/medicalInfo/createMedicalInfo.schema";
+import { UpdateMedicalRecordSchema } from "../schema/medicalInfo/updateMedicalInfo.schema";
 
 const router = express.Router();
 
@@ -13,8 +15,10 @@ router.get("/:driverId", authenticate, authorize(Role.DRIVER, Role.ADMIN), valid
 router.post("/:driverId", authenticate, authorize(Role.ADMIN), validate(createMedicalInfoSchema), createMedicalRecord);
 router.patch("/:driverId", authenticate, authorize(Role.ADMIN), validate(UpdateMedicalRecordSchema), updateMedicalRecord);
 
-
-// getting custom thresholds  -- no validations as there is no params , driverId out of user token
+// ---------------------
+// getting custom thresholds  
+// ----------------------
+// -- no validations as there is no params, driverId out of user token --
 router.get("/custom-threshold", authenticate, authorize(Role.DRIVER), getCustomThresholds)
 
 export default router;

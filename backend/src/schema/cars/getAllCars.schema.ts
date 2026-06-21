@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const getAllCarsSchema = z.object({
-  body: z.object({}).strict(),
+  body: z.undefined(),
 
   query: z.object({
     status: z.string().optional(),

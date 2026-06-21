@@ -197,18 +197,17 @@ Authorization: Bearer FLEET_MANAGER_TOKEN
 ### ALERTS — GET
 ### ─────────────────────────────────────────
 
-### Get all alerts — admin sees all
+### Get all alerts — admin sees all (Admin Token or fleet token)
 GET http://localhost:3000/api/alerts/12
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzg2Mjk0NDMsImV4cCI6MTc3ODcxNTg0M30.s8-yGOTSJbWCqUnR1HGngURDn7T9tC_-u7vC1dENqVA
+Authorization: Bearer ADMIN_TOKEN
 
 ########
 
 ### Get all alerts — fleet manager sees all
 GET http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer FLEET_MANAGER_TOKEN
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MDI3MDM5MywiZXhwIjoxNzgwMzU2NzkzfQ.sSob78qUoDxSKf9P5t5seHz-QtNFFyubpN4D5b51YQc
 ########
 
 ### Get all alerts — driver sees only their own
@@ -268,9 +267,9 @@ Authorization: Bearer ADMIN_TOKEN
 ########
 
 ### Get specific alert — driver owns it
-GET http://localhost:3000/api/alerts/1
+GET http://localhost:3000/api/alerts/14
 Content-Type: application/json
-Authorization: Bearer DRIVER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc5Mjg5MjQwLCJleHAiOjE3NzkzNzU2NDB9.I2PqnhLWH1UkQ_9PG8poo41OFGzlaBbX0Pq5Z4J1O2A
 
 ########
 
@@ -285,3 +284,20 @@ Authorization: Bearer DRIVER_TOKEN
 GET http://localhost:3000/api/alerts/9999
 Content-Type: application/json
 Authorization: Bearer ADMIN_TOKEN
+
+###
+GET http://localhost:3000/api/alerts?limit=10&page=2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE5LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc5MTQ5OTM2LCJleHAiOjE3NzkyMzYzMzZ9.KGSenmtd2slvfSDUe586j6P43D3QIV53jDdSvWdwiwk
+
+### 
+
+GET http://localhost:3000/api/alerts?limit=10&page=2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3Nzk1NzY5MDIsImV4cCI6MTc3OTY2MzMwMn0.tjoFUSF1nwHn4uKsRY9-0G2AulcNcRev3z386CHWVpE
+
+####
+
+GET http://localhost:3000/api/alerts/115
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsInJvbGUiOiJEUklWRVIiLCJpYXQiOjE3Nzk2MzYzODQsImV4cCI6MTc3OTcyMjc4NH0.qLNC6eV6IRxhpT5yjDzLoNe199gwOIHrf9bsM3THuyY

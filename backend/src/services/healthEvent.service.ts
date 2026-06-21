@@ -68,10 +68,10 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
         })
 
         // 4- return health event + first-aid-guidance guidance 
-        const response = await getGuidance(healthEvent.guidances)
+        const guidanceStrings = await getGuidance(healthEvent.guidances)       // translate guidances into the strings
 
-        // null is added to always return response for compatabilty
-        return { healthEvent, response: response ?? null }
+        // null is added to always return same response for compatabilty
+        return { healthEvent, guidanceStrings: guidanceStrings ?? null }
     }
     catch (error) {
         const message = error instanceof Error ? error.message : String(error);

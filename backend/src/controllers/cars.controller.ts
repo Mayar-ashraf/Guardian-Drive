@@ -7,10 +7,11 @@ import { Request, Response } from "express"
 export const getAllCars = async (req: Request, res: Response) => {
   try {
     const role = req.user?.role;
+    
 
-    if (!role) {
+    /*if (!role) {
       return res.status(401).json({ message: "Missing or invalid token" });
-    }
+    }*/
 
     if (role === Role.DRIVER) {
       return res.status(403).json({ message: "you are unauthorized to make this request" });
@@ -47,10 +48,13 @@ export const getAllCars = async (req: Request, res: Response) => {
 };
 export const getCarById = async (req: Request, res: Response) => {
   try {
-    const { engineId } = req.validated?.params;
-    const user = req.user;
+    console.log("USER:", req.user);
+console.log("PARAMS:", req.validated?.params);
+const engineId = req.validated?.params?.engineId;
 
-    if (!user) {
+const user = req.user;
+
+   if (!user) {
       return res.status(401).json({ message: "Missing or invalid token" });
     }
 
@@ -58,6 +62,7 @@ export const getCarById = async (req: Request, res: Response) => {
       where: { engineId },
       include: {
         trips: true,
+    
       },
     });
 
@@ -142,19 +147,29 @@ async function updateCar(req: Request, res: Response) {
 }
 async function deleteCar(req: Request, res: Response) {
   try {
-    const engineId = req.validated?.params.engineId
-    await prisma.car.delete({
-      where: {
-        engineId: engineId
-      }
-    })
-    return res.status(204).send();
-  } catch (error: any) {
-    if (error.code === "P2025") {
+    const engineId = req.validated?.params.engineId;
+
+    const car = await prisma.car.findUnique({
+      where: { engineId },
+    });
+
+    if (!car) {
       return res.status(404).json({ message: "Car not found" });
     }
-    return res.status(500).json({ message: "Server Error" })
-  }
 
+    if (car.status === "IN_TRIP") {
+      return res.status(400).json({
+        message: "Cannot delete a car that is currently in a trip",
+      });
+    }
+
+    await prisma.car.delete({
+      where: { engineId },
+    });
+
+    return res.status(204).send();
+  } catch (error: any) {
+    return res.status(500).json({ message: "Server Error" });
+  }
 }
 export { updateCar, deleteCar }

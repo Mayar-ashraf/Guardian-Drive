@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { prisma } from "../lib/prisma"
 import { Trip } from "../../generated/prisma/client"
 import { sendError, sendNotFound, sendSuccess } from "../utils/HttpResponses";
-import { Role, tripStatus } from "../../generated/prisma/enums";
+import { carStatus, Role, tripStatus } from "../../generated/prisma/enums";
 import { id } from "zod/locales";
 import { date } from "zod";
 import { NOTFOUND } from "node:dns";
@@ -232,8 +232,8 @@ export const emergencyPerformanceReport = async (req: Request, res: Response) =>
             resolved_emergency_requests: resolvedCount,
             avg_emergency_response_time_minutes: avgResponseTime,
             pending_emergency_requests: emergencies.length - resolvedCount,
-            slowestResponseMinutes: resolvedCount > 0 ? fastestResponseTime : 0,
-            fastestResponseMinutes: resolvedCount > 0 ? slowestResponseTime : 0
+            slowestResponseMinutes: resolvedCount > 0 ? slowestResponseTime : 0,
+            fastestResponseMinutes: resolvedCount > 0 ? fastestResponseTime : 0
         });
     }
     catch (error) {
