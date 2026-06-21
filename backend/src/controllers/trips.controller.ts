@@ -45,7 +45,7 @@ async function createTrip(req: Request, res: Response) {
 
             // added to prevent assigning trip to driver without Medical Record
             if (!driver.medicalInformation) {
-                return sendBadRequest(res, "Driver doesn't have saved medical record yet!!")
+                return res.status(422).json({ message: "Driver doesn't have saved medical record yet!!" })
             }
 
         }
