@@ -14,6 +14,10 @@ const fleetManagerUpdateTripSchema = z.object({
     body: z.object({
         startPoint: z.string().min(1).optional(),
         destPoint: z.string().min(1).optional(),
+        startLatitude: z.coerce.number().min(-90).max(90).optional(),
+        startLongitude: z.coerce.number().min(-180).max(180).optional(),
+        destLatitude: z.coerce.number().min(-90).max(90).optional(),
+        destLongitude: z.coerce.number().min(-180).max(180).optional(),
         plannedStartTime: z.iso.datetime().optional(),
         fleetManagerId: z.coerce.number().int().positive().optional(),
         engineId: z.string().optional(),

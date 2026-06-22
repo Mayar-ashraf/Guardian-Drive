@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 const deleteTripSchema = z.object({
-    body: z.object({}).strict(),
+    body: z.undefined(),
     query: z.object({}).strict(),
     params: z.object({
         tripId: z.coerce.number().int().positive()
