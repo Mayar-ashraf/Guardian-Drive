@@ -41,7 +41,19 @@ io.on("connection", (socket) => {
         socket.join(roomName);
         console.log(`👤 Fleet Manager ${fleetManagerId} joined room: ${roomName}`);
     });
+    // ✨ ADDED: Listen for specific trip details tracking channels
+    socket.on("join_trip_room", ({ tripId }) => {
+        const roomName = `trip_${tripId}`;
+        socket.join(roomName);
+        console.log(`📡 Live tracking viewer joined live room: ${roomName}`);
+    });
 
+    // ✨ ADDED: Handle cleanly leaving the live room room channels
+    socket.on("leave_trip_room", ({ tripId }) => {
+        const roomName = `trip_${tripId}`;
+        socket.leave(roomName);
+        console.log(`❌ Dashboard viewer left live room: ${roomName}`);
+    });
     socket.on("disconnect", () => {
         console.log(`❌ Client disconnected: ${socket.id}`);
     });

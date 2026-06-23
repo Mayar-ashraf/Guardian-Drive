@@ -198,9 +198,9 @@ Authorization: Bearer FLEET_MANAGER_TOKEN
 ### ─────────────────────────────────────────
 
 ### Get all alerts — admin sees all (Admin Token or fleet token)
-GET http://localhost:3000/api/alerts/12
+GET http://localhost:3000/api/alerts?tripId=67
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjE4Nzg5NSwiZXhwIjoxNzgyMjc0Mjk1fQ._Dz-llWZWHa7kHG8_Hsb-LfjybMVibilgMX32dHvX2s
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyMTk5MjQyLCJleHAiOjE3ODIyODU2NDJ9.S1PczkTQIWBChHt4bhTyRW3aIC5U8JfT282Ct9ufJIk
 
 ########
 

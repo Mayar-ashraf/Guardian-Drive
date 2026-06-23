@@ -16,6 +16,7 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
             status,         // alertStatus: ACTIVE | RESOLVED
             driverId,       // Int
             engineId,       // String
+            tripId, //int
             from,           // ISO date string e.g. "2024-01-01"
             to,             // ISO date string e.g. "2024-12-31"
             limit,
@@ -41,6 +42,7 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
         const whereConditions: any = {
             ...(type && { type }),
             ...(status && { status }),
+            ...(tripId && { tripId }),
             ...(Object.keys(generatedAtFilter).length > 0 && { generatedAt: generatedAtFilter }),
             ...((driverId || engineId || req.user?.role === Role.DRIVER) && {
                 trip: {

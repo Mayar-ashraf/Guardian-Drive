@@ -18,7 +18,7 @@ export const validate =
     (schema: ZodObject<any>) =>
         (req: Request, res: Response, next: NextFunction) => {
             try {
-                console.log(schema);
+                // console.log(schema);
                 const parsed = schema.parse({
                     body: req.body,
                     query: req.query,
