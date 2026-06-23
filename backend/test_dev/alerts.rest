@@ -62,12 +62,12 @@ Authorization: Bearer DRIVER_TOKEN
 ### Create HEALTH_ABNORMAL alert — low heart rate + low temp
 POST http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer DRIVER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyMTk5MjQyLCJleHAiOjE3ODIyODU2NDJ9.S1PczkTQIWBChHt4bhTyRW3aIC5U8JfT282Ct9ufJIk
 
 {
-    "type":                "HEALTH_ABNORMAL",
-    "tripId":              14,
-    "triggeredLocationId": 1,
+    "type":                "SOS",
+    "tripId":              67,
+    "triggeredLocationId": 3,
     "heartRate":           48,
     "temp":                35.2,
     "spo2":                95
@@ -115,7 +115,7 @@ Authorization: Bearer DRIVER_TOKEN
 ### Create alert — location not belonging to trip 
 POST http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer DRIVER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyMTk5MDk3LCJleHAiOjE3ODIyODU0OTd9.ubyArreLj69zBUl05jzTvkQwQ-0L41JmF9mywkPOJd0
 
 {
     "type":                "SOS",
@@ -200,14 +200,14 @@ Authorization: Bearer FLEET_MANAGER_TOKEN
 ### Get all alerts — admin sees all (Admin Token or fleet token)
 GET http://localhost:3000/api/alerts/12
 Content-Type: application/json
-Authorization: Bearer ADMIN_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjE4Nzg5NSwiZXhwIjoxNzgyMjc0Mjk1fQ._Dz-llWZWHa7kHG8_Hsb-LfjybMVibilgMX32dHvX2s
 
 ########
 
 ### Get all alerts — fleet manager sees all
 GET http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MDI3MDM5MywiZXhwIjoxNzgwMzU2NzkzfQ.sSob78qUoDxSKf9P5t5seHz-QtNFFyubpN4D5b51YQc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjE4Nzg5NSwiZXhwIjoxNzgyMjc0Mjk1fQ._Dz-llWZWHa7kHG8_Hsb-LfjybMVibilgMX32dHvX2s
 ########
 
 ### Get all alerts — driver sees only their own

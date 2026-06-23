@@ -15,9 +15,38 @@ import reportsRoute from "./routes/reports.route.ts"
 import firstAidGuidanceRoutes from "./routes/firstAidGuidance.route.ts"
 import adminRoute from "./routes/admin.route.ts"
 import { Role } from "../generated/prisma/enums";
+import { createServer } from "http"; // 🌟 1. Import Node's native HTTP server creator
+import { Server } from "socket.io";  // 🌟 2. Import Socket.io
 import cors from "cors"
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*", // Matches your Express cors config
+        methods: ["GET", "POST"]
+    }
+});
+
+// 🌟 4. Share the 'io' instance globally with Express controllers
+app.set("io", io);
+
+// 🌟 5. Define your real-time WebSocket connection handling logic
+io.on("connection", (socket) => {
+    console.log(`🔌 Client connected: ${socket.id}`);
+
+    // Listen for the Fleet Manager authentication/room assignment event
+    socket.on("join_manager_room", (fleetManagerId) => {
+        const roomName = `manager_${fleetManagerId}`;
+        socket.join(roomName);
+        console.log(`👤 Fleet Manager ${fleetManagerId} joined room: ${roomName}`);
+    });
+
+    socket.on("disconnect", () => {
+        console.log(`❌ Client disconnected: ${socket.id}`);
+    });
+});
+
 app.use(express.json())
 app.use(cors({ origin: '*' })); // Allow everything for now
 app.use("/api/auth", authRoutes)
@@ -40,6 +69,9 @@ app.use("/api/admin", adminRoute)
 
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.urlencoded({ extended: true }));
-app.listen(3000, () => {
-    console.log("server is running on http://localhost:3000")
+// app.listen(3000, () => {
+//     console.log("server is running on http://localhost:3000")
+// })
+server.listen(3000, () => {
+    console.log("server and socket is running on http://localhost:3000")
 })
