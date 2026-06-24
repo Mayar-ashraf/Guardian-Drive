@@ -17,6 +17,7 @@ import adminRoute from "./routes/admin.route.ts"
 import { Role } from "../generated/prisma/enums";
 import { createServer } from "http"; // 🌟 1. Import Node's native HTTP server creator
 import { Server } from "socket.io";  // 🌟 2. Import Socket.io
+import avgReadingRoute from "./routes/avgReadings.route.ts";
 import cors from "cors"
 
 const app = express();
@@ -71,7 +72,7 @@ app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/cars", carsRoutes)
-
+app.use("/api/avg-readings", avgReadingRoute)
 app.use("/api/emergency-service-request", authMiddleware.authenticate, emergencyServiceRequestRoute)
 app.use("/api/towing-requests", authMiddleware.authenticate, towingRequestRoute);
 app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);

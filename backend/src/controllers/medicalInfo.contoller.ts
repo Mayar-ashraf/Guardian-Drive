@@ -15,6 +15,7 @@ export const getMedicalRecords = async (req: express.Request, res: express.Respo
 export const getMedicalRecordById = async (req: express.Request, res: express.Response) => {
     try {
         const driverId = req.validated?.params?.driverId
+        console.log(driverId);
         const driver = await prisma.driver.findUnique({
             where: { id: driverId },
         });
