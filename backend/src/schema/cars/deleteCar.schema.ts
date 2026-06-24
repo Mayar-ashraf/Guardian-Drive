@@ -1,7 +1,7 @@
 import { z } from "zod"
 const deleteCarSchema = z.object({
-    body: z.object({}).strict(),
-    query: z.object({}).strict(),
+  body: z.undefined(),
+query: z.object({}).optional(),
     params: z.object({
         engineId: z.string().min(1)
     }).strict()

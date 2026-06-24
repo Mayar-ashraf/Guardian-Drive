@@ -15,9 +15,53 @@ import reportsRoute from "./routes/reports.route.ts"
 import firstAidGuidanceRoutes from "./routes/firstAidGuidance.route.ts"
 import adminRoute from "./routes/admin.route.ts"
 import { Role } from "../generated/prisma/enums";
+import { createServer } from "http"; // 🌟 1. Import Node's native HTTP server creator
+import { Server } from "socket.io";  // 🌟 2. Import Socket.io
+import avgReadingRoute from "./routes/avgReadings.route.ts";
 import cors from "cors"
+import healthEventRoute from "./routes/healthEvents.route.ts"
+//import"healthEvents"
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*", // Matches your Express cors config
+        methods: ["GET", "POST"]
+    }
+});
+
+// 🌟 4. Share the 'io' instance globally with Express controllers
+app.set("io", io);
+
+// 🌟 5. Define your real-time WebSocket connection handling logic
+io.on("connection", (socket) => {
+    console.log(`🔌 Client connected: ${socket.id}`);
+
+    // Listen for the Fleet Manager authentication/room assignment event
+    socket.on("join_manager_room", (fleetManagerId) => {
+        const roomName = `manager_${fleetManagerId}`;
+        socket.join(roomName);
+        console.log(`👤 Fleet Manager ${fleetManagerId} joined room: ${roomName}`);
+    });
+    // ✨ ADDED: Listen for specific trip details tracking channels
+    socket.on("join_trip_room", ({ tripId }) => {
+        const roomName = `trip_${tripId}`;
+        socket.join(roomName);
+        console.log(`📡 Live tracking viewer joined live room: ${roomName}`);
+    });
+
+    // ✨ ADDED: Handle cleanly leaving the live room room channels
+    socket.on("leave_trip_room", ({ tripId }) => {
+        const roomName = `trip_${tripId}`;
+        socket.leave(roomName);
+        console.log(`❌ Dashboard viewer left live room: ${roomName}`);
+    });
+    socket.on("disconnect", () => {
+        console.log(`❌ Client disconnected: ${socket.id}`);
+    });
+});
+
 app.use(express.json())
 app.use(cors({ origin: '*' })); // Allow everything for now
 app.use("/api/auth", authRoutes)
@@ -29,17 +73,20 @@ app.use("/api/first-aid-guidance", firstAidGuidanceRoutes)
 app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
-app.use("/api/cars", authMiddleware.authenticate, carsRoutes)
-
+app.use("/api/cars", carsRoutes)
+app.use("/api/avg-readings", avgReadingRoute)
 app.use("/api/emergency-service-request", authMiddleware.authenticate, emergencyServiceRequestRoute)
 app.use("/api/towing-requests", authMiddleware.authenticate, towingRequestRoute);
 app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);
 app.use("/api/reports", authMiddleware.authenticate, authMiddleware.authorize(Role.ADMIN), reportsRoute)
-
+app.use("/api/health-events",healthEventRoute)
 app.use("/api/admin", adminRoute)
 
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.urlencoded({ extended: true }));
-app.listen(3000, () => {
-    console.log("server is running on http://localhost:3000")
+// app.listen(3000, () => {
+//     console.log("server is running on http://localhost:3000")
+// })
+server.listen(3000, () => {
+    console.log("server and socket is running on http://localhost:3000")
 })

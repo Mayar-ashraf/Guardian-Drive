@@ -7,6 +7,7 @@ export const FilterAlertSchema = z.object({
         type: z.enum(alertType).optional(),
         status: z.enum(alertStatus).optional(),
         driverId: z.coerce.number().int().positive().optional(),  // coerce converts string query param to number
+        tripId: z.coerce.number().int().positive().optional(),
         engineId: z.string().optional(),
         from: z.iso.datetime().optional(),
         to: z.iso.datetime().optional(),

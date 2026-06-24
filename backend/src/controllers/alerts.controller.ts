@@ -16,6 +16,7 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
             status,         // alertStatus: ACTIVE | RESOLVED
             driverId,       // Int
             engineId,       // String
+            tripId, //int
             from,           // ISO date string e.g. "2024-01-01"
             to,             // ISO date string e.g. "2024-12-31"
             limit,
@@ -41,6 +42,7 @@ export const getAlerts = async (req: express.Request, res: express.Response) => 
         const whereConditions: any = {
             ...(type && { type }),
             ...(status && { status }),
+            ...(tripId && { tripId }),
             ...(Object.keys(generatedAtFilter).length > 0 && { generatedAt: generatedAtFilter }),
             ...((driverId || engineId || req.user?.role === Role.DRIVER) && {
                 trip: {
@@ -374,7 +376,25 @@ export const createAlert = async (req: express.Request, res: express.Response) =
             });
             return { alert, healthEvent, trip };
         });
+        //web socket
+        if (tripExists.fleetManagerId) {
+            const io = req.app.get('io'); // Grab Socket.io instance attached to express app instance
 
+            if (io) {
+                const managerRoom = `manager_${tripExists.fleetManagerId}`;
+
+                io.to(managerRoom).emit('new_alert', {
+                    message: "A driver has triggered a new active alert!",
+                    // Construct the data format your AlertInfo frontend context expects:
+                    data: {
+                        ...result.alert,
+                        trip: result.trip,
+                        healthEvent: result.healthEvent,
+                        triggeredLocation: locationExist
+                    }
+                });
+            }
+        }
         // either both are created successfully or one of them throw an error catched in try block
         return HttpResponses.sendCreated(res, result, "Alert Triggered Successfully")
 

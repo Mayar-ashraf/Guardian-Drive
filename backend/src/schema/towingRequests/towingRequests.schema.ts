@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createTowingRequestSchema = z.object({
   body: z.object({
     tripId: z.number(),
-    alertId: z.number(), 
+    alertId: z.number(),
     towingCompany: z.string().min(2),
     status: z.enum(["REQUESTED", "INPROGRESS", "COMPLETED"]).optional(),
   }).strict(),
@@ -21,7 +21,7 @@ export const getTowingRequestsSchema = z.object({
     completionTime: z.coerce.date().optional(),
   }).strict(),
 
-  body: z.object({}).strict(),
+  body: z.undefined(),
   params: z.object({}).strict(),
 });
 
@@ -45,10 +45,10 @@ export const updateTowingRequestSchema = z.object({
     status: z.enum(["REQUESTED", "INPROGRESS", "COMPLETED"]).optional(),
     completionTime: z.coerce.date().optional(),
   })
-  .refine((data) => Object.keys(data).length > 0, {
-    message: "At least one field must be provided",
-  })
-  .strict(),
+    .refine((data) => Object.keys(data).length > 0, {
+      message: "At least one field must be provided",
+    })
+    .strict(),
 
   query: z.object({}).strict(),
 });

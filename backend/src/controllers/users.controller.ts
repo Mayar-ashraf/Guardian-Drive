@@ -50,7 +50,9 @@ export async function createUser(req: Request, res: Response) {
     } catch (error) {
         return res.status(500).json({ message: "Server Error2" })
     }
+
 }
+
 export const getAllUsers = async (req: express.Request, res: express.Response) => {
     try {
         const role = req.user?.role;
@@ -92,6 +94,7 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
                 lName: true,
                 phone: true,
                 address: true,
+                hiredAt:true,
                 driver: {
                     select: {
                         drivingLicense: true,
@@ -160,6 +163,7 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
                 lName: true,
                 phone: true,
                 address: true,
+                hiredAt:true,
 
                 driver: {
                     select: {

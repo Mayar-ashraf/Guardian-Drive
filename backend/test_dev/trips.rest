@@ -12,26 +12,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvb
 #########
 POST http://localhost:3000/api/trips
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3OTI4Njk0MywiZXhwIjoxNzc5MzczMzQzfQ.ExbU_5Nxt4MVtcEpqmavg0vgt7ttQFDTspzKW4NpVzA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MTgzODAwNSwiZXhwIjoxNzgxOTI0NDA1fQ.f0XVfbyzz_2cCgtuSbgtwZ_X7wuXozH6mWTm2FFD6NI
 
-{ 
+{
     "startLatitude":    31.2001,
     "startLongitude":   29.9187,
     "destLatitude": 30.06263,
     "destLongitude": 31.24967,
-    "plannedStartTime": "2026-06-13T20:30:00.000Z",
-    "driverId": 3,
-    "fleetManagerId": 18
+    "plannedStartTime": "2026-07-16T07:15:00.000Z",
+    "driverId": 12,
+    "fleetManagerId": 13,
+    "engineId": "ENG999"
 } 
 
 ########get all trips admin or fleet manager
-GET http://localhost:3000/api/trips
+GET http://localhost:3000/api/trips/21
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3ODM0MDg5MiwiZXhwIjoxNzc4NDI3MjkyfQ.GcSpWQBOMy0WCg9Dyy_P3-zbYBrHr3O-5O-eqagB4uM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODE4OTU0NDksImV4cCI6MTc4MTk4MTg0OX0.Ot2pKXi0KbzTH5D2jrnf6o0S4914egQzwWOO2l54pfA
 
-{ 
-    
-} 
 ########get all trips admin or fleet manager
 GET http://localhost:3000/api/trips?fromStartDate=2026-04-20T20:30:00.000Z&status=PLANNED
 Content-Type: application/json
@@ -85,4 +83,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvb
 
 { 
     "status": "ONGOING"
+} 
+
+
+########3
+GET http://localhost:3000/api/users/12
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc4NzU4MDYzLCJleHAiOjE3Nzg4NDQ0NjN9.5xoaWGyswNvuQ9JTjNmdMhHqip1SNzH_vJGa0dKm_DA
+
+{ 
+    
 } 

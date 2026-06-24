@@ -1,21 +1,25 @@
 POST http://localhost:3000/api/emergency-service-request/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJGTEVFVF9NQU5BR0VSIiwiaWF0IjoxNzc3NjUzNzU1LCJleHAiOjE3Nzc3NDAxNTV9.c73B-EOWx0roPbkqm9Y6S6EUqVwo9J2SrA3Mi8SRSvY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MTgzODAwNSwiZXhwIjoxNzgxOTI0NDA1fQ.f0XVfbyzz_2cCgtuSbgtwZ_X7wuXozH6mWTm2FFD6NI
 
 { 
     "phone":"01100040",
     "hospitalAssigned":"China Hospital",
-    "alertId": 4
+    "alertId": 116
     
 }
 #########
-GET http://localhost:3000/api/emergency-service-request/
+GET http://localhost:3000/api/emergency-service-request?page=1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc3NzY2Mjc4OCwiZXhwIjoxNzc3NzQ5MTg4fQ.3EeHFnGFrMSvhdiqfLIMLHMSJp2EdCzA6fzI6XhYe9k
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MTgzODAwNSwiZXhwIjoxNzgxOTI0NDA1fQ.f0XVfbyzz_2cCgtuSbgtwZ_X7wuXozH6mWTm2FFD6NI
 
-{ 
-   
-}
+
+#########
+GET http://localhost:3000/api/towing-requests/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MTgwNzg3NywiZXhwIjoxNzgxODk0Mjc3fQ.gd9YWuKMTwiyAxEw_XzpWjaVdh-J0JAz33WVzgsQGUc
+
+{}
 #######
 PATCH http://localhost:3000/api/emergency-service-request/1
 Content-Type: application/json

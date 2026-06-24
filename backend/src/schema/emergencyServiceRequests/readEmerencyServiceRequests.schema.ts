@@ -1,7 +1,7 @@
 import { toUpperCase, z } from "zod"
 
 const readEmerencyServiceRequestsSchema = z.object({
-    body: z.object({}).strict(),
+    body: z.undefined(),
     query: z.object({
         status: z.string().trim().toUpperCase().pipe(z.enum(["REQUESTED", "INPROGRESS", "COMPLETED"])).optional(),
         fromRequestTime: z.iso.datetime().optional(),

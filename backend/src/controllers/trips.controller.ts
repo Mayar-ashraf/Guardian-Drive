@@ -45,7 +45,7 @@ async function createTrip(req: Request, res: Response) {
 
             // added to prevent assigning trip to driver without Medical Record
             if (!driver.medicalInformation) {
-                return sendBadRequest(res, "Driver doesn't have saved medical record yet!!")
+                return res.status(422).json({ message: "Driver doesn't have saved medical record yet!!" })
             }
 
         }
@@ -283,6 +283,18 @@ async function sendTripLocation(req: Request, res: Response) {
                 longitude
             }
         });
+
+        const io = req.app.get('io');
+
+        // 3. Push real-time event frame to listening dashboard web clients instantly
+        if (io) {
+            io.to(`trip_${tripId}`).emit('driver_location_update', {
+                latitude,
+                longitude,
+                time: location.time // Passes your database generated timestamp automatically
+            });
+            console.log(`📢 Realtime coordinates streamed to room: trip_${tripId}`);
+        }
         // return res.status(201).json({ message: "Location sent successfully", location });
         return sendCreated(res, location, "Location sent successfully");
 
