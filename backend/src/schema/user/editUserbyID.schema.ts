@@ -8,7 +8,9 @@ export const edituserbyIDschema =z.object({
         email:z.string().email().optional(),
         fName:z.string().min(2).optional(),
         lName:z.string().min(2).optional(),
-        phone:z.string().min(10).optional(),
+phone: z.array(
+  z.string().min(10, "Phone number must be at least 10 digits")
+).optional(),
         address:z.string().optional(),
 
 
