@@ -6,14 +6,15 @@
 
 ### Create avg health readings for driver (system authorization)
 
-POST http://localhost:3000/api/users/:userId/avg-health-readings/6
+POST http://localhost:3000/api/users/17/avg-health-readings
 Content-Type: application/json
-Authorization: Bearer SYSTEM_TOKEN
+X-Api-Key: 1234782181veryyyyloonngggrandomkey
 
 {
-    "heartRate": 60,
-    "temp": 36,
-    "spo2": 50
+    "avgHeartRate": 60,
+    "avgTemp": 36,
+    "avgSpo2": 50,
+    "tripId": 26
 }
 
 

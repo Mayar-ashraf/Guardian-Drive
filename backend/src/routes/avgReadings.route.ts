@@ -1,26 +1,31 @@
-import express from "express";
-// removed unused imports
-import { validate } from "../validators/validate"
-import { getDriverAvgReadingsSchema } from "../schema/avgReadings/getDriverAvgReadings.schema"
 
-import {
-  createDriverAvgReadings,
-  getDriverAvgReadings,
-} from "../controllers/avgReadings.controller";
-import { authenticate, authorize } from "../middleware/AuthMiddleware";
-
-const router = express.Router();
+/// FOUND IN USER ROUTER
 
 
-router.post("/avg-readings", createDriverAvgReadings);
+
+// import express from "express";
+// // removed unused imports
+// import { validate } from "../validators/validate"
+// import { getDriverAvgReadingsSchema } from "../schema/avgReadings/getDriverAvgReadings.schema"
+
+// import {
+//   createDriverAvgReadings,
+//   getDriverAvgReadings,
+// } from "../controllers/avgReadings.controller";
+// import { authenticate, authorize } from "../middleware/AuthMiddleware";
+
+// const router = express.Router();
 
 
-router.get(
-  "/:userId",
-  authenticate,
-  authorize("ADMIN", "FLEET_MANAGER"),
-  validate(getDriverAvgReadingsSchema),
-  getDriverAvgReadings
-);
+// router.post("/avg-readings", createDriverAvgReadings);
 
-export default router;
+
+// router.get(
+//   "/:userId",
+//   authenticate,
+//   authorize("ADMIN", "FLEET_MANAGER"),
+//   validate(getDriverAvgReadingsSchema),
+//   getDriverAvgReadings
+// );
+
+// export default router;
