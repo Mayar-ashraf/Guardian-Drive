@@ -31,6 +31,7 @@ model Driver {
   medicalInformation MedicalInformation?
   trips              Trip[]
   wearableBand       WearableBand?
+  vitals              Vitals?
 }
 
 model Trip {
@@ -182,6 +183,16 @@ model EmergencyServiceRequest {
   hospitalAssigned String
   alertId          Int           @unique
   alert            Alert         @relation(fields: [alertId], references: [alertId], onDelete: Cascade)
+}
+
+model Vitals {
+  id       Int    @id @default(autoincrement())
+  driverId Int    @unique
+  driver   Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  heartRate Float
+  spo2      Float
+  temp      Float
+  createdAt DateTime
 }
 
 enum Role {
