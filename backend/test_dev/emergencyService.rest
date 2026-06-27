@@ -15,7 +15,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb
 
 
 #########
-GET http://localhost:3000/api/towing-requests/
+GET http://localhost:3000/api/towing-requests/4
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjUxMzg1MywiZXhwIjoxNzgyNjAwMjUzfQ.fS1TxiRAFdJ8b6A53vFvK2G7tctx3WtPvUxKFi9ORI0
 
