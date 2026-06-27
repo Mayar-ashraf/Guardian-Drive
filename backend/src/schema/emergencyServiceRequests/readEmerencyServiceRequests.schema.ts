@@ -10,6 +10,7 @@ const readEmerencyServiceRequestsSchema = z.object({
         toCompletionTime: z.iso.datetime().optional(),
         hospitalAssigned: z.string().trim().optional(),
         alertId: z.coerce.number().positive().int().optional(),
+        fleetManagerId: z.coerce.number().int().positive().optional(),
         limit: z.coerce.number().int().positive().default(10),
         page: z.coerce.number().int().positive().default(1),
         orderBy: z.string().transform(val => val.toLowerCase()).pipe(z.enum(["asc", "desc"])).default('asc')
