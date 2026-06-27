@@ -9,7 +9,7 @@ const NUMBER_OF_AVG_ROWS = 10
 // creates avgReading/trip AND update medical info thresholds
 export const createDriverAvgReadings = async (req: express.Request, res: express.Response) => {
     try {
-        const driverId = req.validated?.query.userId;
+        const driverId = req.validated?.params.userId;
         const tripId = req.validated?.body.tripId
         const { avgHeartRate, avgTemp, avgSpo2 } = req.validated?.body
 

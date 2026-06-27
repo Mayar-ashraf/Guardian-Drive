@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma"
 import { Role } from "../../generated/prisma/enums";
 import { id } from "zod/locales";
 import { Request, Response } from "express"
+import * as HttpResponses from "../utils/HttpResponses";
 
 export const getHealthEventsByDriverId = async (
   req: Request,
@@ -40,3 +41,13 @@ export const getHealthEventsByDriverId = async (
     });
   }
 };
+
+export const getHealthEvents = async (req: express.Request, res: express.Response) => {
+    try {
+        const healthEvents = await prisma.healthEvent.findMany();
+        return HttpResponses.sendSuccess(res, healthEvents, "Medical records retrieved successfully");
+    } catch (error) {
+        return HttpResponses.sendError(res);
+    }
+
+}

@@ -96,6 +96,16 @@ GET http://localhost:3000/api/first-aid-guidance/1
 Content-Type: application/json
 Authorization: Bearer FLEET_MANAGER_TOKEN
 
+
+#####
+
+// GET Guidance of certain readings
+GET  http://localhost:3000/api/first-aid-guidance/vitals?heartRate=100.05&spo2=94.03&temp=37.56
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyMzMzOTIzLCJleHAiOjE3ODI0MjAzMjN9.ny0oj9mN3rXdK8m5RFL3_fpm2NpeijzrDC1FqY2TeP4
+
+
+
 ########
 
 ### Get guidance by id — not found (should 404)

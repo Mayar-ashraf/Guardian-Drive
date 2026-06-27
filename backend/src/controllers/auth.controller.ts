@@ -17,7 +17,7 @@ async function login(req: Request, res: Response) {
         if (!user) return sendUnauthorized(res, "Invalid email or password");
 
         const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) return sendUnauthorized(res);
+        if (!passwordMatch) return sendUnauthorized(res, "Invalid email or password");
 
         // token generated from user id and role for later JWT Authorization
         const accessToken = signAccessToken({ userId: user.id, role: user.role });

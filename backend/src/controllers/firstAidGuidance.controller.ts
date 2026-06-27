@@ -4,6 +4,7 @@ import * as HttpResponses from "../utils/HttpResponses"
 import { HealthEventError } from "../utils/InternalErrors";
 import { FirstAidGuidance } from "../../generated/prisma/client";
 import { TranslateGuidanceConditions } from "../services/firstAidGuidance.service";
+import { classifyReadings } from "../services/classifyReadings.service";
 
 
 export const getGuidanceByAlertId = async (req: Request, res: Response) => {
@@ -33,6 +34,37 @@ export const getGuidance = async (guidances: FirstAidGuidance[]) => {
 
     return TranslateGuidanceConditions(guidances)
 
+}
+
+export const getVitalsGuidance = async (req: Request, res: Response) => {
+    try {
+        const heartRate = req.validated?.query.heartRate;
+        const temp = req.validated?.query.temp;
+        const spo2 = req.validated?.query.spo2;
+
+        console.log('heartRate :', heartRate, 'spo2:', spo2, '+ temp:', temp);
+
+        // classify vitals and fetch matching guidance rows
+        const classifications = classifyReadings(heartRate, temp, spo2);
+
+        // this used to fetch exactly the guidance rows that match the driver's abnormal readings —no more, no less. 
+        // Each OR condition is a pair, not individual fields,
+        // so HIGH_HEART_RATE + MODERATE won't accidentally match HIGH_HEART_RATE + CRITICAL.
+        const guidances = await prisma.firstAidGuidance.findMany({
+            where: {
+                OR: classifications.map(({ condition, severity }) => ({ condition, severity }))
+            }
+        });
+
+        const guidanceStrings = await getGuidance(guidances)       // translate guidances into the strings
+
+        return HttpResponses.sendSuccess(res, { guidance: guidanceStrings });
+    } catch (error) {
+        if (error instanceof Error) {
+            return HttpResponses.sendError(res, error.message)
+        }
+        return HttpResponses.sendError(res)
+    }
 }
 
 export const getAllGuidances = async (req: Request, res: Response) => {
