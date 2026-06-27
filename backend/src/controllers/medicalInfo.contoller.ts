@@ -2,7 +2,7 @@ import express from "express";
 import { prisma } from "../lib/prisma";
 import * as HttpResponses from "../utils/HttpResponses";
 
-export const getMedicalRecords = async (req: express.Request, res: express.Response) => {
+export const getAllMedicalRecords = async (req: express.Request, res: express.Response) => {
     try {
         const medicalRecords = await prisma.medicalInformation.findMany();
         return HttpResponses.sendSuccess(res, medicalRecords, "Medical records retrieved successfully");

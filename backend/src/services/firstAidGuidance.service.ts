@@ -28,9 +28,9 @@ const getActionBySeverity = (severity: ConditionSeverity): string => {
 
 const getActionBySeverity = (severity: ConditionSeverity): string => {
     const actions: Record<ConditionSeverity, string> = {
-        [ConditionSeverity.CRITICAL]: "Call emergency services immediately. Do not leave the driver alone.",
-        [ConditionSeverity.MODERATE]: "Pull over immediately. Monitor the driver closely and call emergency if no improvement in 3 minutes.",
-        [ConditionSeverity.MILD]: "Pull over and let the driver rest. Monitor vitals and escalate if symptoms worsen.",
+        [ConditionSeverity.CRITICAL]: "Pull over immediately and Call emergency services. Try not to be alone",
+        [ConditionSeverity.MODERATE]: "Pull over immediately. Monitor closely and call emergency if no improvement in 3 minutes.",
+        [ConditionSeverity.MILD]: "Pull over and rest. Monitor vitals and escalate if symptoms worsen.",
     };
     return actions[severity];
 };

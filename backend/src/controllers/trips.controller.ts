@@ -197,10 +197,11 @@ async function getTripLocation(req: Request, res: Response) {
             return sendBadRequest(res, "Trip was cancelled and has no location data.");
         }
 
+        console.log(trip);
         res.json({
             "latitude": trip.location[0].latitude,
             "longitude": trip.location[0].longitude,
-
+            "locationId": trip.location[0].locationId,
         });
 
     } catch (error) {

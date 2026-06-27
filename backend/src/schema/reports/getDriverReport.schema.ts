@@ -7,5 +7,6 @@ const getDriverReportSchema = z.object({
     params: z.object({
         driverId: z.coerce.number().int().positive(),
     }).strict(),
+    body: z.undefined(),
 })
 export { getDriverReportSchema }

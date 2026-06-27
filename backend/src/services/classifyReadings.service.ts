@@ -2,7 +2,7 @@ import { ConditionSeverity, ConditionType } from "../../generated/prisma/enums";
 
 
 // helper function to classify the vitals for the correct condition - and then - guidance
-export const classifyReadings = (heartRate: number, spo2: number, temp: number): { condition: ConditionType; severity: ConditionSeverity }[] => {
+export const classifyReadings = (heartRate: number, temp: number, spo2: number): { condition: ConditionType; severity: ConditionSeverity }[] => {
     const results: { condition: ConditionType; severity: ConditionSeverity }[] = [];
 
     // Heart Rate
@@ -21,7 +21,7 @@ export const classifyReadings = (heartRate: number, spo2: number, temp: number):
     // Temperature
     if (temp > 39.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.CRITICAL });
     else if (temp > 38) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MODERATE });
-    else if (temp > 37.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MILD });
+    else if (temp >= 37.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MILD });
     else if (temp < 35) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.CRITICAL });
     else if (temp < 36) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.MODERATE });
 

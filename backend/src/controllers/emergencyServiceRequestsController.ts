@@ -52,11 +52,19 @@ async function readEmerencyServiceRequests(req: Request, res: Response) {
                     contains: validatedQuery.hospitalAssigned
                 }
             }), //like
-            alert: {
+
+            // alert: {
+            //     trip: {
+            //         fleetManagerId: user?.userId
+            //     }
+            // }
+        }
+        if (validatedQuery.fleetManagerId) {
+            whereConditions.alert = {
                 trip: {
-                    fleetManagerId: user?.userId
+                    fleetManagerId: Number(validatedQuery.fleetManagerId)
                 }
-            }
+            };
         }
         //from to request and completion
         const completionTimeFilter: any = {};
@@ -105,14 +113,34 @@ async function readEmerencyServiceRequests(req: Request, res: Response) {
 async function getEmergencyServiceRequestById(req: Request, res: Response) {
     try {
         const validatedParams = req.validated?.params
-        const emergencyServiceRequest = await prisma.emergencyServiceRequest.findUnique({
+        const emergencyServiceRequestData = await prisma.emergencyServiceRequest.findUnique({
             where: {
                 requestId: validatedParams.requestId
+            },
+            include: {
+                alert: {
+                    include: {
+                        trip: {
+                            select: {
+                                fleetManagerId: true // Reaches deep into the trip to extract the fleetId
+                            }
+                        }
+                    }
+                }
             }
         })
-        if (!emergencyServiceRequest) {
+        if (!emergencyServiceRequestData) {
             return res.status(404).json({ message: "Emergency service request not found" });
         }
+        const fleetManagerId = emergencyServiceRequestData.alert?.trip?.fleetManagerId || null;
+
+        const { alert, ...restOfRequest } = emergencyServiceRequestData;
+
+        const emergencyServiceRequest = {
+            ...restOfRequest,
+            fleetManagerId: fleetManagerId
+        };
+
         return res.status(200).json({ emergencyServiceRequest });
 
     } catch (error) {
