@@ -17,7 +17,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb
     "status": "ONGOING"
 } 
 ########### get 
-GET http://localhost:3000/api/cars/ENG999
+GET http://localhost:3000/api/users
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc4NTE5NzAxLCJleHAiOjE3Nzg2MDYxMDF9.-2oFl9ctFdb5WDCJepfdJCayK6PJxDt8OZsQDlSzu7U
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjAwNjE3NywiZXhwIjoxNzgyMDkyNTc3fQ.3geGWLnRU8X8Wl8KS8a4PQcgCVb33-a_JGIdb-gAKHk
+
 

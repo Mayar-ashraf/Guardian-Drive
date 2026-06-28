@@ -9,17 +9,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb
     
 }
 #########
-GET http://localhost:3000/api/emergency-service-request?page=1
+GET http://localhost:3000/api/emergency-service-request/9
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MTgzODAwNSwiZXhwIjoxNzgxOTI0NDA1fQ.f0XVfbyzz_2cCgtuSbgtwZ_X7wuXozH6mWTm2FFD6NI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjUxMzg1MywiZXhwIjoxNzgyNjAwMjUzfQ.fS1TxiRAFdJ8b6A53vFvK2G7tctx3WtPvUxKFi9ORI0
 
 
 #########
-GET http://localhost:3000/api/towing-requests/
+GET http://localhost:3000/api/towing-requests/4
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MTgwNzg3NywiZXhwIjoxNzgxODk0Mjc3fQ.gd9YWuKMTwiyAxEw_XzpWjaVdh-J0JAz33WVzgsQGUc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjUxMzg1MywiZXhwIjoxNzgyNjAwMjUzfQ.fS1TxiRAFdJ8b6A53vFvK2G7tctx3WtPvUxKFi9ORI0
 
-{}
+
 #######
 PATCH http://localhost:3000/api/emergency-service-request/1
 Content-Type: application/json

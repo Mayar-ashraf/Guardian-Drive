@@ -26,9 +26,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb
 } 
 
 ########get all trips admin or fleet manager
-GET http://localhost:3000/api/trips/21
+GET http://localhost:3000/api/trips/66
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODE4OTU0NDksImV4cCI6MTc4MTk4MTg0OX0.Ot2pKXi0KbzTH5D2jrnf6o0S4914egQzwWOO2l54pfA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyMTk5MjQyLCJleHAiOjE3ODIyODU2NDJ9.S1PczkTQIWBChHt4bhTyRW3aIC5U8JfT282Ct9ufJIk
 
 ########get all trips admin or fleet manager
 GET http://localhost:3000/api/trips?fromStartDate=2026-04-20T20:30:00.000Z&status=PLANNED
@@ -87,9 +87,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvb
 
 
 ########3
-GET http://localhost:3000/api/users/12
+GET http://localhost:3000/api/users
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc4NzU4MDYzLCJleHAiOjE3Nzg4NDQ0NjN9.5xoaWGyswNvuQ9JTjNmdMhHqip1SNzH_vJGa0dKm_DA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEzLCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjAwNjE3NywiZXhwIjoxNzgyMDkyNTc3fQ.3geGWLnRU8X8Wl8KS8a4PQcgCVb33-a_JGIdb-gAKHk
 
 { 
     

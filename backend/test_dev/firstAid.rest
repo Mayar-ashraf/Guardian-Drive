@@ -87,14 +87,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb
 ### Get all guidances — any authenticated user
 GET http://localhost:3000/api/first-aid-guidance
 Content-Type: application/json
-Authorization: Bearer DRIVER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODI1ODA3NTgsImV4cCI6MTc4MjY2NzE1OH0.8oB5DjsRwWuIg6vxUMEU_VUkyCAcSe4oT2Pfwchz57k
 
 ########
 
 ### Get guidance by id — exists
-GET http://localhost:3000/api/first-aid-guidance/1
+GET http://localhost:3000/api/first-aid-guidance/17
 Content-Type: application/json
-Authorization: Bearer FLEET_MANAGER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODI1ODA3NTgsImV4cCI6MTc4MjY2NzE1OH0.8oB5DjsRwWuIg6vxUMEU_VUkyCAcSe4oT2Pfwchz57k
 
 
 #####

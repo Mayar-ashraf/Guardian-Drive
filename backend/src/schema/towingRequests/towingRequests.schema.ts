@@ -31,7 +31,7 @@ export const getTowingRequestByIdSchema = z.object({
     towingRequestId: z.coerce.number(),
   }).strict(),
 
-  body: z.object({}).strict(),
+  body: z.undefined(),
   query: z.object({}).strict(),
 });
 

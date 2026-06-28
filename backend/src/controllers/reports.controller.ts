@@ -2,12 +2,13 @@ import { Request, Response } from "express"
 import { prisma } from "../lib/prisma"
 import { Trip } from "../../generated/prisma/client"
 import { sendError, sendNotFound, sendSuccess } from "../utils/HttpResponses";
-import { carStatus, Role, tripStatus } from "../../generated/prisma/enums";
+import { carStatus, Role, tripStatus , ConditionType,ConditionSeverity } from "../../generated/prisma/enums";
 import { id } from "zod/locales";
 import { date } from "zod";
 import { NOTFOUND } from "node:dns";
 import { Stats } from "node:fs";
 import { CANCELLED } from "node:dns/promises";
+
 
 export async function getDriverReport(req: Request, res: Response) {
     try {
@@ -311,7 +312,13 @@ alerts_per_condition_object
   "total_alerts": int,
 }
 */
-export const alertsPerConditionReport = async (req: Request, res: Response) => {
+
+
+
+export const alertsPerConditionReport = async (
+    req: Request,
+    res: Response
+) => {
     try {
         const { from, to } = req.validated!.query;
 
@@ -319,52 +326,78 @@ export const alertsPerConditionReport = async (req: Request, res: Response) => {
         const toDate = new Date(to);
 
         if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-            return res.status(400).json({ message: "Invalid date format" });
+            return res.status(400).json({
+                message: "Invalid date format",
+            });
         }
+
+        toDate.setHours(23, 59, 59, 999);
 
         const alerts = await prisma.alert.findMany({
             where: {
                 generatedAt: {
                     gte: fromDate,
-                    lte: toDate
-                }
+                    lte: toDate,
+                },
             },
             include: {
-                healthEvent: true
-            }
+                healthEvent: {
+                    include: {
+                        guidances: true,
+                    },
+                },
+            },
         });
 
-        const counts: Record<string, number> = {};
+        const counts: Record<
+            string,
+            {
+                condition: ConditionType;
+                severity: ConditionSeverity;
+                totalAlerts: number;
+            }
+        > = {};
 
         for (const alert of alerts) {
             if (!alert.healthEvent) continue;
 
-            const heartRate = alert.healthEvent.heartRate;
-            const temp = alert.healthEvent.temp;
+            for (const guidance of alert.healthEvent.guidances) {
+                const key = `${guidance.condition}_${guidance.severity}`;
 
-            let condition = "normal";
+                if (!counts[key]) {
+                    counts[key] = {
+                        condition: guidance.condition,
+                        severity: guidance.severity,
+                        totalAlerts: 0,
+                    };
+                }
 
-            if (heartRate > 100) {
-                condition = "high_heart_rate";
-            } else if (heartRate < 60) {
-                condition = "low_heart_rate";
-            } else if (temp > 38) {
-                condition = "fever";
+                counts[key].totalAlerts++;
             }
-
-            counts[condition] = (counts[condition] || 0) + 1;
         }
 
-        const result = Object.entries(counts).map(([condition, total]) => ({
-            condition,
-            total_alerts: total
-        }));
+        const report = Object.values(counts).sort((a, b) => {
+            if (a.condition === b.condition) {
+                return a.severity.localeCompare(b.severity);
+            }
 
-        return res.status(200).json(result);
+            return a.condition.localeCompare(b.condition);
+        });
 
+        return res.status(200).json({
+            period: {
+                from,
+                to,
+            },
+            totalConditions: report.length,
+            report,
+        });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal Server Error" });
+
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
     }
 };
 

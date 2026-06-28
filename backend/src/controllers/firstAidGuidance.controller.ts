@@ -167,5 +167,19 @@ export const deleteGuidance = async (req: Request, res: Response) => {
     }
 }
 
+export const getGuidanceById = async (req: Request, res: Response) => {
 
+    try {
+        const guidanceId = req.validated?.params.guidanceId
+        const guidance = await prisma.firstAidGuidance.findUnique({
+            where: { guidanceId }
+        })
+        if (!guidance) return HttpResponses.sendNotFound(res, "Guidance Not found")
+        return HttpResponses.sendSuccess(res, guidance, "Successful")
+
+    } catch (error) {
+        return HttpResponses.sendError(res, "Fetching First Aid Guidances Failed");
+    }
+
+}
 
