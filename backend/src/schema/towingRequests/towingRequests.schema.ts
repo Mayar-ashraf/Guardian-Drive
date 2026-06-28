@@ -14,6 +14,7 @@ export const createTowingRequestSchema = z.object({
 
 export const getTowingRequestsSchema = z.object({
   query: z.object({
+    fleetManagerId: z.coerce.number().int().positive().optional(),
     car: z.string().optional(),
     towingCompany: z.string().optional(),
     status: z.enum(["REQUESTED", "INPROGRESS", "COMPLETED"]).optional(),
