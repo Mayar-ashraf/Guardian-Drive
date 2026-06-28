@@ -127,12 +127,13 @@ Authorization: Bearer FLEET_MANAGER_TOKEN
 ### Create guidance — valid (no steps)
 POST http://localhost:3000/api/first-aid-guidance
 Content-Type: application/json
-Authorization: Bearer FLEET_MANAGER_TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJyb2xlIjoiRkxFRVRfTUFOQUdFUiIsImlhdCI6MTc4MjQ4NDUxMywiZXhwIjoxNzgyNTcwOTEzfQ.dcYeCz6GS5aVBUtRBINwGdkhEW4YGaeO8eonb6-2BSs
 
 {
-    "condition":   "HIGH_HEART_RATE",
-    "severity":    "MILD",
-    "description": "Heart rate slightly above driver's normal range"
+  "condition": "LOW_TEMP",
+  "severity": "CRITICAL",
+  "description": "Hypothermia (below 35°C)",
+  "specificAction": "Warm driver gradually with blankets. Do not rub limbs. Remain still."
 }
 
 ########
