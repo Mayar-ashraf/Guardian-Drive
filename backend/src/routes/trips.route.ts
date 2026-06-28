@@ -1,6 +1,6 @@
 import express from "express"
 import { createTrip, readTrips, getTripById, updateTrip, deleteTrip, getTripLocation, sendTripLocation, getTripHeatMap } from "../controllers/trips.controller"
-import { authorize } from '../middleware/AuthMiddleware';
+import { authenticate, authorize } from '../middleware/AuthMiddleware';
 import { validate } from "../validators/validate"
 import { validateRoleBased } from "../validators/roleBasedValidate"
 import { createTripSchema } from "../schema/trips/createTrip.schema"
@@ -11,13 +11,22 @@ import { driverUpdateTripSchema, fleetManagerUpdateTripSchema } from "../schema/
 import { tripIdParamSchema } from "../schema/trips/tripIdParam.schema";
 import { sendTripLocationSchema } from "../schema/location/sendTripLocation.schema";
 import { getTripLocationSchema } from "../schema/location/getTripLocation.schema";
+import { Role } from "../../generated/prisma/enums";
+import { authorizeSystem } from "../middleware/AuthSystem";
+import SystemUpdateTripSchema from "../schema/trips/systemUpdateTrip.schema";
 
 const router = express.Router()
 router.post("/", authorize("FLEET_MANAGER"), validate(createTripSchema), createTrip)
 router.get("/", validate(readTripsSchema), readTrips)
 router.get("/:tripId", validate(getTripByIdSchema), getTripById)
 router.patch("/:tripId", authorize("FLEET_MANAGER", "DRIVER"), validateRoleBased({ FLEET_MANAGER: fleetManagerUpdateTripSchema, DRIVER: driverUpdateTripSchema }), updateTrip)
+router.patch("/:tripId", authorize("FLEET_MANAGER", "DRIVER"), validateRoleBased({ FLEET_MANAGER: fleetManagerUpdateTripSchema, DRIVER: driverUpdateTripSchema }), updateTrip)
 router.delete("/:tripId", validate(deleteTripSchema), authorize("FLEET_MANAGER"), deleteTrip)
+
+
+// trips/:tripId/system -> to auto cancel the system in case of failed bluetooth connection
+router.patch('/:tripId/system', authorizeSystem,
+    validate(SystemUpdateTripSchema), updateTrip);
 
 /*
 POST /api/trips/:tripId/gps
