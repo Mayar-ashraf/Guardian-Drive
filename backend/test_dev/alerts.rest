@@ -62,7 +62,7 @@ Authorization: Bearer DRIVER_TOKEN
 ### Create HEALTH_ABNORMAL alert — low heart rate + low temp
 POST http://localhost:3000/api/alerts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyNTg4MTkyLCJleHAiOjE3ODI2NzQ1OTJ9.CdmWVKDBXG9AZ6gzNt8-UVQ7DUslwCVBLINY6Hz1k8I
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyNTg4MjU3LCJleHAiOjE3ODI2NzQ2NTd9.Euegx16K4kKmTMkoja11GKJe6wvOYavap1mNnHhtwiw
 
 {
     "type":                "SOS",
