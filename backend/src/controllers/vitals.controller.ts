@@ -27,7 +27,7 @@ export const createVitals = async (req: Request, res: Response) => {
             heartRate,
             spo2,
             temp
-        } = req.validated!.body;
+        } = req.body;
 
         const trip = await prisma.trip.findFirst({
             where: {

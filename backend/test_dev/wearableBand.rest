@@ -35,3 +35,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvb
    "isConnected": true
 
 }
+###
+POST http://localhost:3000/api/vitals/post-OnGoingTrips-vitals
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyNzU4OTY3LCJleHAiOjE3ODI4NDUzNjd9.MHVnsWiMT8ZqRGUFyiNYvW4JoXgcx0Z3rrqDTa13RX8
+
+{
+    "driverId": 17,
+    "heartRate": 60,
+    "spo2": 100, 
+    "temp": 38
+
+}
