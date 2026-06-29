@@ -1,5 +1,3 @@
-// utils/classifyReadings.ts
-
 import { MedicalInformation } from "../../generated/prisma/client";
 import { ConditionSeverity, ConditionType } from "../../generated/prisma/enums";
 
@@ -8,26 +6,42 @@ interface ClassifiedCondition {
     severity: ConditionSeverity;
 }
 
-const severityFromDeviation = (value: number, baseline: number): ConditionSeverity => {
-    const deviation = Math.abs(value - baseline) / baseline;
-    if (deviation > 0.25) return ConditionSeverity.CRITICAL;
-    if (deviation > 0.10) return ConditionSeverity.MODERATE;
-    return ConditionSeverity.MILD;
-};
-
 const classifyBound = (
     value: number,
-    avg: number,
     min: number,
     max: number,
+    warningBuffer: number,
     lowType: ConditionType,
-    highType?: ConditionType,
-    results: ClassifiedCondition[] = [],
+    highType: ConditionType | undefined,
+    results: ClassifiedCondition[],
 ): void => {
+
+    // Low side
     if (value < min) {
-        results.push({ condition: lowType, severity: severityFromDeviation(value, avg) });
-    } else if (highType && value > max) {
-        results.push({ condition: highType, severity: severityFromDeviation(value, avg) });
+        results.push({
+            condition: lowType,
+            severity: ConditionSeverity.CRITICAL,
+        });
+    } else if (value <= min + warningBuffer) {
+        results.push({
+            condition: lowType,
+            severity: ConditionSeverity.MODERATE,
+        });
+    }
+
+    // High side
+    if (highType) {
+        if (value > max) {
+            results.push({
+                condition: highType,
+                severity: ConditionSeverity.CRITICAL,
+            });
+        } else if (value >= max - warningBuffer) {
+            results.push({
+                condition: highType,
+                severity: ConditionSeverity.MODERATE,
+            });
+        }
     }
 };
 
@@ -35,15 +49,16 @@ export const classifyReadings = (
     heartRate: number,
     spo2: number,
     temp: number,
-    medical: MedicalInformation, // fetched from DB — same record used by createHealthEvent
+    medical: MedicalInformation,
 ): ClassifiedCondition[] => {
+
     const results: ClassifiedCondition[] = [];
 
     classifyBound(
         heartRate,
-        medical.avgHeartRate,
         medical.minHeartRate,
         medical.maxHeartRate,
+        WARNING_BUFFER.heartRate,
         ConditionType.LOW_HEART_RATE,
         ConditionType.HIGH_HEART_RATE,
         results,
@@ -51,19 +66,19 @@ export const classifyReadings = (
 
     classifyBound(
         spo2,
-        medical.avgSpo2,
-        medical.minSpo2,
+        medical.minSpo2 - WARNING_BUFFER.spo2,
         medical.maxSpo2,
+        0,
         ConditionType.LOW_SPO2,
-        undefined, // no HIGH_SPO2 — same reason as mobile
+        undefined,
         results,
     );
 
     classifyBound(
         temp,
-        medical.avgTemp,
         medical.minTemp,
         medical.maxTemp,
+        WARNING_BUFFER.temp,
         ConditionType.LOW_TEMP,
         ConditionType.HIGH_TEMP,
         results,

@@ -37,7 +37,7 @@ export const createHealthEvent = async (heartRate: number, temp: number, spo2: n
         // 2- fetch first-aid-guidance
 
         // classify vitals and fetch matching guidance rows
-        const classifications = classifyReadings(heartRate, temp, spo2);
+        const classifications = classifyReadings(heartRate, temp, spo2, medicalRecord);
 
 
 

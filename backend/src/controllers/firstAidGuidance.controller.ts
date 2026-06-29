@@ -41,11 +41,19 @@ export const getVitalsGuidance = async (req: Request, res: Response) => {
         const heartRate = req.validated?.query.heartRate;
         const temp = req.validated?.query.temp;
         const spo2 = req.validated?.query.spo2;
+        const driverId = req.user?.userId;
 
         console.log('heartRate :', heartRate, 'spo2:', spo2, '+ temp:', temp);
 
+        const medicalRecord = await prisma.medicalInformation.findUnique({
+            where: { driverId: driverId }
+        })
+        if (!medicalRecord) {
+            throw new HealthEventError("Medical Record Not Found")
+        }
+
         // classify vitals and fetch matching guidance rows
-        const classifications = classifyReadings(heartRate, temp, spo2);
+        const classifications = classifyReadings(heartRate, temp, spo2, medicalRecord);
 
         // this used to fetch exactly the guidance rows that match the driver's abnormal readings —no more, no less. 
         // Each OR condition is a pair, not individual fields,

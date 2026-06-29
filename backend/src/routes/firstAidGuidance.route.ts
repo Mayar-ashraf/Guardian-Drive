@@ -16,7 +16,7 @@ router.get("/", authenticate, authorize(Role.FLEET_MANAGER, Role.ADMIN), getAllG
 router.get("/:guidanceId", authenticate, authorize(Role.FLEET_MANAGER, Role.ADMIN), validate(getGuidanceByIdSchema), getGuidanceById)
 
 
-// 2. GET /first-aid-guidance/vitals - to get guidance based on the driver vital readings -- accessed by driver by sending him his readings
+// 2. GET /first-aid-guidance/vitals/:userId - to get guidance based on the driver vital readings -- accessed by driver by sending him his readings
 router.get("/vitals", authenticate, authorize(Role.DRIVER), validate(GetReadingsGuidanceSchema), getVitalsGuidance);
 
 // 3. GET /api/alerts/:alertId/first-aid-guidance — get guidance for a specific alert
