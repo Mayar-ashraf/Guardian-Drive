@@ -1,35 +1,97 @@
+import { MedicalInformation } from "../../generated/prisma/client";
 import { ConditionSeverity, ConditionType } from "../../generated/prisma/enums";
+import { WARNING_BUFFER } from "../utils/sensorsNoise";
 
+interface ClassifiedCondition {
+    condition: ConditionType;
+    severity: ConditionSeverity;
+}
 
-// helper function to classify the vitals for the correct condition - and then - guidance
-export const classifyReadings = (heartRate: number, temp: number, spo2: number): { condition: ConditionType; severity: ConditionSeverity }[] => {
-    const results: { condition: ConditionType; severity: ConditionSeverity }[] = [];
+const classifyBound = (
+    value: number,
+    min: number,
+    max: number,
+    warningBuffer: number,
+    lowType: ConditionType,
+    highType: ConditionType | undefined,
+    results: ClassifiedCondition[],
+): void => {
 
-    // Heart Rate
-    if (heartRate > 150) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.CRITICAL });
-    else if (heartRate > 120) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MODERATE });
-    else if (heartRate > 100) results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MILD });
-    else if (heartRate < 40) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.CRITICAL });
-    else if (heartRate < 50) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.MODERATE });
-    else if (heartRate < 60) results.push({ condition: ConditionType.LOW_HEART_RATE, severity: ConditionSeverity.MILD });
-
-    // SPO2
-    if (spo2 < 88) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.CRITICAL });
-    else if (spo2 < 92) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.MODERATE });
-    else if (spo2 < 95) results.push({ condition: ConditionType.LOW_SPO2, severity: ConditionSeverity.MILD });
-
-    // Temperature
-    if (temp > 39.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.CRITICAL });
-    else if (temp > 38) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MODERATE });
-    else if (temp >= 37.5) results.push({ condition: ConditionType.HIGH_TEMP, severity: ConditionSeverity.MILD });
-    else if (temp < 35) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.CRITICAL });
-    else if (temp < 36) results.push({ condition: ConditionType.LOW_TEMP, severity: ConditionSeverity.MODERATE });
-
-    // fallback — readings appear normal but alert was still triggered
-    // can add General Type in conditionType and use it as fallback condition But for now let it be like that
-    if (results.length === 0) {
-        results.push({ condition: ConditionType.HIGH_HEART_RATE, severity: ConditionSeverity.MILD });
+    // Low side
+    if (value < min) {
+        results.push({
+            condition: lowType,
+            severity: ConditionSeverity.CRITICAL,
+        });
+    } else if (value <= min + warningBuffer) {
+        results.push({
+            condition: lowType,
+            severity: ConditionSeverity.MODERATE,
+        });
     }
 
-    return results
+    // High side
+    if (highType) {
+        if (value > max) {
+            results.push({
+                condition: highType,
+                severity: ConditionSeverity.CRITICAL,
+            });
+        } else if (value >= max - warningBuffer) {
+            results.push({
+                condition: highType,
+                severity: ConditionSeverity.MODERATE,
+            });
+        }
+    }
+};
+
+export const classifyReadings = (
+    heartRate: number,
+    spo2: number,
+    temp: number,
+    medical: MedicalInformation,
+): ClassifiedCondition[] => {
+
+    const results: ClassifiedCondition[] = [];
+
+    classifyBound(
+        heartRate,
+        medical.minHeartRate,
+        medical.maxHeartRate,
+        WARNING_BUFFER.heartRate,
+        ConditionType.LOW_HEART_RATE,
+        ConditionType.HIGH_HEART_RATE,
+        results,
+    );
+
+    classifyBound(
+        spo2,
+        medical.minSpo2 - WARNING_BUFFER.spo2,
+        medical.maxSpo2,
+        0,
+        ConditionType.LOW_SPO2,
+        undefined,
+        results,
+    );
+
+    classifyBound(
+        temp,
+        medical.minTemp,
+        medical.maxTemp,
+        WARNING_BUFFER.temp,
+        ConditionType.LOW_TEMP,
+        ConditionType.HIGH_TEMP,
+        results,
+    );
+
+    // fallback on mild if no readings was classified
+    if (results.length === 0) {
+        results.push({
+            condition: ConditionType.HIGH_HEART_RATE,
+            severity: ConditionSeverity.MILD,
+        });
+    }
+
+    return results;
 };

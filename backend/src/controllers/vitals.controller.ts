@@ -17,7 +17,7 @@ import { send } from "node:process";
     "spo2": 98,
     "temp": 36.7
 }
-  every 2 sec  */ 
+  every 2 sec  */
 export const createVitals = async (req: Request, res: Response) => {
 
     try {
@@ -218,9 +218,9 @@ export const getAllOnGoingTripVitals = async (
                     }
 
                 });
-console.log("Latest vitals:", latestVitals);
+                console.log("Latest vitals:", latestVitals);
 
-             
+
 
 
                 return {
@@ -239,8 +239,8 @@ console.log("Latest vitals:", latestVitals);
                     temp: latestVitals?.temp ?? null,
 
                     createdAt: latestVitals?.createdAt ?? null,
-                    id : latestVitals?.id??null,
-                    
+                    id: latestVitals?.id ?? null,
+
 
 
 
