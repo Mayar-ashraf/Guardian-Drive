@@ -21,7 +21,7 @@ import cors from "cors"
 import healthEventRoute from "./routes/healthEvents.route.ts"
 import avgReadingsRoute from "./routes/avgReadings.route.ts"
 //import"healthEvents"
-
+import vitalsRoute from "./routes/vitals.route.ts"
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -69,6 +69,7 @@ app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/medical-information", medicalInfoRoutes)
 app.use("/api/alerts", alertRoute);
+app.use("/api/vitals",vitalsRoute)
 app.use("/api/first-aid-guidance", firstAidGuidanceRoutes)
 app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
