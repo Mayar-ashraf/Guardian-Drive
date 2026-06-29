@@ -3,12 +3,13 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE3LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzczODA3NTcsImV4cCI6MTc3NzQ2NzE1N30.e-ezM_3QqaLQQ55BI5Yikv_UTZWsowN-eS6zHMim8Ro
 
 ### 
-POST http://localhost:3000/api/trips/23/gps
+POST http://localhost:3000/api/trips/67/gps
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzc3MzkxOTg2LCJleHAiOjE3Nzc0NzgzODZ9.s5b77OoP_jeLHkt7Qf6Rmppvvk226uBSEjnPomLT194
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJyb2xlIjoiRFJJVkVSIiwiaWF0IjoxNzgyNjcwNTk4LCJleHAiOjE3ODI3NTY5OTh9.FP3bEz8VStPBYoudeq1HUlILKhpMtv7Kd-3aQw7UZPo
 
 {
-    "latitude" : 2.1121
+    "latitude" : 2.1125,
+    "longitude": 30.5121
 }
 #######
 POST http://localhost:3000/api/trips/1/gps

@@ -157,6 +157,34 @@ export const getDriverAvgReadings = async (req: express.Request, res: express.Re
 
 
 }
+
+export const getAvgReadingPerTrip = async (req: express.Request, res: express.Response) => {
+
+    try {
+        const tripId = req.validated?.params.tripId;
+
+        const trip = await prisma.trip.findUnique({
+            where: { tripId: tripId }
+        })
+
+        if (!trip) {
+            return HttpResponses.sendNotFound(res, "Trip Not Found")
+        }
+
+        const avgReadings = await prisma.avgHealthReadings.findFirst({
+            where: { tripId },
+
+        });
+
+        return HttpResponses.sendSuccess(res, avgReadings)
+
+
+    } catch (error) {
+        if (error instanceof Error)
+            return HttpResponses.sendError(res, error.message)
+        return HttpResponses.sendError(res)
+    }
+}
 /*
 // GET /drivers/:driverId/avg-readings
 // Auth: ADMIN, FLEET_MANAGER — any driver | DRIVER — own only

@@ -81,9 +81,9 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
                 { lName: { startsWith: name as string, mode: "insensitive" } }
             ];
         }
-        if (role === Role.FLEET_MANAGER) {
-            where.role = Role.DRIVER;
-        }
+        // if (role === Role.FLEET_MANAGER) {
+        //     where.role = Role.DRIVER;
+        // }
         const users = await prisma.user.findMany({
             where,
             select: {
@@ -94,7 +94,7 @@ export const getAllUsers = async (req: express.Request, res: express.Response) =
                 lName: true,
                 phone: true,
                 address: true,
-                hiredAt:true,
+                hiredAt: true,
                 driver: {
                     select: {
                         drivingLicense: true,
@@ -163,7 +163,7 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
                 lName: true,
                 phone: true,
                 address: true,
-                hiredAt:true,
+                hiredAt: true,
 
                 driver: {
                     select: {
@@ -175,35 +175,35 @@ export const getuserbyID = async (req: express.Request, res: express.Response) =
                 }
             }
         });
-         if (role === Role.DRIVER && caller?.userId !== ID) {
-      return res.status(403).json({
-        message: "Drivers can only access their own profile",
-      });
-    }
-    if (role==Role.DRIVER&&caller?.userId==ID){
-        const user = await prisma.user.findUnique({
-      where: { id: ID },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        fName: true,
-        lName: true,
-        phone: true,
-        address: true,
+        if (role === Role.DRIVER && caller?.userId !== ID) {
+            return res.status(403).json({
+                message: "Drivers can only access their own profile",
+            });
+        }
+        if (role == Role.DRIVER && caller?.userId == ID) {
+            const user = await prisma.user.findUnique({
+                where: { id: ID },
+                select: {
+                    id: true,
+                    email: true,
+                    role: true,
+                    fName: true,
+                    lName: true,
+                    phone: true,
+                    address: true,
 
-        driver: {
-          select: {
-            drivingLicense: true,
-            avgHealthReadings: true,
-            medicalInformation: true,
-            wearableBand: true,
-          },
-        },
-      },
-    });
-    return res.json(user);
-    }
+                    driver: {
+                        select: {
+                            drivingLicense: true,
+                            avgHealthReadings: true,
+                            medicalInformation: true,
+                            wearableBand: true,
+                        },
+                    },
+                },
+            });
+            return res.json(user);
+        }
         if (!user) {
 
             return res.status(400).json({ message: "User not found" });
@@ -385,7 +385,7 @@ export const deleteuserbyID = async (req: express.Request, res: express.Response
                 message: "Admin deleted successfully"
             });
         }
-        const { newFleetManagerId, newDriverId } = req.validated?.body;
+        //const { newFleetManagerId, newDriverId } = req.validated?.body;
 
         if (user.role === Role.DRIVER) {
 
@@ -395,42 +395,46 @@ export const deleteuserbyID = async (req: express.Request, res: express.Response
 
 
             if (tripsCount > 0) {
-
-                if (!newDriverId) {
-                    return res.status(400).json({ message: "Please Provide new driver ID to reassign trips" });
-                }
-                if (newFleetManagerId) {
-                    return res.status(400).json({
-                        message: "Driver deletion requires newDriverID only "
-                    });
-                }
-
-                if (newDriverId === userId) {
-                    return res.status(400).json({
-                        message: "Cannot reassign to the same driver"
-                    });
-                }
-
-                const newDriver = await prisma.user.findFirst({
-                    where: {
-                        id: newDriverId,
-                        role: Role.DRIVER
-                    }
-                });
-
-                if (!newDriver) {
-                    return res.status(400).json({
-                        message: "Invalid new driver ID"
-                    });
-                }
-
-                await prisma.trip.updateMany({
-                    where: { driverId: userId },
-                    data: { driverId: newDriverId }
+                return res.status(400).json({
+                    message: "Driver is assigned to a trip"
                 });
             }
         }
+        /*  if (!newDriverId) {
+              return res.status(400).json({ message: "Please Provide new driver ID to reassign trips" });
+          }
+          if (newFleetManagerId) {
+              return res.status(400).json({
+                  message: "Driver deletion requires newDriverID only "
+              });
+          }
 
+          if (newDriverId === userId) {
+              return res.status(400).json({
+                  message: "Cannot reassign to the same driver"
+              });
+          }
+
+          const newDriver = await prisma.user.findFirst({
+              where: {
+                  id: newDriverId,
+                  role: Role.DRIVER
+              }
+          });
+
+          if (!newDriver) {
+              return res.status(400).json({
+                  message: "Invalid new driver ID"
+              });
+          }
+
+          await prisma.trip.updateMany({
+              where: { driverId: userId },
+              data: { driverId: newDriverId }
+          });
+      }
+  }
+*/
 
         if (user.role === Role.FLEET_MANAGER) {
 
@@ -441,43 +445,48 @@ export const deleteuserbyID = async (req: express.Request, res: express.Response
 
 
             if (tripsCount > 0) {
-                if (newDriverId) {
-                    return res.status(400).json({
-                        message: "Fleet Manager deletion requires newFleetManagerId only"
-                    });
-                }
-                if (!newFleetManagerId) {
-                    return res.status(400).json({
-                        message: "please provide new fleet manager ID to reassign trips"
-                    });
-                }
-
-                if (newFleetManagerId === userId) {
-                    return res.status(400).json({
-                        message: "Cannot reassign to the same fleet manager"
-                    });
-                }
-
-                const newManager = await prisma.user.findFirst({
-                    where: {
-                        id: newFleetManagerId,
-                        role: Role.FLEET_MANAGER
-                    }
-                });
-
-                if (!newManager) {
-                    return res.status(400).json({
-                        message: "Invalid fleet manager ID"
-                    });
-                }
-
-                await prisma.trip.updateMany({
-                    where: { fleetManagerId: userId },
-                    data: { fleetManagerId: newFleetManagerId }
+                return res.status(400).json({
+                    message: "Fleet manager is assigned to trips"
                 });
             }
         }
+        /*  if (newDriverId) {
+              return res.status(400).json({
+                  message: "Fleet Manager deletion requires newFleetManagerId only"
+              });
+          }
+          if (!newFleetManagerId) {
+              return res.status(400).json({
+                  message: "please provide new fleet manager ID to reassign trips"
+              });
+          }
 
+          if (newFleetManagerId === userId) {
+              return res.status(400).json({
+                  message: "Cannot reassign to the same fleet manager"
+              });
+          }
+
+          const newManager = await prisma.user.findFirst({
+              where: {
+                  id: newFleetManagerId,
+                  role: Role.FLEET_MANAGER
+              }
+          });
+
+          if (!newManager) {
+              return res.status(400).json({
+                  message: "Invalid fleet manager ID"
+              });
+          }
+
+          await prisma.trip.updateMany({
+              where: { fleetManagerId: userId },
+              data: { fleetManagerId: newFleetManagerId }
+          });
+      }
+  }
+*/
 
         await prisma.user.delete({
             where: { id: userId }

@@ -12,5 +12,6 @@ export const getAllUsersSchema = z.object({
         name: z.string()
             .min(1, "Name cannot be empty")
             .optional()
+
     }).strict()
 });

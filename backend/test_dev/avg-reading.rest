@@ -31,5 +31,10 @@ Authorization: Bearer DRIVER_TOKEN
 
 }
 
+#############
+
+Get http://localhost:3000/api/avg-readings/trips/67
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODI2Nzc5MTAsImV4cCI6MTc4Mjc2NDMxMH0.2zphBdWffjzE2WFMxQ48nG9AEQuEZtxGABz8feSk0zk
 
 
