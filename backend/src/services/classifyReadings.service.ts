@@ -1,5 +1,6 @@
 import { MedicalInformation } from "../../generated/prisma/client";
 import { ConditionSeverity, ConditionType } from "../../generated/prisma/enums";
+import { WARNING_BUFFER } from "../utils/sensorsNoise";
 
 interface ClassifiedCondition {
     condition: ConditionType;
