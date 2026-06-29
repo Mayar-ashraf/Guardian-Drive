@@ -19,6 +19,7 @@ import { createServer } from "http"; // 🌟 1. Import Node's native HTTP server
 import { Server } from "socket.io";  // 🌟 2. Import Socket.io
 import cors from "cors"
 import healthEventRoute from "./routes/healthEvents.route.ts"
+import avgReadingsRoute from "./routes/avgReadings.route.ts"
 //import"healthEvents"
 
 const app = express();
@@ -79,7 +80,7 @@ app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);
 app.use("/api/reports", authMiddleware.authenticate, authMiddleware.authorize(Role.ADMIN), reportsRoute)
 app.use("/api/health-events", healthEventRoute)
 app.use("/api/admin", adminRoute)
-
+app.use("/api/avg-readings", authMiddleware.authenticate, avgReadingsRoute)
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.urlencoded({ extended: true }));
 // app.listen(3000, () => {
