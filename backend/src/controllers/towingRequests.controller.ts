@@ -66,6 +66,7 @@ export const getTowingRequests = async (req: Request, res: Response) => {
       car,
       requestTime,
       completionTime,
+      fleetManagerId
     } = req.validated?.query;
 
     const requests = await prisma.towingRequest.findMany({
@@ -81,6 +82,11 @@ export const getTowingRequests = async (req: Request, res: Response) => {
             car: {
               engineId: car,
             },
+          },
+        }),
+        ...(fleetManagerId && {
+          trip: {
+            fleetManagerId: fleetManagerId
           },
         }),
       },

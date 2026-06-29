@@ -19,8 +19,9 @@ import { createServer } from "http"; // 🌟 1. Import Node's native HTTP server
 import { Server } from "socket.io";  // 🌟 2. Import Socket.io
 import cors from "cors"
 import healthEventRoute from "./routes/healthEvents.route.ts"
+import avgReadingsRoute from "./routes/avgReadings.route.ts"
 //import"healthEvents"
-
+import vitalsRoute from "./routes/vitals.route.ts"
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -68,6 +69,7 @@ app.use("/api/password", passwordRoutes)
 app.use("/api/users", usersRoutes)
 app.use("/api/medical-information", medicalInfoRoutes)
 app.use("/api/alerts", alertRoute);
+app.use("/api/vitals",vitalsRoute)
 app.use("/api/first-aid-guidance", firstAidGuidanceRoutes)
 app.use("/api/trips", authMiddleware.authenticate, tripsRoutes)
 app.use("/api/password", passwordRoutes)
@@ -79,7 +81,7 @@ app.use("/api/wearablebands", authMiddleware.authenticate, wearablebandsRoute);
 app.use("/api/reports", authMiddleware.authenticate, authMiddleware.authorize(Role.ADMIN), reportsRoute)
 app.use("/api/health-events", healthEventRoute)
 app.use("/api/admin", adminRoute)
-
+app.use("/api/avg-readings", authMiddleware.authenticate, avgReadingsRoute)
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use(express.urlencoded({ extended: true }));
 // app.listen(3000, () => {

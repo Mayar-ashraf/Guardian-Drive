@@ -5,7 +5,7 @@ export const deleteUserbyIDschema = z.object({
         id: z.string().regex(/^\d+$/, "User ID must be a number"),
     }).strict(),
 
-    body: z.object({
+  /*  body: z.object({
         newFleetManagerId: z.number().optional(),
         newDriverId: z.number().optional()
     })
@@ -15,5 +15,5 @@ export const deleteUserbyIDschema = z.object({
         {
             message: "Provide only one reassignment ID, not both"
         }
-    )
+    )*/
 });
